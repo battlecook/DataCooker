@@ -3,7 +3,6 @@
 namespace test;
 
 use battlecook\DataStore\PdoDataStore;
-use main\php\Config;
 use PHPUnit\DbUnit\TestCase;
 use PHPUnit\DbUnit\TestCaseTrait;
 use test\fixture\MemoryDataStore\BeforeData;
@@ -11,7 +10,7 @@ use test\fixture\MemoryDataStore\Item;
 use test\fixture\MemoryDataStore\Shard;
 use test\fixture\MemoryDataStore\User;
 
-require __DIR__  . '/../vendor/autoload.php';
+require __DIR__  . '/../../vendor/autoload.php';
 
 class PdoDataStoreTest extends TestCase
 {

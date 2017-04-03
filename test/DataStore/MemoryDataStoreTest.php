@@ -7,7 +7,7 @@ use battlecook\DataStore\MemoryDataStore;
 use test\fixture\MemoryDataStore\Item;
 use test\fixture\MemoryDataStore\User;
 
-require __DIR__  . '/../vendor/autoload.php';
+require __DIR__  . '/../../vendor/autoload.php';
 
 class MemoryDataStoreTest extends TestCase
 {

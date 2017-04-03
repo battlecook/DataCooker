@@ -378,6 +378,8 @@ class PdoDataStore extends BufferDataStore implements DataStore
             $sql = 'delete from ';
 
         }
+
+        //todo rollback 이 가능하도록 rollback 쿼리 작성할 것
     }
 
     public function rollback()
