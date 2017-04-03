@@ -4,7 +4,7 @@ namespace battlecook\DataStore;
 
 use battlecook\DataObject\Model;
 
-class ApcuDataStore implements DataStore
+class ApcuDataStore extends BufferDataStore implements DataStore
 {
     private $buffer;
     private $store;
@@ -17,7 +17,30 @@ class ApcuDataStore implements DataStore
 
     public function get(Model $object)
     {
-        // TODO: Implement get() method.
+        if(empty($this->buffer))
+        {
+            $identifiers = $object->getIdentifiers();
+            $rootIdentifier = $identifiers[0];
+            $key = $rootIdentifier;
+            $cachedData = apcu_fetch($key);
+            foreach($cachedData as $data)
+            {
+                $this->buffer[] = array('data' => $data, 'state' => DataState::NOT_CHANGED);
+            }
+        }
+
+        if(empty($this->buffer) && $this->store)
+        {
+            $storedData = $this->store->get($object);
+            foreach($storedData as $data)
+            {
+                $this->buffer[] = array('data' => $data, 'state' => DataState::NOT_CHANGED);
+            }
+        }
+
+        $ret = parent::get($object);
+
+        return $ret;
     }
 
     /**
