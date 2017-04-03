@@ -8,40 +8,6 @@ abstract class BufferDataStore
     /** @var Model[]  */
     protected $buffer;
 
-    protected function getBufferData($identifiers, $object)
-    {
-        $depth = $this->getDepth($identifiers, $object);
-
-        $ret = array();
-        foreach ($this->buffer as $key => $data)
-        {
-            if($this->isRemoved($data))
-            {
-                continue;
-            }
-
-            $count = 0;
-            foreach($identifiers as $identifier)
-            {
-                if($data['data']->$identifier === $object->$identifier)
-                {
-                    $count++;
-                }
-                else
-                {
-                    break;
-                }
-            }
-
-            if($this->isSameDepth($count, $depth))
-            {
-                $ret[] = $data['data'];
-            }
-        }
-
-        return $ret;
-    }
-
     private function isRemoved($data)
     {
         return $data['state'] === DataState::REMOVE;
@@ -70,7 +36,23 @@ abstract class BufferDataStore
         return $depth;
     }
 
-    protected function getDataAll()
+    protected function get(Model $object)
+    {
+        $identifiers = $object->getIdentifiers();
+        $depth = $this->getDepth($identifiers, $object);
+        if($depth === 0)
+        {
+            $ret = $this->getDataAll();
+        }
+        else
+        {
+            $ret = $this->getBufferData($identifiers, $object);
+        }
+
+        return $ret;
+    }
+
+    private function getDataAll()
     {
         $ret = array();
         foreach ($this->buffer as $key => $data)
@@ -80,6 +62,40 @@ abstract class BufferDataStore
                 continue;
             }
             $ret[] = $data['data'];
+        }
+
+        return $ret;
+    }
+
+    private function getBufferData($identifiers, $object)
+    {
+        $depth = $this->getDepth($identifiers, $object);
+
+        $ret = array();
+        foreach ($this->buffer as $key => $data)
+        {
+            if($this->isRemoved($data))
+            {
+                continue;
+            }
+
+            $count = 0;
+            foreach($identifiers as $identifier)
+            {
+                if($data['data']->$identifier === $object->$identifier)
+                {
+                    $count++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            if($this->isSameDepth($count, $depth))
+            {
+                $ret[] = $data['data'];
+            }
         }
 
         return $ret;

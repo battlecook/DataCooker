@@ -81,15 +81,7 @@ class PdoDataStore extends BufferDataStore implements DataStore
             }
         }
 
-        $depth = $this->getDepth($identifiers, $object);
-        if($depth === 0)
-        {
-            $ret = $this->getDataAll();
-        }
-        else
-        {
-            $ret = $this->getBufferData($identifiers, $object);
-        }
+        $ret = parent::get($object);
 
         return $ret;
     }

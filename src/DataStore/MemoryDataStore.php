@@ -25,21 +25,12 @@ class MemoryDataStore extends BufferDataStore implements DataStore
             $storedData = $this->store->get($object);
             foreach($storedData as $data)
             {
-                $this->data[] = array('data' => $data, 'state' => DataState::NOT_CHANGED);
+                $this->buffer[] = array('data' => $data, 'state' => DataState::NOT_CHANGED);
             }
-            $this->buffer = $this->data;
+            $this->data = $this->buffer;
         }
 
-        $identifiers = $object->getIdentifiers();
-        $depth = $this->getDepth($identifiers, $object);
-        if($depth === 0)
-        {
-            $ret = $this->getDataAll();
-        }
-        else
-        {
-            $ret = $this->getBufferData($identifiers, $object);
-        }
+        $ret = parent::get($object);
 
         return $ret;
     }
