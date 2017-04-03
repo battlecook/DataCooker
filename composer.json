@@ -2,7 +2,8 @@
     "minimum-stability": "stable",
     "require": {
         "phpunit/phpunit": "^6.0",
-        "phpunit/dbunit": "dev-master"
+        "phpunit/dbunit": "dev-master",
+        "phpoffice/phpspreadsheet": "dev-master"
     },
     "autoload": {
         "psr-4": {

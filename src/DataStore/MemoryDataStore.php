@@ -80,42 +80,7 @@ class MemoryDataStore extends BufferDataStore implements DataStore
 
     public function add(Model $object)
     {
-        $ret = $this->get($object);
-        if(empty($ret))
-        {
-            $this->buffer[] = array('data' => $object, 'state' => DataState::ADD);
-        }
-        else
-        {
-            $data = $ret[0];
-            foreach($this->buffer as $key => $value)
-            {
-                if($value === $data)
-                {
-                    $state = $data['state'];
-                    if($state === DataState::REMOVE)
-                    {
-                        $state = DataState::SET;
-                    }
-                    elseif($state === DataState::SET)
-                    {
-                    }
-                    elseif($state === DataState::NOT_CHANGED || $state === DataState::ADD)
-                    {
-                        throw new \Exception("already data exist");
-                    }
-                    else
-                    {
-                        throw new \Exception("invalid state");
-                    }
-                    $this->buffer[$key]['state'] = $state;
-                    $this->buffer[$key]['data'] = $data;
-
-                    break;
-                }
-            }
-        }
-
+        parent::add($object);
         if($this->store)
         {
             $this->store->add($object);

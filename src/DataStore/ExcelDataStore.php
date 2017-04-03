@@ -3,6 +3,8 @@
 namespace battlecook\DataStore;
 
 use battlecook\DataObject\Model;
+use PhpOffice\PhpSpreadsheet\Reader\Excel5;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 class ExcelDataStore extends BufferDataStore implements DataStore
 {
@@ -19,7 +21,12 @@ class ExcelDataStore extends BufferDataStore implements DataStore
     {
         if(empty($this->buffer))
         {
-           //excel 에서 가져오는 로직 추가
+            $spreadsheet = new Spreadsheet();
+            //$sheet = $spreadsheet->getActiveSheet();
+            //$sheet->setCellValue('A1', 'Hello World !');
+
+            //$writer = new Xlsx($spreadsheet);
+            //$writer->save('hello world.xlsx');
         }
 
         if(empty($this->buffer) && $this->store)
