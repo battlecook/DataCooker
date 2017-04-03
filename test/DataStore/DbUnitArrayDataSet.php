@@ -1,6 +1,7 @@
 <?php
 
-namespace test;
+
+namespace test\DataStore;
 
 use PHPUnit\DbUnit\Database\DataSet;
 use PHPUnit\DbUnit\DataSet\DefaultTable;

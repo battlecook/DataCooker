@@ -1,12 +1,12 @@
 <?php
 
-namespace main\php;
+namespace battlecook\DataStore;
 
 class DBO
 {
     public static $pdo = null;
 
-    function __construct(Config $config)
+    function __construct($config)
     {
         $this->pdoPool = array();
 

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpunit
+        colors="true"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/6.0/phpunit.xsd"
+        extensionsDirectory="tools/phpunit.d">
+
+    <testsuites>
+        <testsuite name="DataCooker Test Suites">
+            <directory>../test/</directory>
+        </testsuite>
+    </testsuites>
+
+    <filter>
+        <whitelist>
+            <directory suffix=".php">../test</directory>
+        </whitelist>
+    </filter>
+</phpunit>
+

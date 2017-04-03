@@ -1,6 +1,6 @@
 <?php
 
-namespace test;
+namespace test\DataStore;
 
 use PHPUnit\Framework\TestCase;
 use battlecook\DataStore\MemoryDataStore;

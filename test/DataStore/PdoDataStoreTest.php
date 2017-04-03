@@ -1,10 +1,12 @@
 <?php
 
-namespace test;
+namespace test\DataStore;
 
+use battlecook\DataStore\DBO;
 use battlecook\DataStore\PdoDataStore;
 use PHPUnit\DbUnit\TestCase;
 use PHPUnit\DbUnit\TestCaseTrait;
+use test\fixture\MemoryDataStore\AfterData;
 use test\fixture\MemoryDataStore\BeforeData;
 use test\fixture\MemoryDataStore\Item;
 use test\fixture\MemoryDataStore\Shard;
@@ -182,42 +184,6 @@ class PdoDataStoreTest extends TestCase
         $this->assertEquals('2', $ret[0]->channelId);
     }
 
-    public function testGetChannel()
-    {
-        //given
-        $store = new PdoDataStore(null, new Config());
-
-        $object = new Channel();
-        $object->channelId = '1';
-        $object->localId = 1;
-
-        $store->add($object);
-
-        $object = new Channel();
-        $object->channelId = '2';
-        $object->localId = 2;
-
-        $store->add($object);
-
-        $object = new Channel();
-        $object->channelId = '3';
-        $object->localId = 3;
-
-        $store->add($object);
-
-        $store->flush();
-
-        //when
-        $object = new Channel();
-        $object->channelId = '2';
-
-        $ret = $store->get($object);
-
-        //then
-        $this->assertEquals(1, count($ret));
-        $this->assertEquals('2', $ret[0]->channelId);
-    }
-
     public function testAdd()
     {
         //given
@@ -366,11 +332,11 @@ class PdoDataStoreTest extends TestCase
         $ret = $store->get($object);
         $this->assertEquals('item2-2', $ret[0]->itemName);
 
-        $fixtureData = \test\php\DataStore\AfterData::getData();
+        $fixtureData = AfterData::getData();
         $AfterDataSet = $this->createArrayDataSet($fixtureData);
         $expectedTableNames = $AfterDataSet->getTableNames();
 
-        $dbo = new \main\php\DBO(new Config());
+        $dbo = new DBO(new Config());
         $dbConnection = $this->createDefaultDBConnection($dbo->getPdo());
 
         foreach($expectedTableNames as $expectedTableName)
@@ -401,7 +367,7 @@ class PdoDataStoreTest extends TestCase
      */
     public function getConnection()
     {
-        $dbo = new \main\php\DBO(new Config());
+        $dbo = new DBO(new Config());
 
         return $this->createDefaultDBConnection($dbo->getPdo(), ':memory:');
     }
