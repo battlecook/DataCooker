@@ -65,9 +65,9 @@ class PdoDataStore extends BufferDataStore implements DataStore
             if ($rowCount > 0)
             {
                 $className = get_class($object);
-                while($loadedValue = $pdoStatement->fetchObject($className))
+                while($loadedData = $pdoStatement->fetchObject($className))
                 {
-                    $this->buffer[] = $loadedValue;
+                    $this->buffer[] = array('data' => $loadedData, 'state' => DataState::NOT_CHANGED);
                 }
             }
         }
