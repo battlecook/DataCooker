@@ -1,0 +1,14 @@
+{
+    "minimum-stability": "stable",
+    "require": {
+        "phpunit/phpunit": "^6.0",
+        "phpunit/dbunit": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "battlecook\\DataStore\\": "src\\DataStore",
+            "battlecook\\DataObject\\": "src\\DataObject",
+            "test\\": "test"
+        }
+    }
+}
