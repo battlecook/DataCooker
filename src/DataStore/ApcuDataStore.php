@@ -9,7 +9,7 @@ class ApcuDataStore extends BufferDataStore implements DataStore
     private $buffer;
     private $store;
 
-    public function __construct(DataStore $store = null)
+    public function __construct(DataStore $store = null, $keyPrefix)
     {
         $this->buffer = array();
         $this->store = $store;
@@ -22,6 +22,10 @@ class ApcuDataStore extends BufferDataStore implements DataStore
             $identifiers = $object->getIdentifiers();
             $rootIdentifier = $identifiers[0];
             $key = $rootIdentifier;
+
+
+
+
             $cachedData = apcu_fetch($key);
             foreach($cachedData as $data)
             {

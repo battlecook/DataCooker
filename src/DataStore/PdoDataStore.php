@@ -24,7 +24,6 @@ class PdoDataStore extends BufferDataStore implements DataStore
 
     public function get(Model $object)
     {
-        $identifiers = $object->getIdentifiers();
         if(empty($this->buffer))
         {
             if($this->shardStrategy)

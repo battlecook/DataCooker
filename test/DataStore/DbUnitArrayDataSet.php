@@ -17,6 +17,8 @@ class DbUnitArrayDataSet extends DataSet
     protected $tables = array();
 
     /**
+     * DbUnitArrayDataSet constructor.
+     * @param \PHPUnit\DbUnit\Database\Connection $connection
      * @param array $data
      */
     public function __construct($connection, array $data)

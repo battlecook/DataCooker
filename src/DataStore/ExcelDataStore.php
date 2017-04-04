@@ -22,11 +22,15 @@ class ExcelDataStore extends BufferDataStore implements DataStore
         if(empty($this->buffer))
         {
             $spreadsheet = new Spreadsheet();
-            //$sheet = $spreadsheet->getActiveSheet();
-            //$sheet->setCellValue('A1', 'Hello World !');
+            $sheet = $spreadsheet->getActiveSheet();
 
-            //$writer = new Xlsx($spreadsheet);
-            //$writer->save('hello world.xlsx');
+            $sheet->setCellValue('A1', 'Hello World !');
+
+            $writer = new Xlsx($spreadsheet);
+            $writer->save('hello world.xlsx');
+
+
+
         }
 
         if(empty($this->buffer) && $this->store)

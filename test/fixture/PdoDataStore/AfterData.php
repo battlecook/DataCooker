@@ -1,8 +1,8 @@
 <?php
 
-namespace test\fixture\MemoryDataStore;
+namespace test\fixture\PdoDataStore;
 
-require __DIR__  . '/../../../vendor/autoload.php';
+require __DIR__ . '/../../../vendor/autoload.php';
 
 class AfterData
 {
