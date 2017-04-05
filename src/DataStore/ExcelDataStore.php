@@ -58,7 +58,7 @@ class ExcelDataStore extends BufferDataStore implements DataStore
                     $object->$name = $value;
                 }
 
-                $this->buffer[] = array('data' => $object, 'state' => DataState::NOT_CHANGED);
+                $this->buffer[] = array(self::DATA => $object, self::STATE => DataState::NOT_CHANGED);
             }
         }
 
@@ -67,7 +67,7 @@ class ExcelDataStore extends BufferDataStore implements DataStore
             $storedData = $this->store->get($object);
             foreach($storedData as $data)
             {
-                $this->buffer[] = array('data' => $data, 'state' => DataState::NOT_CHANGED);
+                $this->buffer[] = array(self::DATA => $data, self::STATE => DataState::NOT_CHANGED);
             }
         }
 

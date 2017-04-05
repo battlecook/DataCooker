@@ -25,7 +25,7 @@ class MemoryDataStore extends BufferDataStore implements DataStore
             $storedData = $this->store->get($object);
             foreach($storedData as $data)
             {
-                $this->buffer[] = array('data' => $data, 'state' => DataState::NOT_CHANGED);
+                $this->buffer[] = array(self::DATA => $data, self::STATE => DataState::NOT_CHANGED);
             }
             $this->data = $this->buffer;
         }
@@ -56,12 +56,12 @@ class MemoryDataStore extends BufferDataStore implements DataStore
             {
                 foreach($this->buffer as $key => $value)
                 {
-                    if($value['data'] === $data)
+                    if($value[self::DATA] === $data)
                     {
-                        $this->buffer[$key]['data'] = $object;
-                        if($value['state'] !== DataState::ADD)
+                        $this->buffer[$key][self::DATA] = $object;
+                        if($value[self::STATE] !== DataState::ADD)
                         {
-                            $this->buffer[$key]['state'] = DataState::SET;
+                            $this->buffer[$key][self::STATE] = DataState::SET;
                         }
                         $rowCount++;
                         break;
@@ -104,7 +104,7 @@ class MemoryDataStore extends BufferDataStore implements DataStore
                 $count = 0;
                 foreach($identifiers as $identifier)
                 {
-                    if($data['data']->$identifier === $object->$identifier)
+                    if($data[self::DATA]->$identifier === $object->$identifier)
                     {
                         $count++;
                     }
@@ -142,13 +142,13 @@ class MemoryDataStore extends BufferDataStore implements DataStore
 
         foreach($this->buffer as $key => $data)
         {
-            if($data['state'] === DataState::REMOVE)
+            if($data[self::STATE] === DataState::REMOVE)
             {
                 unset($this->buffer[$key]);
             }
             else
             {
-                $this->buffer[$key]['state'] = DataState::NOT_CHANGED;
+                $this->buffer[$key][self::STATE] = DataState::NOT_CHANGED;
             }
         }
 

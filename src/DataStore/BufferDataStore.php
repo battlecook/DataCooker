@@ -5,12 +5,16 @@ use battlecook\DataObject\Model;
 
 abstract class BufferDataStore
 {
+    const DATA = 0;
+    const STATE = 1;
+    const CHANGED = 2;
+
     /** @var Model[]  */
     protected $buffer;
 
     private function isRemoved($data)
     {
-        return $data['state'] === DataState::REMOVE;
+        return $data[self::STATE] === DataState::REMOVE;
     }
 
     private function isSameDepth($count, $depth)
@@ -57,11 +61,11 @@ abstract class BufferDataStore
         $ret = array();
         foreach ($this->buffer as $key => $data)
         {
-            if($data['state'] === DataState::REMOVE)
+            if($data[self::STATE] === DataState::REMOVE)
             {
                 continue;
             }
-            $ret[] = $data['data'];
+            $ret[] = $data[self::DATA];
         }
 
         return $ret;
@@ -82,7 +86,7 @@ abstract class BufferDataStore
             $count = 0;
             foreach($identifiers as $identifier)
             {
-                if($data['data']->$identifier === $object->$identifier)
+                if($data[self::DATA]->$identifier === $object->$identifier)
                 {
                     $count++;
                 }
@@ -94,7 +98,7 @@ abstract class BufferDataStore
 
             if($this->isSameDepth($count, $depth))
             {
-                $ret[] = $data['data'];
+                $ret[] = $data[self::DATA];
             }
         }
 
@@ -106,7 +110,7 @@ abstract class BufferDataStore
         $ret = $this->get($object);
         if(empty($ret))
         {
-            $this->buffer[] = array('data' => $object, 'state' => DataState::ADD);
+            $this->buffer[] = array(self::DATA => $object, self::STATE => DataState::ADD);
         }
         else
         {
@@ -115,7 +119,7 @@ abstract class BufferDataStore
             {
                 if($value === $data)
                 {
-                    $state = $data['state'];
+                    $state = $data[self::DATA];
                     if($state === DataState::REMOVE)
                     {
                         $state = DataState::SET;
@@ -131,8 +135,8 @@ abstract class BufferDataStore
                     {
                         throw new \Exception("invalid state");
                     }
-                    $this->buffer[$key]['state'] = $state;
-                    $this->buffer[$key]['data'] = $data;
+                    $this->buffer[$key][self::STATE] = $state;
+                    $this->buffer[$key][self::DATA] = $data;
 
                     break;
                 }
