@@ -29,20 +29,29 @@ abstract class Model implements DataObject
         }
         $this->shortName = $reflection->getShortName();
     }
+
     public function getIdentifiers()
     {
         return $this->identifiers;
     }
+
     public function getAutoIncrements()
     {
         return $this->autoIncrements;
     }
+
     public function getAttributes()
     {
         return $this->attributes;
     }
+
     public function getShortName()
     {
         return $this->shortName;
+    }
+
+    public function getShardKey()
+    {
+        return false;
     }
 }

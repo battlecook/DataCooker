@@ -3,34 +3,63 @@
 namespace battlecook\DataStore;
 
 use battlecook\DataObject\Model;
-use PhpOffice\PhpSpreadsheet\Reader\Excel5;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class ExcelDataStore extends BufferDataStore implements DataStore
 {
-    private $buffer;
     private $store;
 
-    public function __construct(DataStore $store = null, $config)
+    private $path;
+
+    public function __construct(DataStore $store = null, $path)
     {
         $this->buffer = array();
         $this->store = $store;
+
+        $this->path = $path;
     }
 
     public function get(Model $object)
     {
         if(empty($this->buffer))
         {
-            $spreadsheet = new Spreadsheet();
-            $sheet = $spreadsheet->getActiveSheet();
+            $inputFileName = $this->path;
+            $spreadsheet = IOFactory::load($inputFileName);
+            $highest = $spreadsheet->getActiveSheet()->getHighestRowAndColumn();
 
-            $sheet->setCellValue('A1', 'Hello World !');
+            $fields = array();
+            $data = array();
+            for($row=1; $row<=$highest['row']; $row++)
+            {
+                $loadedData = array();
+                foreach (range('A', $highest['column']) as $column)
+                {
+                    $value = $spreadsheet->getActiveSheet()->getCell($column . $row)->getValue();
+                    $loadedData[] = $value;
+                }
+                if($row === 1)
+                {
+                    $fields = $loadedData;
+                }
+                else
+                {
+                    $data[] = $loadedData;
+                }
+            }
 
-            $writer = new Xlsx($spreadsheet);
-            $writer->save('hello world.xlsx');
+            $className = get_class($object);
+            foreach($data as $datum)
+            {
+                $object = new $className;
+                for($i=0; $i<count($datum)-1; $i++)
+                {
+                    $name = $fields[$i];
+                    $value = $datum[$i];
+                    $object->$name = $value;
+                }
 
-
-
+                $this->buffer[] = array('data' => $object, 'state' => DataState::NOT_CHANGED);
+            }
         }
 
         if(empty($this->buffer) && $this->store)
