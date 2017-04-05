@@ -9,10 +9,14 @@ class ApcuDataStore extends BufferDataStore implements DataStore
     private $buffer;
     private $store;
 
+    private $keyPrefix;
+
     public function __construct(DataStore $store = null, $keyPrefix)
     {
         $this->buffer = array();
         $this->store = $store;
+
+        $this->keyPrefix = $keyPrefix;
     }
 
     public function get(Model $object)
@@ -21,10 +25,8 @@ class ApcuDataStore extends BufferDataStore implements DataStore
         {
             $identifiers = $object->getIdentifiers();
             $rootIdentifier = $identifiers[0];
-            $key = $rootIdentifier;
 
-
-
+            $key = $this->keyPrefix . '/' . $object->getShortName() . '/' . $rootIdentifier;
 
             $cachedData = apcu_fetch($key);
             foreach($cachedData as $data)
