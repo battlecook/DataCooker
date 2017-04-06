@@ -15,7 +15,10 @@ class CompoundDataStoreTest extends TestCase
     public function testGet()
     {
         //given
-        $store = new MemoryDataStore(new PdoDataStore(null, new Config()));
+        $store = new MemoryDataStore(new PdoDataStore(null, function (){
+            $dbo = new DBO(new Config());
+            return $dbo->getPdo();
+        }));
 
         $object = new Item();
         $object->userId = 1;
@@ -53,7 +56,10 @@ class CompoundDataStoreTest extends TestCase
     public function testGetSameUser()
     {
         //given
-        $store = new MemoryDataStore(new PdoDataStore(null, new Config()));
+        $store = new MemoryDataStore(new PdoDataStore(null, function (){
+            $dbo = new DBO(new Config());
+            return $dbo->getPdo();
+        }));
 
         $object = new Item();
         $object->userId = 1;
@@ -91,7 +97,10 @@ class CompoundDataStoreTest extends TestCase
     public function testAdd()
     {
         //given
-        $store = new MemoryDataStore(new PdoDataStore(null, new Config()));
+        $store = new MemoryDataStore(new PdoDataStore(null, function (){
+            $dbo = new DBO(new Config());
+            return $dbo->getPdo();
+        }));
 
         $object = new User();
         $object->userId = 1;
@@ -108,7 +117,10 @@ class CompoundDataStoreTest extends TestCase
     public function testSet()
     {
         //given
-        $store = new MemoryDataStore(new PdoDataStore(null, new Config()));
+        $store = new MemoryDataStore(new PdoDataStore(null, function (){
+            $dbo = new DBO(new Config());
+            return $dbo->getPdo();
+        }));
 
         $object = new Item();
         $object->userId = 1;
@@ -152,7 +164,10 @@ class CompoundDataStoreTest extends TestCase
     public function testRemove()
     {
         //given
-        $store = new MemoryDataStore(new PdoDataStore(null, new Config()));
+        $store = new MemoryDataStore(new PdoDataStore(null, function (){
+            $dbo = new DBO(new Config());
+            return $dbo->getPdo();
+        }));
 
         $object = new Item();
         $object->userId = 1;

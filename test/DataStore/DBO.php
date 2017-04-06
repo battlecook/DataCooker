@@ -1,6 +1,6 @@
 <?php
 
-namespace battlecook\DataStore;
+namespace test\DataStore;
 
 class DBO
 {

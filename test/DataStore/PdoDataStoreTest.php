@@ -2,7 +2,6 @@
 
 namespace test\DataStore;
 
-use battlecook\DataStore\DBO;
 use battlecook\DataStore\PdoDataStore;
 use PHPUnit\DbUnit\TestCase;
 use PHPUnit\DbUnit\TestCaseTrait;
@@ -26,7 +25,10 @@ class PdoDataStoreTest extends TestCase
     public function testGet()
     {
         //given
-        $store = new PdoDataStore(null, new Config());
+        $store = new PdoDataStore(null, function (){
+            $dbo = new DBO(new Config());
+            return $dbo->getPdo();
+        });
 
         $object = new Item();
         $object->userId = 1;
@@ -66,7 +68,10 @@ class PdoDataStoreTest extends TestCase
     public function testGetEmptyCondition()
     {
         //given
-        $store = new PdoDataStore(null, new Config());
+        $store = new PdoDataStore(null, function (){
+            $dbo = new DBO(new Config());
+            return $dbo->getPdo();
+        });
 
         $object = new Item();
         $object->userId = 1;
@@ -105,7 +110,10 @@ class PdoDataStoreTest extends TestCase
     public function testGetSameUser()
     {
         //given
-        $store = new PdoDataStore(null, new Config());
+        $store = new PdoDataStore(null, function (){
+            $dbo = new DBO(new Config());
+            return $dbo->getPdo();
+        });
 
         $object = new Item();
         $object->userId = 1;
@@ -145,7 +153,10 @@ class PdoDataStoreTest extends TestCase
     public function testGetShard()
     {
         //given
-        $store = new PdoDataStore(null, new Config());
+        $store = new PdoDataStore(null, function (){
+            $dbo = new DBO(new Config());
+            return $dbo->getPdo();
+        });
 
         $object = new Shard();
         $object->localId = 1;
@@ -187,7 +198,10 @@ class PdoDataStoreTest extends TestCase
     public function testAdd()
     {
         //given
-        $store = new PdoDataStore(null, new Config());
+        $store = new PdoDataStore(null, function (){
+            $dbo = new DBO(new Config());
+            return $dbo->getPdo();
+        });
 
         $object = new User();
         $object->userId = 1;
@@ -204,7 +218,10 @@ class PdoDataStoreTest extends TestCase
     public function testSet()
     {
         //given
-        $store = new PdoDataStore(null, new Config());
+        $store = new PdoDataStore(null, function (){
+            $dbo = new DBO(new Config());
+            return $dbo->getPdo();
+        });
 
         $object = new Item();
         $object->userId = 1;
@@ -248,7 +265,10 @@ class PdoDataStoreTest extends TestCase
     public function testRemove()
     {
         //given
-        $store = new PdoDataStore(null, new Config());
+        $store = new PdoDataStore(null, function (){
+            $dbo = new DBO(new Config());
+            return $dbo->getPdo();
+        });
 
         $object = new Item();
         $object->userId = 1;
@@ -291,7 +311,10 @@ class PdoDataStoreTest extends TestCase
     public function testFlush()
     {
         //given
-        $store = new PdoDataStore(null, new Config());
+        $store = new PdoDataStore(null, function (){
+            $dbo = new DBO(new Config());
+            return $dbo->getPdo();
+        });
 
         $object = new Item();
         $object->userId = 1;

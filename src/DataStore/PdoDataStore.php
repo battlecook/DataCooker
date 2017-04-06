@@ -3,23 +3,23 @@
 namespace battlecook\DataStore;
 
 use battlecook\DataObject\Model;
+use Closure;
 
 class PdoDataStore extends BufferDataStore implements DataStore
 {
     private $store;
 
     private $shardStrategy;
+    /** @var \PDO pdo */
     private $pdo;
 
-    public function __construct(DataStore $store = null, $config, ShardStrategy $shardStrategy = null)
+    public function __construct(DataStore $store = null, Closure $closure, ShardStrategy $shardStrategy = null)
     {
         $this->buffer = array();
         $this->store = $store;
 
         $this->shardStrategy = $shardStrategy;
-
-        $dbo = new DBO($config);
-        $this->pdo = $dbo->getPdo();
+        $this->pdo = $closure();
     }
 
     public function get(Model $object)
