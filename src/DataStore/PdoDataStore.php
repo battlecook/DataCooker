@@ -331,72 +331,36 @@ class PdoDataStore extends BufferDataStore implements DataStore
 
         if(!empty($removedDataList))
         {
-
-            $sql = "delete from $tableName";
-            $delimiter = ' where (';
             foreach($removedDataList as $removedData)
             {
                 $identifiers = $removedData->getIdentifiers();
-            }
-            foreach($identifiers as $identifier)
-            {
-                $identifierValue = $identifier->getValue($objects[0]);
-                if($identifierValue === null)
-                {
-                    continue;
-                }
-                $identifierName = $identifier->getName();
-                $sql .= $delimiter . $identifierName;
-                $delimiter = ' , ';
-            }
-
-            $sql .= ') IN ((';
-
-            $count = 1;
-            $delimiter = ':';
-            foreach($objects as $object)
-            {
-                foreach($identifiers as $identifier)
-                {
-                    $identifierValue = $identifier->getValue($object);
-                    if($identifierValue === null)
-                    {
-                        continue;
-                    }
-                    $identifierName = $identifier->getName();
-                    $sql .= $delimiter . $identifierName . $count;
-                    $sql .= ', ';
-                }
-                $sql = \substr($sql, 0, \strlen($sql) - 2);
-                $sql .= '),(';
-
-                $count++;
-            }
-
-            $sql = \substr($sql, 0, \strlen($sql) - 2);
-            $sql .= ')';
-
-            $pdoStatement = $pdo->prepare($sql);
-
-            //bind value
-            $count = 1;
-            foreach($objects as $object)
-            {
+                $sql = "delete from $tableName";
+                $delimiter = ' where ';
                 foreach ($identifiers as $identifier)
                 {
-                    $identifierValue = $identifier->getValue($object);
+                    $identifierValue = $removedData->$identifier;
                     if($identifierValue === null)
                     {
                         continue;
                     }
-                    $identifierName = $identifier->getName() . $count;
-                    $pdoStatement->bindValue(':' . $identifierName, $identifierValue);
+                    $sql .= $delimiter . $identifier . ' = :' . $identifier;
+                    $delimiter = ' and ';
+                }
+                $sql .= ';';
+
+                $pdoStatement = $this->pdo->prepare($sql);
+                foreach ($identifiers as $identifier)
+                {
+                    $identifierValue =  $removedData->$identifier;
+                    if($identifierValue === null)
+                    {
+                        continue;
+                    }
+                    $pdoStatement->bindValue(':' . $identifier, $identifierValue);
                 }
 
-                $count++;
+                $this->execute($pdoStatement, $sql);
             }
-
-            $this->execute($pdoStatement, $sql);
         }
 
 

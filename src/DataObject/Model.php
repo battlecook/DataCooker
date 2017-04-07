@@ -9,6 +9,9 @@ abstract class Model implements DataObject
     private $autoIncrements = array();
     private $attributes = array();
     private $shortName = null;
+
+    protected $version = 1;
+
     public function __construct()
     {
         $reflection = new ReflectionClass($this);
@@ -53,5 +56,10 @@ abstract class Model implements DataObject
     public function getShardKey()
     {
         return false;
+    }
+
+    public function getVersion()
+    {
+        return $this->version;
     }
 }
