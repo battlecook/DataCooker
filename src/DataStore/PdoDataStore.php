@@ -274,7 +274,7 @@ class PdoDataStore extends BufferDataStore implements DataStore
             elseif($data[self::STATE] === DataState::REMOVE)
             {
                 //todo remove 된 녀석들 끼리 모아서 where 절에서 한번에 제거
-                $removedDataList[] = $data['data'];
+                $removedDataList[] = $data[self::DATA];
                 unset($this->buffer[$key]);
             }
             elseif($data[self::STATE] === DataState::SET)
@@ -294,7 +294,7 @@ class PdoDataStore extends BufferDataStore implements DataStore
                 }
 
                 $sql = substr($sql, 0, -2);
-                $delimiter = ' WHERE ';
+                $delimiter = ' where ';
                 foreach ($identifiers as $identifier)
                 {
                     $identifierValue = $object->$identifier;
@@ -329,11 +329,76 @@ class PdoDataStore extends BufferDataStore implements DataStore
             }
         }
 
-        foreach($removedDataList as $removedData)
+        if(!empty($removedDataList))
         {
-            $sql = 'delete from ';
 
+            $sql = "delete from $tableName";
+            $delimiter = ' where (';
+            foreach($removedDataList as $removedData)
+            {
+                $identifiers = $removedData->getIdentifiers();
+            }
+            foreach($identifiers as $identifier)
+            {
+                $identifierValue = $identifier->getValue($objects[0]);
+                if($identifierValue === null)
+                {
+                    continue;
+                }
+                $identifierName = $identifier->getName();
+                $sql .= $delimiter . $identifierName;
+                $delimiter = ' , ';
+            }
+
+            $sql .= ') IN ((';
+
+            $count = 1;
+            $delimiter = ':';
+            foreach($objects as $object)
+            {
+                foreach($identifiers as $identifier)
+                {
+                    $identifierValue = $identifier->getValue($object);
+                    if($identifierValue === null)
+                    {
+                        continue;
+                    }
+                    $identifierName = $identifier->getName();
+                    $sql .= $delimiter . $identifierName . $count;
+                    $sql .= ', ';
+                }
+                $sql = \substr($sql, 0, \strlen($sql) - 2);
+                $sql .= '),(';
+
+                $count++;
+            }
+
+            $sql = \substr($sql, 0, \strlen($sql) - 2);
+            $sql .= ')';
+
+            $pdoStatement = $pdo->prepare($sql);
+
+            //bind value
+            $count = 1;
+            foreach($objects as $object)
+            {
+                foreach ($identifiers as $identifier)
+                {
+                    $identifierValue = $identifier->getValue($object);
+                    if($identifierValue === null)
+                    {
+                        continue;
+                    }
+                    $identifierName = $identifier->getName() . $count;
+                    $pdoStatement->bindValue(':' . $identifierName, $identifierValue);
+                }
+
+                $count++;
+            }
+
+            $this->execute($pdoStatement, $sql);
         }
+
 
         //todo rollback 이 가능하도록 rollback 쿼리 작성할 것
     }
