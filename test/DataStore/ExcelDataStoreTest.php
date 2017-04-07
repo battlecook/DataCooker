@@ -18,7 +18,7 @@ class ExcelDataStoreTest extends TestCase
 
         //when
         $object = new Monster();
-        $object->monsterId = 2;
+        $object->id = 2;
         $object->x = 2;
 
         $ret = $store->get($object);
