@@ -4,8 +4,9 @@ namespace battlecook\DataStore;
 
 use battlecook\DataObject\Model;
 
-class ApcuDataStore extends BufferDataStore implements DataStore
+class RedisDataStore extends BufferDataStore implements DataStore
 {
+    private $buffer;
     private $store;
 
     private $keyPrefix;
@@ -27,7 +28,7 @@ class ApcuDataStore extends BufferDataStore implements DataStore
 
             $key = $this->keyPrefix . '/' . $object->getShortName() . '/' . 'v:' . $object->getVersion() . '/' . $rootIdentifier;
 
-            $ret = apcu_fetch($key, $cachedData);
+            $cachedData = apcu_fetch($key);
             foreach($cachedData as $data)
             {
                 $this->buffer[] = array(self::DATA => $data, self::STATE => DataState::NOT_CHANGED);
