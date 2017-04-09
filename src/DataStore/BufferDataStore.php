@@ -12,6 +12,8 @@ abstract class BufferDataStore
     /** @var Model[]  */
     protected $buffer;
 
+    protected $lastCommittedData;
+
     private function isRemoved($data)
     {
         return $data[self::STATE] === DataState::REMOVE;
@@ -142,5 +144,10 @@ abstract class BufferDataStore
                 }
             }
         }
+    }
+
+    protected function flush()
+    {
+        $this->lastCommittedData = $this->buffer;
     }
 }

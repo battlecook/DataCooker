@@ -365,6 +365,7 @@ class PdoDataStore extends BufferDataStore implements DataStore
             }
         }
 
+        parent::flush();
 
         //todo rollback 이 가능하도록 rollback 쿼리 작성할 것
     }

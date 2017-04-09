@@ -165,6 +165,8 @@ class MemoryDataStore extends BufferDataStore implements DataStore
         {
             $this->data[] = $data;
         }
+
+        parent::flush();
     }
 
     public function rollback()
