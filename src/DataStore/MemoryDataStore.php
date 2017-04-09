@@ -20,6 +20,14 @@ class MemoryDataStore extends BufferDataStore implements DataStore
 
     public function get(Model $object)
     {
+        if(empty($this->buffer))
+        {
+            if(!empty($this->data))
+            {
+                $this->data = $this->buffer;
+            }
+        }
+
         if(empty($this->buffer) && $this->store)
         {
             $storedData = $this->store->get($object);

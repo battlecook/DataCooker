@@ -41,6 +41,7 @@ class ApcuDataStore extends BufferDataStore implements DataStore
             {
                 $this->buffer[] = array(self::DATA => $data, self::STATE => DataState::NOT_CHANGED);
             }
+            //have to filled at apc from buffer
         }
 
         $ret = parent::get($object);
