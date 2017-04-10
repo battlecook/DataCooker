@@ -28,11 +28,13 @@ class MemcacheDataStore extends BufferDataStore implements DataStore
 
             $key = $this->keyPrefix . '/' . $object->getShortName() . '/' . 'v:' . $object->getVersion() . '/' . $rootIdentifier;
 
+            /*
             $cachedData = apcu_fetch($key);
             foreach($cachedData as $data)
             {
                 $this->buffer[] = array(self::DATA => $data, self::STATE => DataState::NOT_CHANGED);
             }
+            */
         }
 
         if(empty($this->buffer) && $this->store)

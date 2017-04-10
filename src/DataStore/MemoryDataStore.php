@@ -150,6 +150,10 @@ class MemoryDataStore extends BufferDataStore implements DataStore
 
         foreach($this->buffer as $key => $data)
         {
+            if($data[self::STATE] === DataState::ADD)
+            {
+                $this->lastAddedDataList[] = $data[self::DATA];
+            }
             if($data[self::STATE] === DataState::REMOVE)
             {
                 unset($this->buffer[$key]);
@@ -165,8 +169,6 @@ class MemoryDataStore extends BufferDataStore implements DataStore
         {
             $this->data[] = $data;
         }
-
-        parent::flush();
     }
 
     public function rollback()

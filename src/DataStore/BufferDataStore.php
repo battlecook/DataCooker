@@ -12,7 +12,7 @@ abstract class BufferDataStore
     /** @var Model[]  */
     protected $buffer;
 
-    protected $lastCommittedData;
+    protected $lastAddedDataList;
 
     private function isRemoved($data)
     {
@@ -146,8 +146,8 @@ abstract class BufferDataStore
         }
     }
 
-    protected function flush()
+    public function getLastAddedDataList()
     {
-        $this->lastCommittedData = $this->buffer;
+        return $this->lastAddedDataList;
     }
 }

@@ -272,6 +272,8 @@ class PdoDataStore extends BufferDataStore implements DataStore
                 }
 
                 $this->buffer[$key][self::STATE] = DataState::NOT_CHANGED;
+
+                $this->lastAddedDataList[] = $data[self::DATA];
             }
             elseif($data[self::STATE] === DataState::REMOVE)
             {
@@ -364,8 +366,6 @@ class PdoDataStore extends BufferDataStore implements DataStore
                 $this->execute($pdoStatement, $sql);
             }
         }
-
-        parent::flush();
 
         //todo rollback 이 가능하도록 rollback 쿼리 작성할 것
     }
