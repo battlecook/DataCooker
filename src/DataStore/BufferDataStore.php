@@ -5,14 +5,19 @@ use battlecook\DataObject\Model;
 
 abstract class BufferDataStore
 {
-    const DATA = 0;
+    const NODE = 0;
     const STATE = 1;
     const CHANGED = 2;
+
+    const INDEX = 0;
+    const DATA = 1;
 
     /** @var Model[]  */
     protected $buffer;
 
     protected $lastAddedDataList;
+
+    protected $autoIncrement = 0;
 
     private function isRemoved($data)
     {
@@ -67,7 +72,7 @@ abstract class BufferDataStore
             {
                 continue;
             }
-            $ret[] = $data[self::DATA];
+            $ret[] = $data[self::NODE];
         }
 
         return $ret;
@@ -88,7 +93,7 @@ abstract class BufferDataStore
             $count = 0;
             foreach($identifiers as $identifier)
             {
-                if($data[self::DATA]->$identifier === $object->$identifier)
+                if($data[self::NODE]->$identifier === $object->$identifier)
                 {
                     $count++;
                 }
@@ -100,7 +105,7 @@ abstract class BufferDataStore
 
             if($this->isSameDepth($count, $depth))
             {
-                $ret[] = $data[self::DATA];
+                $ret[] = $data[self::NODE];
             }
         }
 
@@ -112,7 +117,7 @@ abstract class BufferDataStore
         $ret = $this->get($object);
         if(empty($ret))
         {
-            $this->buffer[] = array(self::DATA => $object, self::STATE => DataState::ADD);
+            $this->buffer[] = array(self::NODE => $object, self::STATE => DataState::ADD);
         }
         else
         {
@@ -121,7 +126,7 @@ abstract class BufferDataStore
             {
                 if($value === $data)
                 {
-                    $state = $data[self::DATA];
+                    $state = $data[self::NODE];
                     if($state === DataState::REMOVE)
                     {
                         $state = DataState::SET;
@@ -138,7 +143,7 @@ abstract class BufferDataStore
                         throw new \Exception("invalid state");
                     }
                     $this->buffer[$key][self::STATE] = $state;
-                    $this->buffer[$key][self::DATA] = $data;
+                    $this->buffer[$key][self::NODE] = $data;
 
                     break;
                 }

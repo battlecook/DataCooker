@@ -10,11 +10,13 @@ class MemcacheDataStore extends BufferDataStore implements DataStore
     private $store;
 
     private $keyPrefix;
+    private $memcache;
 
-    public function __construct(DataStore $store = null, $keyPrefix)
+    public function __construct(DataStore $store = null, \Memcache $memcache, $keyPrefix)
     {
-        $this->buffer = array();
+        $this->buffer = array('index' => array(), 'data' => array());
         $this->store = $store;
+        $this->memcache = $memcache;
 
         $this->keyPrefix = $keyPrefix;
     }
@@ -28,13 +30,11 @@ class MemcacheDataStore extends BufferDataStore implements DataStore
 
             $key = $this->keyPrefix . '/' . $object->getShortName() . '/' . 'v:' . $object->getVersion() . '/' . $rootIdentifier;
 
-            /*
-            $cachedData = apcu_fetch($key);
+            $cachedData = $this->memcache->get($key);
             foreach($cachedData as $data)
             {
-                $this->buffer[] = array(self::DATA => $data, self::STATE => DataState::NOT_CHANGED);
+                $this->buffer[] = array(self::NODE => $data, self::STATE => DataState::NOT_CHANGED);
             }
-            */
         }
 
         if(empty($this->buffer) && $this->store)
@@ -42,7 +42,7 @@ class MemcacheDataStore extends BufferDataStore implements DataStore
             $storedData = $this->store->get($object);
             foreach($storedData as $data)
             {
-                $this->buffer[] = array(self::DATA => $data, self::STATE => DataState::NOT_CHANGED);
+                $this->buffer[] = array(self::NODE => $data, self::STATE => DataState::NOT_CHANGED);
             }
         }
 
@@ -57,7 +57,45 @@ class MemcacheDataStore extends BufferDataStore implements DataStore
      */
     public function set(Model $object)
     {
-        // TODO: Implement set() method.
+        $rowCount = 0;
+        $bufferedData = $this->get($object);
+        if(!empty($bufferedData))
+        {
+            $data = $bufferedData[0];
+            $attributes = $object->getAttributes();
+            $isDirty = false;
+            foreach($attributes as $attribute)
+            {
+                if($data->$attribute !== $object->$attribute)
+                {
+                    $isDirty = true;
+                    break;
+                }
+            }
+            if($isDirty)
+            {
+                foreach($this->buffer as $key => $value)
+                {
+                    if($value[self::NODE] === $data)
+                    {
+                        $this->buffer[$key][self::NODE] = $object;
+                        if($value[self::STATE] !== DataState::ADD)
+                        {
+                            $this->buffer[$key][self::STATE] = DataState::SET;
+                        }
+                        $rowCount++;
+                        break;
+                    }
+                }
+            }
+
+            if($this->store)
+            {
+                $this->store->set($object);
+            }
+        }
+
+        return $rowCount;
     }
 
     /**
@@ -66,7 +104,11 @@ class MemcacheDataStore extends BufferDataStore implements DataStore
      */
     public function add(Model $object)
     {
-        // TODO: Implement add() method.
+        parent::add($object);
+        if($this->store)
+        {
+            $this->store->add($object);
+        }
     }
 
     /**
@@ -75,7 +117,41 @@ class MemcacheDataStore extends BufferDataStore implements DataStore
      */
     public function remove(Model $object)
     {
-        // TODO: Implement remove() method.
+        $rowCount = 0;
+        $identifiers = $object->getIdentifiers();
+        $depth = $this->getDepth($identifiers, $object);
+        if($depth === 0)
+        {
+            return $rowCount;
+        }
+        $ret = $this->get($object);
+        if(!empty($ret))
+        {
+            foreach ($this->buffer as $key => $data)
+            {
+                $count = 0;
+                foreach($identifiers as $identifier)
+                {
+                    if($data[self::NODE]->$identifier === $object->$identifier)
+                    {
+                        $count++;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                if($count >= $depth)
+                {
+                    array_splice($this->buffer, $key, 1);
+                    $rowCount++;
+                    break;
+                }
+            }
+        }
+
+        return $rowCount;
     }
 
     public function flush()

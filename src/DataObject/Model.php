@@ -5,6 +5,8 @@ use ReflectionClass;
 
 abstract class Model implements DataObject
 {
+    private static $data = array();
+
     private $identifiers = array();
     private $autoIncrements = array();
     private $attributes = array();
@@ -14,38 +16,54 @@ abstract class Model implements DataObject
 
     public function __construct()
     {
-        $reflection = new ReflectionClass($this);
-        foreach($reflection->getProperties() as $property)
+        $className = get_class($this);
+        $explodedClassName = explode('\\', $className);
+        $shortName = end($explodedClassName);
+        $this->shortName = $shortName;
+
+        if(!isset(self::$data[$shortName]))
         {
-            if(stripos($property->getDocComment(), 'dataStoreIdentifier'))
+            $identifiers = array();
+            $attributes = array();
+            $autoIncrements = array();
+
+            $reflection = new ReflectionClass($this);
+            foreach($reflection->getProperties() as $property)
             {
-                $this->identifiers[] = $property->getName();
+                if(stripos($property->getDocComment(), 'dataStoreIdentifier'))
+                {
+                    $identifiers[] = $property->getName();
+                }
+                if(stripos($property->getDocComment(), 'dataStoreAttribute'))
+                {
+                    $attributes[] = $property->getName();
+                }
+                if(stripos($property->getDocComment(), 'dataStoreAutoIncrement'))
+                {
+                    $autoIncrements[] = $property->getName();
+                }
             }
-            if(stripos($property->getDocComment(), 'dataStoreAttribute'))
-            {
-                $this->attributes[] = $property->getName();
-            }
-            if(stripos($property->getDocComment(), 'dataStoreAutoIncrement'))
-            {
-                $this->autoIncrements[] = $property->getName();
-            }
+
+
+            self::$data[$shortName]['identifiers'] = $identifiers;
+            self::$data[$shortName]['attributes'] = $attributes;
+            self::$data[$shortName]['autoIncrements'] = $autoIncrements;
         }
-        $this->shortName = $reflection->getShortName();
     }
 
     public function getIdentifiers()
     {
-        return $this->identifiers;
+        return self::$data[$this->shortName]['identifiers'];
     }
 
     public function getAutoIncrements()
     {
-        return $this->autoIncrements;
+        return self::$data[$this->shortName]['autoIncrements'];
     }
 
     public function getAttributes()
     {
-        return $this->attributes;
+        return self::$data[$this->shortName]['attributes'];
     }
 
     public function getShortName()

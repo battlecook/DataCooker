@@ -14,13 +14,14 @@ class MemoryDataStore extends BufferDataStore implements DataStore
     public function __construct(DataStore $store = null)
     {
         $this->data = array();
+        //$this->buffer = array(self::INDEX => array(), self::DATA => array());
         $this->buffer = array();
         $this->store = $store;
     }
 
     public function get(Model $object)
     {
-        if(empty($this->buffer))
+        if(empty($this->buffer[self::DATA]))
         {
             if(!empty($this->data))
             {
@@ -28,12 +29,24 @@ class MemoryDataStore extends BufferDataStore implements DataStore
             }
         }
 
-        if(empty($this->buffer) && $this->store)
+        if(empty($this->buffer[self::DATA]) && $this->store)
         {
             $storedData = $this->store->get($object);
             foreach($storedData as $data)
             {
-                $this->buffer[] = array(self::DATA => $data, self::STATE => DataState::NOT_CHANGED);
+                /*
+                $ret = array();
+                foreach($data->getIdentifiers() as $identifier)
+                {
+                    $ret[] = $data->$identifier;
+                }
+
+
+                $data->$identifier;
+                $this->buffer[self::INDEX];
+                */
+
+                $this->buffer[] = array(self::NODE => $data, self::STATE => DataState::NOT_CHANGED);
             }
             $this->data = $this->buffer;
         }
@@ -64,9 +77,9 @@ class MemoryDataStore extends BufferDataStore implements DataStore
             {
                 foreach($this->buffer as $key => $value)
                 {
-                    if($value[self::DATA] === $data)
+                    if($value[self::NODE] === $data)
                     {
-                        $this->buffer[$key][self::DATA] = $object;
+                        $this->buffer[$key][self::NODE] = $object;
                         if($value[self::STATE] !== DataState::ADD)
                         {
                             $this->buffer[$key][self::STATE] = DataState::SET;
@@ -112,7 +125,7 @@ class MemoryDataStore extends BufferDataStore implements DataStore
                 $count = 0;
                 foreach($identifiers as $identifier)
                 {
-                    if($data[self::DATA]->$identifier === $object->$identifier)
+                    if($data[self::NODE]->$identifier === $object->$identifier)
                     {
                         $count++;
                     }
@@ -152,7 +165,7 @@ class MemoryDataStore extends BufferDataStore implements DataStore
         {
             if($data[self::STATE] === DataState::ADD)
             {
-                $this->lastAddedDataList[] = $data[self::DATA];
+                $this->lastAddedDataList[] = $data[self::NODE];
             }
             if($data[self::STATE] === DataState::REMOVE)
             {

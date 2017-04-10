@@ -32,7 +32,7 @@ class ApcuDataStore extends BufferDataStore implements DataStore
             {
                 foreach($cachedData as $data)
                 {
-                    $this->buffer[] = array(self::DATA => $data, self::STATE => DataState::NOT_CHANGED);
+                    $this->buffer[] = array(self::NODE => $data, self::STATE => DataState::NOT_CHANGED);
                 }
             }
         }
@@ -42,7 +42,7 @@ class ApcuDataStore extends BufferDataStore implements DataStore
             $storedData = $this->store->get($object);
             foreach($storedData as $data)
             {
-                $this->buffer[] = array(self::DATA => $data, self::STATE => DataState::NOT_CHANGED);
+                $this->buffer[] = array(self::NODE => $data, self::STATE => DataState::NOT_CHANGED);
             }
             //have to filled at apc from buffer
             apcu_store($key, $this->buffer);
