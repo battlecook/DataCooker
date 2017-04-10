@@ -26,9 +26,9 @@ class ApcuDataStore extends BufferDataStore implements DataStore
 
         if(empty($this->buffer))
         {
-            $cachedData = array();
-            $ret = apcu_fetch($key, $cachedData);
-            if($ret)
+            $isSuccess = false;
+            $cachedData = apcu_fetch($key, $isSuccess);
+            if($isSuccess)
             {
                 foreach($cachedData as $data)
                 {

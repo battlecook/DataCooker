@@ -12,6 +12,15 @@ class ApcuDataStoreTest extends TestCase
 {
     public function setUp()
     {
+        if(ini_get('apc.enable_cli') !== '1')
+        {
+            if(ini_set ('apc.enable_cli', '1' ) === false)
+            {
+                print_r("you have to set apc.enable_cli is 1 in php.ini file");
+                return 1;
+            }
+        }
+
         $keyPrefix = 'ProjectName';
 
         $object = new Monster();
