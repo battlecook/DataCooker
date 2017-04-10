@@ -10,8 +10,8 @@ class AfterData
     {
         return array(
             'Item' => array(
-                array('seq' => 1, 'userId' => 2, 'itemId' => 2, 'itemName' => 'item2-2'),
-                array('seq' => 2, 'userId' => 3, 'itemId' => 3, 'itemName' => 'item3'),
+                array('itemId' => 1, 'userId' => 2, 'itemDesignId' => 2, 'itemName' => 'item2-2'),
+                array('itemId' => 2, 'userId' => 3, 'itemDesignId' => 3, 'itemName' => 'item3'),
             ),
 
         );

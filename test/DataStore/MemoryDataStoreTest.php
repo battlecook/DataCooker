@@ -18,21 +18,21 @@ class MemoryDataStoreTest extends TestCase
 
         $object = new Item();
         $object->userId = 1;
-        $object->itemId = 1;
+        $object->itemDesignId = 1;
         $object->itemName = 'user1';
 
         $store->add($object);
 
         $object = new Item();
         $object->userId = 2;
-        $object->itemId = 2;
+        $object->itemDesignId = 2;
         $object->itemName = 'user2';
 
         $store->add($object);
 
         $object = new Item();
         $object->userId = 3;
-        $object->itemId = 3;
+        $object->itemDesignId = 3;
         $object->itemName = 'user3';
 
         $store->add($object);
@@ -40,7 +40,7 @@ class MemoryDataStoreTest extends TestCase
         //when
         $object = new Item();
         $object->userId = 2;
-        $object->itemId = 2;
+        $object->itemDesignId = 2;
 
         $ret = $store->get($object);
 
@@ -56,21 +56,21 @@ class MemoryDataStoreTest extends TestCase
 
         $object = new Item();
         $object->userId = 1;
-        $object->itemId = 1;
+        $object->itemDesignId = 1;
         $object->itemName = 'item1';
 
         $store->add($object);
 
         $object = new Item();
         $object->userId = 1;
-        $object->itemId = 2;
+        $object->itemDesignId = 2;
         $object->itemName = 'item2';
 
         $store->add($object);
 
         $object = new Item();
         $object->userId = 2;
-        $object->itemId = 1;
+        $object->itemDesignId = 1;
         $object->itemName = 'item1';
 
         $store->add($object);
@@ -111,21 +111,21 @@ class MemoryDataStoreTest extends TestCase
 
         $object = new Item();
         $object->userId = 1;
-        $object->itemId = 1;
+        $object->itemDesignId = 1;
         $object->itemName = 'user1';
 
         $store->add($object);
 
         $object = new Item();
         $object->userId = 2;
-        $object->itemId = 2;
+        $object->itemDesignId = 2;
         $object->itemName = 'user2';
 
         $store->add($object);
 
         $object = new Item();
         $object->userId = 3;
-        $object->itemId = 3;
+        $object->itemDesignId = 3;
         $object->itemName = 'user3';
 
         $store->add($object);
@@ -133,7 +133,7 @@ class MemoryDataStoreTest extends TestCase
         //when
         $object = new Item();
         $object->userId = 2;
-        $object->itemId = 2;
+        $object->itemDesignId = 2;
         $object->itemName = 'user2-2';
 
         $ret = $store->set($object);
@@ -143,7 +143,7 @@ class MemoryDataStoreTest extends TestCase
 
         $object = new Item();
         $object->userId = 2;
-        $object->itemId = 2;
+        $object->itemDesignId = 2;
         $ret = $store->get($object);
         $this->assertEquals('user2-2', $ret[0]->itemName);
     }
@@ -155,21 +155,21 @@ class MemoryDataStoreTest extends TestCase
 
         $object = new Item();
         $object->userId = 1;
-        $object->itemId = 1;
+        $object->itemDesignId = 1;
         $object->itemName = 'user1';
 
         $store->add($object);
 
         $object = new Item();
         $object->userId = 2;
-        $object->itemId = 2;
+        $object->itemDesignId = 2;
         $object->itemName = 'user2';
 
         $store->add($object);
 
         $object = new Item();
         $object->userId = 3;
-        $object->itemId = 3;
+        $object->itemDesignId = 3;
         $object->itemName = 'user3';
 
         $store->add($object);
@@ -177,7 +177,7 @@ class MemoryDataStoreTest extends TestCase
         //when
         $object = new Item();
         $object->userId = 2;
-        $object->itemId = 2;
+        $object->itemDesignId = 2;
 
         $ret = $store->remove($object);
 

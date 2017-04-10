@@ -32,21 +32,21 @@ class PdoDataStoreTest extends TestCase
 
         $object = new Item();
         $object->userId = 1;
-        $object->itemId = 1;
+        $object->itemDesignId = 1;
         $object->itemName = 'item1';
 
         $store->add($object);
 
         $object = new Item();
         $object->userId = 2;
-        $object->itemId = 2;
+        $object->itemDesignId = 2;
         $object->itemName = 'item2';
 
         $store->add($object);
 
         $object = new Item();
         $object->userId = 3;
-        $object->itemId = 3;
+        $object->itemDesignId = 3;
         $object->itemName = 'item3';
 
         $store->add($object);
@@ -56,7 +56,7 @@ class PdoDataStoreTest extends TestCase
         //when
         $object = new Item();
         $object->userId = 2;
-        $object->itemId = 2;
+        $object->itemDesignId = 2;
 
         $ret = $store->get($object);
 
@@ -75,21 +75,21 @@ class PdoDataStoreTest extends TestCase
 
         $object = new Item();
         $object->userId = 1;
-        $object->itemId = 1;
+        $object->itemDesignId = 1;
         $object->itemName = 'item1';
 
         $store->add($object);
 
         $object = new Item();
         $object->userId = 2;
-        $object->itemId = 2;
+        $object->itemDesignId = 2;
         $object->itemName = 'item2';
 
         $store->add($object);
 
         $object = new Item();
         $object->userId = 3;
-        $object->itemId = 3;
+        $object->itemDesignId = 3;
         $object->itemName = 'item3';
 
         $store->add($object);
@@ -99,7 +99,7 @@ class PdoDataStoreTest extends TestCase
         //when
         $object = new Item();
         $object->userId = 2;
-        $object->itemId = 1;
+        $object->itemDesignId = 1;
 
         $ret = $store->get($object);
 
@@ -117,21 +117,21 @@ class PdoDataStoreTest extends TestCase
 
         $object = new Item();
         $object->userId = 1;
-        $object->itemId = 1;
+        $object->itemDesignId = 1;
         $object->itemName = 'item1';
 
         $store->add($object);
 
         $object = new Item();
         $object->userId = 1;
-        $object->itemId = 2;
+        $object->itemDesignId = 2;
         $object->itemName = 'item2';
 
         $store->add($object);
 
         $object = new Item();
         $object->userId = 2;
-        $object->itemId = 1;
+        $object->itemDesignId = 1;
         $object->itemName = 'item1';
 
         $store->add($object);
@@ -225,21 +225,21 @@ class PdoDataStoreTest extends TestCase
 
         $object = new Item();
         $object->userId = 1;
-        $object->itemId = 1;
+        $object->itemDesignId = 1;
         $object->itemName = 'item1';
 
         $store->add($object);
 
         $object = new Item();
         $object->userId = 2;
-        $object->itemId = 2;
+        $object->itemDesignId = 2;
         $object->itemName = 'item2';
 
         $store->add($object);
 
         $object = new Item();
         $object->userId = 3;
-        $object->itemId = 3;
+        $object->itemDesignId = 3;
         $object->itemName = 'item3';
 
         $store->add($object);
@@ -247,7 +247,7 @@ class PdoDataStoreTest extends TestCase
         //when
         $object = new Item();
         $object->userId = 2;
-        $object->itemId = 2;
+        $object->itemDesignId = 2;
         $object->itemName = 'item2-2';
 
         $ret = $store->set($object);
@@ -272,21 +272,21 @@ class PdoDataStoreTest extends TestCase
 
         $object = new Item();
         $object->userId = 1;
-        $object->itemId = 1;
+        $object->itemDesignId = 1;
         $object->itemName = 'item1';
 
         $store->add($object);
 
         $object = new Item();
         $object->userId = 2;
-        $object->itemId = 2;
+        $object->itemDesignId = 2;
         $object->itemName = 'item2';
 
         $store->add($object);
 
         $object = new Item();
         $object->userId = 3;
-        $object->itemId = 3;
+        $object->itemDesignId = 3;
         $object->itemName = 'item3';
 
         $store->add($object);
@@ -303,7 +303,7 @@ class PdoDataStoreTest extends TestCase
 
         $object = new Item();
         $object->userId = 2;
-        $object->itemId = 2;
+        $object->itemDesignId = 2;
         $ret = $store->get($object);
         $this->assertEquals(array(), $ret);
     }
@@ -318,21 +318,21 @@ class PdoDataStoreTest extends TestCase
 
         $object = new Item();
         $object->userId = 1;
-        $object->itemId = 1;
+        $object->itemDesignId = 1;
         $object->itemName = 'item1';
 
         $store->add($object);
 
         $object = new Item();
         $object->userId = 2;
-        $object->itemId = 2;
+        $object->itemDesignId = 2;
         $object->itemName = 'item2';
 
         $store->add($object);
 
         $object = new Item();
         $object->userId = 3;
-        $object->itemId = 3;
+        $object->itemDesignId = 3;
         $object->itemName = 'item3';
 
         $store->add($object);
@@ -340,14 +340,14 @@ class PdoDataStoreTest extends TestCase
         //when
         $object = new Item();
         $object->userId = 2;
-        $object->itemId = 2;
+        $object->itemDesignId = 2;
         $object->itemName = 'item2-2';
 
         $ret = $store->set($object);
 
         $object = new Item();
         $object->userId = 1;
-        $object->itemId = 1;
+        $object->itemDesignId = 1;
         $store->remove($object);
         $store->flush();
 
@@ -358,7 +358,7 @@ class PdoDataStoreTest extends TestCase
 
         $object = new Item();
         $object->userId = 2;
-        $object->itemId = 2;
+        $object->itemDesignId = 2;
         $ret = $store->get($object);
         $this->assertEquals('item2-2', $ret[0]->itemName);
 

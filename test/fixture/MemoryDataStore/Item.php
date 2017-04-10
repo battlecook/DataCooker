@@ -15,12 +15,12 @@ class Item extends Model
     /**
      * @dataStoreIdentifier
      */
-    public $itemId;
+    public $itemDesignId;
     /**
      * @dataStoreAttribute
      * @dataStoreAutoIncrement
      */
-    public $seq;
+    public $itemId;
     /**
      * @dataStoreAttribute
      */
