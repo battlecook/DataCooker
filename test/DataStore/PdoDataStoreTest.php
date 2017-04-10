@@ -353,6 +353,8 @@ class PdoDataStoreTest extends TestCase
 
         //then
         $this->assertEquals(1, $ret);
+        $latAddedDataList = $store->getLastAddedDataList();
+        $this->assertEquals(2, count($latAddedDataList));
 
         $object = new Item();
         $object->userId = 2;

@@ -36,7 +36,11 @@ class ApcuDataStoreTest extends TestCase
 
         $value[] = $object;
 
-        apcu_store($key, $value);
+        $ret = apcu_store($key, $value);
+        if($ret === false)
+        {
+            print_r("ApcuDataStore Setup Failed");
+        }
     }
 
     public function testGet()

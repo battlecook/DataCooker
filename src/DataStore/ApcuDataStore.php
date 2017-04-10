@@ -20,17 +20,20 @@ class ApcuDataStore extends BufferDataStore implements DataStore
 
     public function get(Model $object)
     {
+        $identifiers = $object->getIdentifiers();
+        $rootIdentifier = $identifiers[0];
+        $key = $this->keyPrefix . '/' . $object->getShortName() . '/' . 'v:' . $object->getVersion() . '/' . $rootIdentifier;
+
         if(empty($this->buffer))
         {
-            $identifiers = $object->getIdentifiers();
-            $rootIdentifier = $identifiers[0];
-
-            $key = $this->keyPrefix . '/' . $object->getShortName() . '/' . 'v:' . $object->getVersion() . '/' . $rootIdentifier;
-
+            $cachedData = array();
             $ret = apcu_fetch($key, $cachedData);
-            foreach($cachedData as $data)
+            if($ret)
             {
-                $this->buffer[] = array(self::DATA => $data, self::STATE => DataState::NOT_CHANGED);
+                foreach($cachedData as $data)
+                {
+                    $this->buffer[] = array(self::DATA => $data, self::STATE => DataState::NOT_CHANGED);
+                }
             }
         }
 
@@ -42,6 +45,7 @@ class ApcuDataStore extends BufferDataStore implements DataStore
                 $this->buffer[] = array(self::DATA => $data, self::STATE => DataState::NOT_CHANGED);
             }
             //have to filled at apc from buffer
+            apcu_store($key, $this->buffer);
         }
 
         $ret = parent::get($object);
