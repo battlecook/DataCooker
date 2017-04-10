@@ -79,7 +79,10 @@ class PdoDataStore extends BufferDataStore implements DataStore
                 $this->buffer[] = array(self::DATA => $data, self::STATE => DataState::NOT_CHANGED);
             }
 
-            //have to filled at db from buffer
+            foreach($this->buffer as $data)
+            {
+                $this->add($data[self::DATA]);
+            }
         }
 
         $ret = parent::get($object);
