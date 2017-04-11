@@ -26,6 +26,7 @@ class MemoryDataStore extends BufferDataStore implements DataStore
             if(!empty($this->data))
             {
                 $this->data = $this->buffer;
+                parent::createIndex();
             }
         }
 
@@ -34,17 +35,6 @@ class MemoryDataStore extends BufferDataStore implements DataStore
             $storedData = $this->store->get($object);
             foreach($storedData as $data)
             {
-                /*
-                $ret = array();
-                foreach($data->getIdentifiers() as $identifier)
-                {
-                    $ret[] = $data->$identifier;
-                }
-
-                $data->$identifier;
-                $this->buffer[self::INDEX];
-                */
-
                 $this->buffer[] = array(self::NODE => $data, self::STATE => DataState::CLEAR);
             }
             $this->data = $this->buffer;

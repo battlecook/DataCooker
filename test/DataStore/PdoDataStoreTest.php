@@ -25,7 +25,8 @@ class PdoDataStoreTest extends TestCase
     public function testGet()
     {
         //given
-        $store = new PdoDataStore(null, function (){
+        $store = new PdoDataStore(null, function ()
+        {
             $dbo = new DBO(new Config());
             return $dbo->getPdo();
         });

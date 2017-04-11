@@ -19,6 +19,8 @@ abstract class BufferDataStore
 
     protected $autoIncrement = 0;
 
+    private $useIndex = false;
+
     private function isRemoved($data)
     {
         return $data[self::STATE] === DataState::DIRTY_DEL;
@@ -80,32 +82,39 @@ abstract class BufferDataStore
 
     private function getBufferData($identifiers, $object)
     {
-        $depth = $this->getDepth($identifiers, $object);
-
-        $ret = array();
-        foreach ($this->buffer as $key => $data)
+        if($this->useIndex)
         {
-            if($this->isRemoved($data))
-            {
-                continue;
-            }
+            $ret = array();
+        }
+        else
+        {
+            $depth = $this->getDepth($identifiers, $object);
 
-            $count = 0;
-            foreach($identifiers as $identifier)
+            $ret = array();
+            foreach ($this->buffer as $key => $data)
             {
-                if($data[self::NODE]->$identifier === $object->$identifier)
+                if($this->isRemoved($data))
                 {
-                    $count++;
+                    continue;
                 }
-                else
-                {
-                    break;
-                }
-            }
 
-            if($this->isSameDepth($count, $depth))
-            {
-                $ret[] = $data[self::NODE];
+                $count = 0;
+                foreach($identifiers as $identifier)
+                {
+                    if($data[self::NODE]->$identifier === $object->$identifier)
+                    {
+                        $count++;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                if($this->isSameDepth($count, $depth))
+                {
+                    $ret[] = $data[self::NODE];
+                }
             }
         }
 
@@ -117,7 +126,14 @@ abstract class BufferDataStore
         $ret = $this->get($object);
         if(empty($ret))
         {
-            $this->buffer[] = array(self::NODE => $object, self::STATE => DataState::DIRTY_ADD);
+            if($this->useIndex)
+            {
+
+            }
+            else
+            {
+                $this->buffer[] = array(self::NODE => $object, self::STATE => DataState::DIRTY_ADD);
+            }
         }
         else
         {
@@ -171,7 +187,9 @@ abstract class BufferDataStore
     {
         if($depth === $maxDepth)
         {
-            $index = $data;
+            $index = $this->autoIncrement;
+            $this->buffer[self::DATA][$this->autoIncrement] = array(self::NODE => $data, self::STATE => DataState::CLEAR);
+            $this->autoIncrement++;
             return;
         }
         $identifier = $identifiers[$depth];
