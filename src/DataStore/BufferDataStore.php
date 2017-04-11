@@ -12,8 +12,8 @@ abstract class BufferDataStore
     const INDEX = 0;
     const DATA = 1;
 
-    /** @var Model[]  */
     protected $buffer;
+    protected $index;
 
     protected $lastAddedDataList;
 
@@ -154,5 +154,33 @@ abstract class BufferDataStore
     public function getLastAddedDataList()
     {
         return $this->lastAddedDataList;
+    }
+
+    protected function createIndex()
+    {
+        foreach($this->buffer as $data)
+        {
+            $depth = 0;
+            $identifiers = $data[self::NODE]->getIdentifiers();
+            $maxDepth = $this->getDepth($identifiers, $data[self::NODE]);
+            $this->recursion($this->index, $data[self::NODE], $identifiers, $depth, $maxDepth);
+        }
+    }
+
+    private function recursion(&$index, $data, $identifiers, $depth, $maxDepth)
+    {
+        if($depth === $maxDepth)
+        {
+            $index = $data;
+            return;
+        }
+        $identifier = $identifiers[$depth];
+        $value = $data->$identifier;
+        if(!isset($index[$value]))
+        {
+            $index[$value] = array();
+        }
+        $depth++;
+        $this->recursion($index[$value], $data, $identifiers, $depth, $maxDepth);
     }
 }

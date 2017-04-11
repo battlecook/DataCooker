@@ -68,6 +68,7 @@ class PdoDataStore extends BufferDataStore implements DataStore
                 {
                     $this->buffer[] = array(self::NODE => $loadedData, self::STATE => DataState::CLEAR);
                 }
+                parent::createIndex();
             }
         }
 
