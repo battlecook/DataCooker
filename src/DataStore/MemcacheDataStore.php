@@ -33,7 +33,7 @@ class MemcacheDataStore extends BufferDataStore implements DataStore
             $cachedData = $this->memcache->get($key);
             foreach($cachedData as $data)
             {
-                $this->buffer[] = array(self::NODE => $data, self::STATE => DataState::NOT_CHANGED);
+                $this->buffer[] = array(self::NODE => $data, self::STATE => DataState::CLEAR);
             }
         }
 
@@ -42,7 +42,7 @@ class MemcacheDataStore extends BufferDataStore implements DataStore
             $storedData = $this->store->get($object);
             foreach($storedData as $data)
             {
-                $this->buffer[] = array(self::NODE => $data, self::STATE => DataState::NOT_CHANGED);
+                $this->buffer[] = array(self::NODE => $data, self::STATE => DataState::CLEAR);
             }
         }
 
@@ -79,9 +79,9 @@ class MemcacheDataStore extends BufferDataStore implements DataStore
                     if($value[self::NODE] === $data)
                     {
                         $this->buffer[$key][self::NODE] = $object;
-                        if($value[self::STATE] !== DataState::ADD)
+                        if($value[self::STATE] !== DataState::DIRTY_ADD)
                         {
-                            $this->buffer[$key][self::STATE] = DataState::SET;
+                            $this->buffer[$key][self::STATE] = DataState::DIRTY_SET;
                         }
                         $rowCount++;
                         break;

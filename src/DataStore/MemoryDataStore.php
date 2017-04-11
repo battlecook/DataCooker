@@ -41,12 +41,11 @@ class MemoryDataStore extends BufferDataStore implements DataStore
                     $ret[] = $data->$identifier;
                 }
 
-
                 $data->$identifier;
                 $this->buffer[self::INDEX];
                 */
 
-                $this->buffer[] = array(self::NODE => $data, self::STATE => DataState::NOT_CHANGED);
+                $this->buffer[] = array(self::NODE => $data, self::STATE => DataState::CLEAR);
             }
             $this->data = $this->buffer;
         }
@@ -80,9 +79,9 @@ class MemoryDataStore extends BufferDataStore implements DataStore
                     if($value[self::NODE] === $data)
                     {
                         $this->buffer[$key][self::NODE] = $object;
-                        if($value[self::STATE] !== DataState::ADD)
+                        if($value[self::STATE] !== DataState::DIRTY_ADD)
                         {
-                            $this->buffer[$key][self::STATE] = DataState::SET;
+                            $this->buffer[$key][self::STATE] = DataState::DIRTY_SET;
                         }
                         $rowCount++;
                         break;
@@ -163,17 +162,17 @@ class MemoryDataStore extends BufferDataStore implements DataStore
 
         foreach($this->buffer as $key => $data)
         {
-            if($data[self::STATE] === DataState::ADD)
+            if($data[self::STATE] === DataState::DIRTY_ADD)
             {
                 $this->lastAddedDataList[] = $data[self::NODE];
             }
-            if($data[self::STATE] === DataState::REMOVE)
+            if($data[self::STATE] === DataState::DIRTY_DEL)
             {
                 unset($this->buffer[$key]);
             }
             else
             {
-                $this->buffer[$key][self::STATE] = DataState::NOT_CHANGED;
+                $this->buffer[$key][self::STATE] = DataState::CLEAR;
             }
         }
 

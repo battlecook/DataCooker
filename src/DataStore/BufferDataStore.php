@@ -21,7 +21,7 @@ abstract class BufferDataStore
 
     private function isRemoved($data)
     {
-        return $data[self::STATE] === DataState::REMOVE;
+        return $data[self::STATE] === DataState::DIRTY_DEL;
     }
 
     private function isSameDepth($count, $depth)
@@ -68,7 +68,7 @@ abstract class BufferDataStore
         $ret = array();
         foreach ($this->buffer as $key => $data)
         {
-            if($data[self::STATE] === DataState::REMOVE)
+            if($data[self::STATE] === DataState::DIRTY_DEL)
             {
                 continue;
             }
@@ -117,7 +117,7 @@ abstract class BufferDataStore
         $ret = $this->get($object);
         if(empty($ret))
         {
-            $this->buffer[] = array(self::NODE => $object, self::STATE => DataState::ADD);
+            $this->buffer[] = array(self::NODE => $object, self::STATE => DataState::DIRTY_ADD);
         }
         else
         {
@@ -127,14 +127,14 @@ abstract class BufferDataStore
                 if($value === $data)
                 {
                     $state = $data[self::NODE];
-                    if($state === DataState::REMOVE)
+                    if($state === DataState::DIRTY_DEL)
                     {
-                        $state = DataState::SET;
+                        $state = DataState::DIRTY_SET;
                     }
-                    elseif($state === DataState::SET)
+                    elseif($state === DataState::DIRTY_SET)
                     {
                     }
-                    elseif($state === DataState::NOT_CHANGED || $state === DataState::ADD)
+                    elseif($state === DataState::CLEAR || $state === DataState::DIRTY_ADD)
                     {
                         throw new \Exception("already data exist");
                     }

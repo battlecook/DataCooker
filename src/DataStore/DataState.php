@@ -4,8 +4,8 @@ namespace battlecook\DataStore;
 
 class DataState
 {
-    const NOT_CHANGED = 0;
-    const ADD = 1;
-    const SET = 2;
-    const REMOVE = 3;
+    const CLEAR = 0;
+    const DIRTY_ADD = 1;
+    const DIRTY_SET = 2;
+    const DIRTY_DEL = 3;
 }
