@@ -4,7 +4,7 @@ namespace test\DataStore;
 
 use battlecook\DataStore\ApcuDataStore;
 use PHPUnit\Framework\TestCase;
-use test\fixture\ExcelDataStore\Monster;
+use test\Fixture\ExcelDataStore\Monster;
 
 require __DIR__  . '/../../vendor/autoload.php';
 

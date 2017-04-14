@@ -4,7 +4,7 @@ namespace test\DataStore;
 
 use battlecook\DataStore\ExcelDataStore;
 use PHPUnit\Framework\TestCase;
-use test\fixture\ExcelDataStore\Monster;
+use test\Fixture\ExcelDataStore\Monster;
 
 require __DIR__  . '/../../vendor/autoload.php';
 
@@ -13,7 +13,7 @@ class ExcelDataStoreTest extends TestCase
     public function testGet()
     {
         //given
-        $path = __DIR__ . '/../fixture/ExcelDataStore/monster.xlsx';
+        $path = __DIR__ . '/../Fixture/ExcelDataStore/monster.xlsx';
         $store = new ExcelDataStore(null, $path);
 
         //when

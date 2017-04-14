@@ -5,12 +5,9 @@ use battlecook\DataObject\Model;
 
 abstract class BufferDataStore
 {
-    const NODE = 0;
+    const DATA = 0;
     const STATE = 1;
     const CHANGED = 2;
-
-    const INDEX = 0;
-    const DATA = 1;
 
     protected $buffer;
     protected $index;
@@ -74,7 +71,7 @@ abstract class BufferDataStore
             {
                 continue;
             }
-            $ret[] = $data[self::NODE];
+            $ret[] = $data[self::DATA];
         }
 
         return $ret;
@@ -101,7 +98,7 @@ abstract class BufferDataStore
                 $count = 0;
                 foreach($identifiers as $identifier)
                 {
-                    if($data[self::NODE]->$identifier === $object->$identifier)
+                    if($data[self::DATA]->$identifier === $object->$identifier)
                     {
                         $count++;
                     }
@@ -113,7 +110,7 @@ abstract class BufferDataStore
 
                 if($this->isSameDepth($count, $depth))
                 {
-                    $ret[] = $data[self::NODE];
+                    $ret[] = $data[self::DATA];
                 }
             }
         }
@@ -132,7 +129,7 @@ abstract class BufferDataStore
             }
             else
             {
-                $this->buffer[] = array(self::NODE => $object, self::STATE => DataState::DIRTY_ADD);
+                $this->buffer[] = array(self::DATA => $object, self::STATE => DataState::DIRTY_ADD);
             }
         }
         else
@@ -142,7 +139,7 @@ abstract class BufferDataStore
             {
                 if($value === $data)
                 {
-                    $state = $data[self::NODE];
+                    $state = $data[self::DATA];
                     if($state === DataState::DIRTY_DEL)
                     {
                         $state = DataState::DIRTY_SET;
@@ -159,7 +156,7 @@ abstract class BufferDataStore
                         throw new \Exception("invalid state");
                     }
                     $this->buffer[$key][self::STATE] = $state;
-                    $this->buffer[$key][self::NODE] = $data;
+                    $this->buffer[$key][self::DATA] = $data;
 
                     break;
                 }
@@ -177,10 +174,18 @@ abstract class BufferDataStore
         foreach($this->buffer as $data)
         {
             $depth = 0;
-            $identifiers = $data[self::NODE]->getIdentifiers();
-            $maxDepth = $this->getDepth($identifiers, $data[self::NODE]);
-            $this->recursion($this->index, $data[self::NODE], $identifiers, $depth, $maxDepth);
+            $identifiers = $data[self::DATA]->getIdentifiers();
+            $maxDepth = $this->getDepth($identifiers, $data[self::DATA]);
+            $this->recursion($this->index, $data[self::DATA], $identifiers, $depth, $maxDepth);
         }
+    }
+
+    protected function addIndex($data)
+    {
+        $depth = 0;
+        $identifiers = $data[self::DATA]->getIdentifiers();
+        $maxDepth = $this->getDepth($identifiers, $data[self::DATA]);
+        $this->recursion($this->index, $data[self::DATA], $identifiers, $depth, $maxDepth);
     }
 
     private function recursion(&$index, $data, $identifiers, $depth, $maxDepth)
@@ -188,7 +193,7 @@ abstract class BufferDataStore
         if($depth === $maxDepth)
         {
             $index = $this->autoIncrement;
-            $this->buffer[self::DATA][$this->autoIncrement] = array(self::NODE => $data, self::STATE => DataState::CLEAR);
+            $this->buffer[$this->autoIncrement] = array(self::DATA => $data, self::STATE => DataState::CLEAR);
             $this->autoIncrement++;
             return;
         }

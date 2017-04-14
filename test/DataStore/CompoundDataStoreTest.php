@@ -5,8 +5,8 @@ namespace test\DataStore;
 use battlecook\DataStore\PdoDataStore;
 use PHPUnit\Framework\TestCase;
 use battlecook\DataStore\MemoryDataStore;
-use test\fixture\MemoryDataStore\Item;
-use test\fixture\MemoryDataStore\User;
+use test\Fixture\MemoryDataStore\Item;
+use test\Fixture\MemoryDataStore\User;
 
 require __DIR__  . '/../../vendor/autoload.php';
 

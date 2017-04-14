@@ -5,11 +5,11 @@ namespace test\DataStore;
 use battlecook\DataStore\PdoDataStore;
 use PHPUnit\DbUnit\TestCase;
 use PHPUnit\DbUnit\TestCaseTrait;
-use test\fixture\PdoDataStore\AfterData;
-use test\fixture\PdoDataStore\BeforeData;
-use test\fixture\MemoryDataStore\Item;
-use test\fixture\MemoryDataStore\Shard;
-use test\fixture\MemoryDataStore\User;
+use test\Fixture\PdoDataStore\AfterData;
+use test\Fixture\PdoDataStore\BeforeData;
+use test\Fixture\MemoryDataStore\Item;
+use test\Fixture\MemoryDataStore\Shard;
+use test\Fixture\MemoryDataStore\User;
 
 require __DIR__  . '/../../vendor/autoload.php';
 

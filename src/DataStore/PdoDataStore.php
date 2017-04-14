@@ -66,9 +66,10 @@ class PdoDataStore extends BufferDataStore implements DataStore
                 $className = get_class($object);
                 while($loadedData = $pdoStatement->fetchObject($className))
                 {
-                    $this->buffer[self::DATA] = array(self::NODE => $loadedData, self::STATE => DataState::CLEAR);
+                    parent::addIndex($loadedData);
+                    $this->buffer[] = array(self::DATA => $loadedData, self::STATE => DataState::CLEAR);
+
                 }
-                parent::createIndex();
             }
         }
 
@@ -77,12 +78,12 @@ class PdoDataStore extends BufferDataStore implements DataStore
             $storedData = $this->store->get($object);
             foreach($storedData as $data)
             {
-                $this->buffer[] = array(self::NODE => $data, self::STATE => DataState::CLEAR);
+                $this->buffer[] = array(self::DATA => $data, self::STATE => DataState::CLEAR);
             }
 
             foreach($this->buffer as $data)
             {
-                $this->add($data[self::NODE]);
+                $this->add($data[self::DATA]);
             }
         }
 
@@ -142,9 +143,9 @@ class PdoDataStore extends BufferDataStore implements DataStore
             {
                 foreach($this->buffer as $key => $value)
                 {
-                    if($value[self::NODE] === $data)
+                    if($value[self::DATA] === $data)
                     {
-                        $this->buffer[$key][self::NODE] = $object;
+                        $this->buffer[$key][self::DATA] = $object;
                         if($value[self::STATE] !== DataState::DIRTY_ADD)
                         {
                             $this->buffer[$key][self::STATE] = DataState::DIRTY_SET;
@@ -191,7 +192,7 @@ class PdoDataStore extends BufferDataStore implements DataStore
                 $count = 0;
                 foreach($identifiers as $identifier)
                 {
-                    if($data[self::NODE]->$identifier === $object->$identifier)
+                    if($data[self::DATA]->$identifier === $object->$identifier)
                     {
                         $count++;
                     }
@@ -224,7 +225,7 @@ class PdoDataStore extends BufferDataStore implements DataStore
         foreach($this->buffer as $key => $data)
         {
             /** @var Model $object */
-            $object = $data[self::NODE];
+            $object = $data[self::DATA];
             $tableName = $object->getShortName();
             if($this->shardStrategy)
             {
@@ -277,12 +278,12 @@ class PdoDataStore extends BufferDataStore implements DataStore
 
                 $this->buffer[$key][self::STATE] = DataState::CLEAR;
 
-                $this->lastAddedDataList[] = $data[self::NODE];
+                $this->lastAddedDataList[] = $data[self::DATA];
             }
             elseif($data[self::STATE] === DataState::DIRTY_DEL)
             {
                 //todo remove 된 녀석들 끼리 모아서 where 절에서 한번에 제거
-                $removedDataList[] = $data[self::NODE];
+                $removedDataList[] = $data[self::DATA];
                 unset($this->buffer[$key]);
             }
             elseif($data[self::STATE] === DataState::DIRTY_SET)

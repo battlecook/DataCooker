@@ -31,7 +31,7 @@ class RedisDataStore extends BufferDataStore implements DataStore
             $cachedData = apcu_fetch($key);
             foreach($cachedData as $data)
             {
-                $this->buffer[] = array(self::NODE => $data, self::STATE => DataState::CLEAR);
+                $this->buffer[] = array(self::DATA => $data, self::STATE => DataState::CLEAR);
             }
         }
 
@@ -40,7 +40,7 @@ class RedisDataStore extends BufferDataStore implements DataStore
             $storedData = $this->store->get($object);
             foreach($storedData as $data)
             {
-                $this->buffer[] = array(self::NODE => $data, self::STATE => DataState::CLEAR);
+                $this->buffer[] = array(self::DATA => $data, self::STATE => DataState::CLEAR);
             }
         }
 

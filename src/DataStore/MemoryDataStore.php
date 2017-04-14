@@ -21,7 +21,7 @@ class MemoryDataStore extends BufferDataStore implements DataStore
 
     public function get(Model $object)
     {
-        if(empty($this->buffer[self::DATA]))
+        if(empty($this->buffer))
         {
             if(!empty($this->data))
             {
@@ -30,12 +30,12 @@ class MemoryDataStore extends BufferDataStore implements DataStore
             }
         }
 
-        if(empty($this->buffer[self::DATA]) && $this->store)
+        if(empty($this->buffer) && $this->store)
         {
             $storedData = $this->store->get($object);
             foreach($storedData as $data)
             {
-                $this->buffer[] = array(self::NODE => $data, self::STATE => DataState::CLEAR);
+                $this->buffer[] = array(self::DATA => $data, self::STATE => DataState::CLEAR);
             }
             $this->data = $this->buffer;
         }
@@ -66,9 +66,9 @@ class MemoryDataStore extends BufferDataStore implements DataStore
             {
                 foreach($this->buffer as $key => $value)
                 {
-                    if($value[self::NODE] === $data)
+                    if($value[self::DATA] === $data)
                     {
-                        $this->buffer[$key][self::NODE] = $object;
+                        $this->buffer[$key][self::DATA] = $object;
                         if($value[self::STATE] !== DataState::DIRTY_ADD)
                         {
                             $this->buffer[$key][self::STATE] = DataState::DIRTY_SET;
@@ -114,7 +114,7 @@ class MemoryDataStore extends BufferDataStore implements DataStore
                 $count = 0;
                 foreach($identifiers as $identifier)
                 {
-                    if($data[self::NODE]->$identifier === $object->$identifier)
+                    if($data[self::DATA]->$identifier === $object->$identifier)
                     {
                         $count++;
                     }
@@ -154,7 +154,7 @@ class MemoryDataStore extends BufferDataStore implements DataStore
         {
             if($data[self::STATE] === DataState::DIRTY_ADD)
             {
-                $this->lastAddedDataList[] = $data[self::NODE];
+                $this->lastAddedDataList[] = $data[self::DATA];
             }
             if($data[self::STATE] === DataState::DIRTY_DEL)
             {
