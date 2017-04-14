@@ -1,6 +1,6 @@
 <?php
 
-namespace test\fixture\ExcelDataStore;
+namespace test\Fixture\ExcelDataStore;
 
 use battlecook\DataObject\Model;
 

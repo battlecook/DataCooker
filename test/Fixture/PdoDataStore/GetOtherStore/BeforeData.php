@@ -9,9 +9,11 @@ class BeforeData
     public static function getData()
     {
         return array(
-            'Item' => array(
-                array('itemId' => 1, 'userId' => 1, 'itemDesignId' => 2, 'itemName' => 'item2'),
-                array('itemId' => 2, 'userId' => 1, 'itemDesignId' => 3, 'itemName' => 'item3'),
+            'Quest' => array(
+                array('id' => 1, 'key1' => 1, 'key2' => 2, 'key3' => 1, 'attr' => 'attr'),
+                array('id' => 2, 'key1' => 1, 'key2' => 3, 'key3' => 1, 'attr' => 'attr'),
+                array('id' => 3, 'key1' => 1, 'key2' => 3, 'key3' => 2, 'attr' => 'attr'),
+                array('id' => 4, 'key1' => 1, 'key2' => 1, 'key3' => 1, 'attr' => 'attr'),
             ),
         );
     }

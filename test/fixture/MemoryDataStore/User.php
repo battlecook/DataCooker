@@ -1,6 +1,6 @@
 <?php
 
-namespace test\fixture\MemoryDataStore;
+namespace test\Fixture\MemoryDataStore;
 
 use battlecook\DataObject\Model;
 

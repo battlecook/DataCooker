@@ -1,33 +1,37 @@
 <?php
 
-namespace test\Fixture\MemoryDataStore;
+namespace test\Fixture\PdoDataStore\GetOtherStore;
 
 use battlecook\DataObject\Model;
 
-require __DIR__  . '/../../../vendor/autoload.php';
+require __DIR__  . '/../../../../vendor/autoload.php';
 
-class Item extends Model
+class Quest extends Model
 {
     /**
      * @dataStoreIdentifier
      */
-    public $userId;
+    public $key1;
     /**
      * @dataStoreIdentifier
      */
-    public $itemDesignId;
+    public $key2;
+    /**
+     * @dataStoreIdentifier
+     */
+    public $key3;
     /**
      * @dataStoreAttribute
      * @dataStoreAutoIncrement
      */
-    public $itemId;
+    public $id;
     /**
      * @dataStoreAttribute
      */
-    public $itemName;
+    public $attr;
 
     public function getShardKey()
     {
-        return $this->userId;
+        return $this->key1;
     }
 }

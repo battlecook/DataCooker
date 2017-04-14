@@ -9,6 +9,7 @@ use PHPUnit\DbUnit\TestCaseTrait;
 use test\Fixture\PdoDataStore\AfterData;
 use test\Fixture\PdoDataStore\BeforeData;
 use test\Fixture\PdoDataStore\Item;
+use test\Fixture\PdoDataStore\GetOtherStore\Quest;
 use test\Fixture\PdoDataStore\Shard;
 use test\Fixture\PdoDataStore\User;
 
@@ -87,9 +88,9 @@ class PdoDataStoreTest extends TestCase
         $db->onSetUp();
 
         //when
-        $object = new Item();
-        $object->userId = 1;
-        $object->itemDesignId = 1;
+        $object = new Quest();
+        $object->key1 = 1;
+        $object->key2 = 3;
 
         $ret = $store->get($object);
 

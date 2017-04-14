@@ -1,6 +1,6 @@
 <?php
 
-namespace test\fixture\PdoDataStore;
+namespace test\Fixture\PdoDataStore;
 
 require __DIR__ . '/../../../vendor/autoload.php';
 

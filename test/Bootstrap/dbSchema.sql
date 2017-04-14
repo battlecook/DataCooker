@@ -16,3 +16,14 @@ CREATE TABLE `Item` (
   PRIMARY KEY (`itemId`),
   KEY `index` (`userId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+DROP TABLE IF EXISTS `Quest`;
+
+CREATE TABLE `Quest` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `key1` bigint(20) unsigned NOT NULL,
+  `key2` bigint(20) unsigned NOT NULL,
+  `key3` bigint(20) NOT NULL,
+  `attr` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
