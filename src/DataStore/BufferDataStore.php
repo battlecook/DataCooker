@@ -183,9 +183,9 @@ abstract class BufferDataStore
     protected function addIndex($data)
     {
         $depth = 0;
-        $identifiers = $data[self::DATA]->getIdentifiers();
-        $maxDepth = $this->getDepth($identifiers, $data[self::DATA]);
-        $this->recursion($this->index, $data[self::DATA], $identifiers, $depth, $maxDepth);
+        $identifiers = $data->getIdentifiers();
+        $maxDepth = $this->getDepth($identifiers, $data);
+        $this->recursion($this->index, $data, $identifiers, $depth, $maxDepth);
     }
 
     private function recursion(&$index, $data, $identifiers, $depth, $maxDepth)

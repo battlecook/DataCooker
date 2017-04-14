@@ -3,13 +3,14 @@
 namespace test\DataStore;
 
 use battlecook\DataStore\PdoDataStore;
+use PHPUnit\DbUnit\DefaultTester;
 use PHPUnit\DbUnit\TestCase;
 use PHPUnit\DbUnit\TestCaseTrait;
 use test\Fixture\PdoDataStore\AfterData;
 use test\Fixture\PdoDataStore\BeforeData;
-use test\Fixture\MemoryDataStore\Item;
-use test\Fixture\MemoryDataStore\Shard;
-use test\Fixture\MemoryDataStore\User;
+use test\Fixture\PdoDataStore\Item;
+use test\Fixture\PdoDataStore\Shard;
+use test\Fixture\PdoDataStore\User;
 
 require __DIR__  . '/../../vendor/autoload.php';
 
@@ -58,6 +59,37 @@ class PdoDataStoreTest extends TestCase
         $object = new Item();
         $object->userId = 2;
         $object->itemDesignId = 2;
+
+        $ret = $store->get($object);
+
+        //then
+        $this->assertEquals(1, count($ret));
+        $this->assertEquals('item2', $ret[0]->itemName);
+    }
+
+    public function testGetOtherStore()
+    {
+        //given
+        $closure =  function ()
+        {
+            $dbo = new DBO(new Config());
+            return $dbo->getPdo();
+        };
+        $store = new PdoDataStore(null, $closure);
+
+
+        $dbConnection = $this->createDefaultDBConnection($closure(), Config::$dbName);
+
+        $db = new DefaultTester($dbConnection);
+
+        $beforeData = \test\Fixture\PdoDataStore\GetOtherStore\BeforeData::getData();
+        $db->setDataSet($this->createArrayDataSet($beforeData));
+        $db->onSetUp();
+
+        //when
+        $object = new Item();
+        $object->userId = 1;
+        $object->itemDesignId = 1;
 
         $ret = $store->get($object);
 
