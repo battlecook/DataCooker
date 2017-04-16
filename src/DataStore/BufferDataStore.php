@@ -229,11 +229,6 @@ abstract class BufferDataStore
         $this->recursion($index[$value], $data, $identifiers, $depth, $maxDepth);
     }
 
-    private function optimizeDataState()
-    {
-
-    }
-
     protected function remove(Model $object)
     {
         $rowCount = 0;

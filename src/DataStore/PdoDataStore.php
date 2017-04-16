@@ -153,7 +153,22 @@ class PdoDataStore extends BufferDataStore implements DataStore
                 $shardKey = $object->getShardKey();
                 $shardId = $this->shardStrategy->getShardId($shardKey);
             }
-            if($data[self::STATE] === DataState::DIRTY_ADD)
+
+            $state = $data[self::STATE];
+            if($state === DataState::DIRTY_ADD && $data[self::STATE_HISTORY][0] === DataState::DIRTY_DEL)
+            {
+                $state = DataState::DIRTY_SET;
+            }
+            else if($state === DataState::DIRTY_SET && $data[self::STATE_HISTORY][0] === DataState::DIRTY_ADD)
+            {
+                $state = DataState::DIRTY_ADD;
+            }
+            else if($state === DataState::DIRTY_DEL && $data[self::STATE_HISTORY][0] === DataState::DIRTY_ADD)
+            {
+                continue;
+            }
+
+            if($state === DataState::DIRTY_ADD)
             {
                 $identifiers = $object->getIdentifiers();
                 $attributes = $object->getAttributes();
@@ -201,13 +216,13 @@ class PdoDataStore extends BufferDataStore implements DataStore
 
                 $this->lastAddedDataList[] = $data[self::DATA];
             }
-            elseif($data[self::STATE] === DataState::DIRTY_DEL)
+            elseif($state === DataState::DIRTY_DEL)
             {
                 //todo remove 된 녀석들 끼리 모아서 where 절에서 한번에 제거
                 $removedDataList[] = $data[self::DATA];
                 unset($this->buffer[$key]);
             }
-            elseif($data[self::STATE] === DataState::DIRTY_SET)
+            elseif($state === DataState::DIRTY_SET)
             {
                 $pdo = $this->pdo;
 
@@ -256,6 +271,7 @@ class PdoDataStore extends BufferDataStore implements DataStore
                 }
 
                 $this->buffer[$key][self::STATE] = DataState::CLEAR;
+                $this->buffer[$key][self::STATE_HISTORY] = array();
             }
         }
 
