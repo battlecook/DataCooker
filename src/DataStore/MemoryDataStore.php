@@ -34,7 +34,7 @@ class MemoryDataStore extends BufferDataStore implements DataStore
             $storedData = $this->store->get($object);
             foreach($storedData as $data)
             {
-                parent::addIndex($data);
+                parent::addClear($data);
             }
             $this->data = $this->buffer;
         }

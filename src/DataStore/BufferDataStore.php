@@ -168,18 +168,41 @@ abstract class BufferDataStore
 
     protected function add(Model $object)
     {
-        $ret = $this->get($object);
-        if(empty($ret))
+        $rowCount = 0;
+        $bufferedData = $this->get($object);
+        if(empty($bufferedData))
         {
-            $this->addIndex($object);
+            $rowCount = 1;
+            //todo have to multi update feature, but once single update only
+            $depth = 0;
+            $identifiers = $object->getIdentifiers();
+            $maxDepth = $this->getDepth($identifiers, $object);
+            $this->addIndex($this->index, $object, $identifiers, $depth, $maxDepth);
         }
-        else
-        {
-            throw new \Exception("already data exist");
-        }
+
+        return $rowCount;
     }
 
-    protected function addIndex($data)
+    private function addIndex(&$index, $data, $identifiers, $depth, $maxDepth)
+    {
+        if($depth === $maxDepth)
+        {
+            $index = $this->autoIncrement;
+            $this->buffer[$this->autoIncrement] = array(self::DATA => $data, self::STATE => DataState::DIRTY_ADD, self::STATE_HISTORY => array(DataState::DIRTY_ADD));
+            $this->autoIncrement++;
+            return;
+        }
+        $identifier = $identifiers[$depth];
+        $value = $data->$identifier;
+        if(!isset($index[$value]))
+        {
+            $index[$value] = array();
+        }
+        $depth++;
+        $this->addIndex($index[$value], $data, $identifiers, $depth, $maxDepth);
+    }
+
+    protected function addClear($data)
     {
         $depth = 0;
         $identifiers = $data->getIdentifiers();
@@ -192,7 +215,7 @@ abstract class BufferDataStore
         if($depth === $maxDepth)
         {
             $index = $this->autoIncrement;
-            $this->buffer[$this->autoIncrement] = array(self::DATA => $data, self::STATE => DataState::CLEAR, self::STATE_HISTORY => array(DataState::DIRTY_ADD));
+            $this->buffer[$this->autoIncrement] = array(self::DATA => $data, self::STATE => DataState::CLEAR, self::STATE_HISTORY => array(DataState::CLEAR));
             $this->autoIncrement++;
             return;
         }
