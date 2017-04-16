@@ -327,7 +327,7 @@ class PdoDataStoreTest extends TestCase
         //when
         $object = new Item();
         $object->userId = 2;
-        $object->itemId = 2;
+        $object->itemDesignId = 2;
 
         $ret = $store->remove($object);
 

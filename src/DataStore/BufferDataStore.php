@@ -22,6 +22,11 @@ abstract class BufferDataStore
         return $data[self::STATE] === DataState::DIRTY_DEL;
     }
 
+    public function getLastAddedDataList()
+    {
+        return $this->lastAddedDataList;
+    }
+
     protected function getDepth($identifiers, $object)
     {
         $depth = 0;
@@ -170,49 +175,7 @@ abstract class BufferDataStore
         }
         else
         {
-            $data = $ret[0];
-            foreach($this->buffer as $key => $value)
-            {
-                if($value === $data)
-                {
-                    $state = $data[self::DATA];
-                    if($state === DataState::DIRTY_DEL)
-                    {
-                        $state = DataState::DIRTY_SET;
-                    }
-                    elseif($state === DataState::DIRTY_SET)
-                    {
-                    }
-                    elseif($state === DataState::CLEAR || $state === DataState::DIRTY_ADD)
-                    {
-                        throw new \Exception("already data exist");
-                    }
-                    else
-                    {
-                        throw new \Exception("invalid state");
-                    }
-                    $this->buffer[$key][self::STATE] = $state;
-                    $this->buffer[$key][self::DATA] = $data;
-
-                    break;
-                }
-            }
-        }
-    }
-
-    public function getLastAddedDataList()
-    {
-        return $this->lastAddedDataList;
-    }
-
-    protected function createIndex()
-    {
-        foreach($this->buffer as $data)
-        {
-            $depth = 0;
-            $identifiers = $data[self::DATA]->getIdentifiers();
-            $maxDepth = $this->getDepth($identifiers, $data[self::DATA]);
-            $this->recursion($this->index, $data[self::DATA], $identifiers, $depth, $maxDepth);
+            throw new \Exception("already data exist");
         }
     }
 
@@ -229,7 +192,7 @@ abstract class BufferDataStore
         if($depth === $maxDepth)
         {
             $index = $this->autoIncrement;
-            $this->buffer[$this->autoIncrement] = array(self::DATA => $data, self::STATE => DataState::CLEAR, self::STATE_HISTORY => array());
+            $this->buffer[$this->autoIncrement] = array(self::DATA => $data, self::STATE => DataState::CLEAR, self::STATE_HISTORY => array(DataState::DIRTY_ADD));
             $this->autoIncrement++;
             return;
         }
@@ -246,5 +209,44 @@ abstract class BufferDataStore
     private function optimizeDataState()
     {
 
+    }
+
+    protected function remove(Model $object)
+    {
+        $rowCount = 0;
+        $bufferedData = $this->get($object);
+        if(!empty($bufferedData))
+        {
+            $rowCount = 1;
+            //todo have to multi update feature, but once single update only
+            $depth = 0;
+            $identifiers = $object->getIdentifiers();
+            $maxDepth = $this->getDepth($identifiers, $object);
+            $this->removeIndex($this->index, $object, $identifiers, $depth, $maxDepth);
+        }
+
+        return $rowCount;
+    }
+
+    private function removeIndex(&$index, $data, $identifiers, $depth, $maxDepth)
+    {
+        if($depth === $maxDepth)
+        {
+            if($this->buffer[$index][self::STATE] === DataState::DIRTY_DEL)
+            {
+                throw new \Exception("already data removed");
+            }
+            $this->buffer[$index][self::STATE] = DataState::DIRTY_DEL;
+            $this->buffer[$index][self::STATE_HISTORY][] = DataState::DIRTY_DEL;
+            return;
+        }
+        $identifier = $identifiers[$depth];
+        $value = $data->$identifier;
+        if(!isset($index[$value]))
+        {
+            throw new \Exception("not exist remove date");
+        }
+        $depth++;
+        $this->removeIndex($index[$value], $data, $identifiers, $depth, $maxDepth);
     }
 }

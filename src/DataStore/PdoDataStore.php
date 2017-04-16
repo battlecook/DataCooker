@@ -131,41 +131,8 @@ class PdoDataStore extends BufferDataStore implements DataStore
 
     public function remove(Model $object)
     {
-        $rowCount = 0;
-        $identifiers = $object->getIdentifiers();
-        $depth = $this->getDepth($identifiers, $object);
-        if($depth === 0)
-        {
-            return $rowCount;
-        }
-        $ret = $this->get($object);
-        if(!empty($ret))
-        {
-            foreach ($this->buffer as $key => $data)
-            {
-                $count = 0;
-                foreach($identifiers as $identifier)
-                {
-                    if($data[self::DATA]->$identifier === $object->$identifier)
-                    {
-                        $count++;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-
-                if($count >= $depth)
-                {
-                    $this->buffer[$key][self::STATE] = DataState::DIRTY_DEL;
-                    $rowCount++;
-                    break;
-                }
-            }
-        }
-
-        if($this->store)
+        $rowCount = parent::remove($object);
+        if($rowCount > 0 && $this->store)
         {
             $this->store->remove($object);
         }
