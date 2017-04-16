@@ -57,8 +57,7 @@ class ExcelDataStore extends BufferDataStore implements DataStore
                     $value = $datum[$i];
                     $object->$name = $value;
                 }
-
-                $this->buffer[] = array(self::DATA => $object, self::STATE => DataState::CLEAR);
+                parent::addClear($object);
             }
         }
 
@@ -67,7 +66,7 @@ class ExcelDataStore extends BufferDataStore implements DataStore
             $storedData = $this->store->get($object);
             foreach($storedData as $data)
             {
-                $this->buffer[] = array(self::DATA => $data, self::STATE => DataState::CLEAR);
+                parent::addClear($data);
             }
         }
 

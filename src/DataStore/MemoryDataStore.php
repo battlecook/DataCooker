@@ -98,38 +98,10 @@ class MemoryDataStore extends BufferDataStore implements DataStore
 
     public function remove(Model $object)
     {
-        $rowCount = 0;
-        $identifiers = $object->getIdentifiers();
-        $depth = $this->getDepth($identifiers, $object);
-        if($depth === 0)
+        $rowCount = parent::remove($object);
+        if($rowCount > 0 && $this->store)
         {
-            return $rowCount;
-        }
-        $ret = $this->get($object);
-        if(!empty($ret))
-        {
-            foreach ($this->buffer as $key => $data)
-            {
-                $count = 0;
-                foreach($identifiers as $identifier)
-                {
-                    if($data[self::DATA]->$identifier === $object->$identifier)
-                    {
-                        $count++;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-
-                if($count >= $depth)
-                {
-                    array_splice($this->buffer, $key, 1);
-                    $rowCount++;
-                    break;
-                }
-            }
+            $this->store->remove($object);
         }
 
         return $rowCount;

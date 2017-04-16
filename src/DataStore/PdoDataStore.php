@@ -15,7 +15,8 @@ class PdoDataStore extends BufferDataStore implements DataStore
 
     public function __construct(DataStore $store = null, Closure $closure, ShardStrategy $shardStrategy = null)
     {
-        $this->buffer = array();
+        parent::__construct();
+
         $this->store = $store;
 
         $this->shardStrategy = $shardStrategy;

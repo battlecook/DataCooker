@@ -17,6 +17,12 @@ abstract class BufferDataStore
 
     protected $autoIncrement = 0;
 
+    public function __construct()
+    {
+        $this->buffer = array();
+        $this->index = array();
+    }
+
     private function isRemoved($data)
     {
         return $data[self::STATE] === DataState::DIRTY_DEL;
@@ -53,6 +59,13 @@ abstract class BufferDataStore
         {
             $ret = $this->getDataAll();
         }
+        else if($depth === count($identifiers))
+        {
+            $depth = 0;
+            $identifiers = $object->getIdentifiers();
+            $maxDepth = $this->getDepth($identifiers, $object);
+            $ret = $this->getByIndex($this->index, $object, $identifiers, $depth, $maxDepth);
+        }
         else
         {
             $ret = $this->getBufferData($identifiers, $object);
@@ -74,6 +87,26 @@ abstract class BufferDataStore
         }
 
         return $ret;
+    }
+
+    private function getByIndex(&$index, $data, $identifiers, $depth, $maxDepth)
+    {
+        if($depth === $maxDepth)
+        {
+            if($this->buffer[$index][self::STATE] === DataState::DIRTY_DEL)
+            {
+                return array();
+            }
+            return array($this->buffer[$index][self::DATA]);
+        }
+        $identifier = $identifiers[$depth];
+        $value = $data->$identifier;
+        if(!isset($index[$value]))
+        {
+            return array();
+        }
+        $depth++;
+        return $this->getByIndex($index[$value], $data, $identifiers, $depth, $maxDepth);
     }
 
     private function getBufferData($identifiers, $object)
@@ -207,10 +240,10 @@ abstract class BufferDataStore
         $depth = 0;
         $identifiers = $data->getIdentifiers();
         $maxDepth = $this->getDepth($identifiers, $data);
-        $this->recursion($this->index, $data, $identifiers, $depth, $maxDepth);
+        $this->clearIndex($this->index, $data, $identifiers, $depth, $maxDepth);
     }
 
-    private function recursion(&$index, $data, $identifiers, $depth, $maxDepth)
+    private function clearIndex(&$index, $data, $identifiers, $depth, $maxDepth)
     {
         if($depth === $maxDepth)
         {
@@ -226,7 +259,7 @@ abstract class BufferDataStore
             $index[$value] = array();
         }
         $depth++;
-        $this->recursion($index[$value], $data, $identifiers, $depth, $maxDepth);
+        $this->clearIndex($index[$value], $data, $identifiers, $depth, $maxDepth);
     }
 
     protected function remove(Model $object)
