@@ -123,14 +123,7 @@ abstract class BufferDataStore
         $ret = $this->get($object);
         if(empty($ret))
         {
-            if($this->useIndex)
-            {
-
-            }
-            else
-            {
-                $this->buffer[] = array(self::DATA => $object, self::STATE => DataState::DIRTY_ADD);
-            }
+            $this->addIndex($object);
         }
         else
         {
