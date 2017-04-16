@@ -8,6 +8,7 @@ abstract class BufferDataStore
     const DATA = 0;
     const STATE = 1;
     const CHANGED = 2;
+    const STATE_HISTORY = 3;
 
     protected $buffer;
     protected $index;
@@ -16,16 +17,9 @@ abstract class BufferDataStore
 
     protected $autoIncrement = 0;
 
-    private $useIndex = false;
-
     private function isRemoved($data)
     {
         return $data[self::STATE] === DataState::DIRTY_DEL;
-    }
-
-    private function isSameDepth($count, $depth)
-    {
-        return $count === $depth;
     }
 
     protected function getDepth($identifiers, $object)
@@ -79,43 +73,92 @@ abstract class BufferDataStore
 
     private function getBufferData($identifiers, $object)
     {
-        if($this->useIndex)
-        {
-            $ret = array();
-        }
-        else
-        {
-            $depth = $this->getDepth($identifiers, $object);
+        $depth = $this->getDepth($identifiers, $object);
 
-            $ret = array();
-            foreach ($this->buffer as $key => $data)
+        $ret = array();
+        foreach ($this->buffer as $key => $data)
+        {
+            if($this->isRemoved($data))
             {
-                if($this->isRemoved($data))
-                {
-                    continue;
-                }
+                continue;
+            }
 
-                $count = 0;
-                foreach($identifiers as $identifier)
+            $count = 0;
+            foreach($identifiers as $identifier)
+            {
+                if($data[self::DATA]->$identifier === $object->$identifier)
                 {
-                    if($data[self::DATA]->$identifier === $object->$identifier)
-                    {
-                        $count++;
-                    }
-                    else
-                    {
-                        break;
-                    }
+                    $count++;
                 }
+                else
+                {
+                    break;
+                }
+            }
 
-                if($this->isSameDepth($count, $depth))
-                {
-                    $ret[] = $data[self::DATA];
-                }
+            if($count >= $depth)
+            {
+                $ret[] = $data[self::DATA];
             }
         }
 
         return $ret;
+    }
+
+    protected function set(Model $object)
+    {
+        $rowCount = 0;
+        $bufferedData = $this->get($object);
+        if(!empty($bufferedData))
+        {
+            $rowCount = 1;
+            //todo have to multi update feature, but once single update only
+            $data = $bufferedData[0];
+            $attributes = $object->getAttributes();
+            $changedAttributes = array();
+            foreach($attributes as $attribute)
+            {
+                if($data->$attribute !== $object->$attribute)
+                {
+                    $dataType = \PDO::PARAM_STR;
+                    if(is_integer($object->$attribute))
+                    {
+                        $dataType = \PDO::PARAM_INT;
+                    }
+
+                    $changedAttributes[] = array('name' => $attribute, 'value' => $object->$attribute, 'dataType' => $dataType);
+                }
+            }
+
+            if(!empty($changedAttributes))
+            {
+                $depth = 0;
+                $identifiers = $data->getIdentifiers();
+                $maxDepth = $this->getDepth($identifiers, $data);
+                $this->setIndex($this->index, $object, $identifiers, $depth, $maxDepth);
+            }
+        }
+
+        return $rowCount;
+    }
+
+    protected function setIndex($index, $data, $identifiers, $depth, $maxDepth)
+    {
+        if($depth === $maxDepth)
+        {
+            $this->buffer[$index][self::DATA] = $data;
+            $this->buffer[$index][self::STATE] = DataState::DIRTY_SET;
+            $this->buffer[$index][self::STATE_HISTORY][] = DataState::DIRTY_SET;
+            return;
+        }
+        $identifier = $identifiers[$depth];
+        $value = $data->$identifier;
+        if(!isset($index[$value]))
+        {
+            throw new \Exception("not exist set date");
+        }
+        $depth++;
+        $this->setIndex($index[$value], $data, $identifiers, $depth, $maxDepth);
     }
 
     protected function add(Model $object)
@@ -186,7 +229,7 @@ abstract class BufferDataStore
         if($depth === $maxDepth)
         {
             $index = $this->autoIncrement;
-            $this->buffer[$this->autoIncrement] = array(self::DATA => $data, self::STATE => DataState::CLEAR);
+            $this->buffer[$this->autoIncrement] = array(self::DATA => $data, self::STATE => DataState::CLEAR, self::STATE_HISTORY => array());
             $this->autoIncrement++;
             return;
         }
@@ -198,5 +241,10 @@ abstract class BufferDataStore
         }
         $depth++;
         $this->recursion($index[$value], $data, $identifiers, $depth, $maxDepth);
+    }
+
+    private function optimizeDataState()
+    {
+
     }
 }

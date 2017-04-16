@@ -67,8 +67,6 @@ class PdoDataStore extends BufferDataStore implements DataStore
                 while($loadedData = $pdoStatement->fetchObject($className))
                 {
                     parent::addIndex($loadedData);
-                    //$this->buffer[] = array(self::DATA => $loadedData, self::STATE => DataState::CLEAR);
-
                 }
             }
         }
@@ -78,12 +76,7 @@ class PdoDataStore extends BufferDataStore implements DataStore
             $storedData = $this->store->get($object);
             foreach($storedData as $data)
             {
-                $this->buffer[] = array(self::DATA => $data, self::STATE => DataState::CLEAR);
-            }
-
-            foreach($this->buffer as $data)
-            {
-                $this->add($data[self::DATA]);
+                parent::addIndex($data);
             }
         }
 
@@ -118,49 +111,10 @@ class PdoDataStore extends BufferDataStore implements DataStore
 
     public function set(Model $object)
     {
-        $rowCount = 0;
-        $bufferedData = $this->get($object);
-        if(!empty($bufferedData))
+        $rowCount = parent::set($object);
+        if($rowCount > 0 && $this->store)
         {
-            $data = $bufferedData[0];
-            $attributes = $object->getAttributes();
-            $changedAttributes = array();
-            foreach($attributes as $attribute)
-            {
-                if($data->$attribute !== $object->$attribute)
-                {
-                    $dataType = \PDO::PARAM_STR;
-                    if(is_integer($object->$attribute))
-                    {
-                        $dataType = \PDO::PARAM_INT;
-                    }
-
-                    $changedAttributes[] = array('name' => $attribute, 'value' => $object->$attribute, 'dataType' => $dataType);
-                }
-            }
-
-            if(!empty($changedAttributes))
-            {
-                foreach($this->buffer as $key => $value)
-                {
-                    if($value[self::DATA] === $data)
-                    {
-                        $this->buffer[$key][self::DATA] = $object;
-                        if($value[self::STATE] !== DataState::DIRTY_ADD)
-                        {
-                            $this->buffer[$key][self::STATE] = DataState::DIRTY_SET;
-                        }
-                        $this->buffer[$key][self::CHANGED] = $changedAttributes;
-                        $rowCount++;
-                        break;
-                    }
-                }
-            }
-
-            if($this->store)
-            {
-                $this->store->set($object);
-            }
+            $this->store->set($object);
         }
 
         return $rowCount;

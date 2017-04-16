@@ -78,7 +78,6 @@ class PdoDataStoreTest extends TestCase
         };
         $store = new PdoDataStore(null, $closure);
 
-
         $dbConnection = $this->createDefaultDBConnection($closure(), Config::$dbName);
 
         $db = new DefaultTester($dbConnection);
@@ -95,8 +94,8 @@ class PdoDataStoreTest extends TestCase
         $ret = $store->get($object);
 
         //then
-        $this->assertEquals(1, count($ret));
-        $this->assertEquals('item2', $ret[0]->itemName);
+        $this->assertEquals(2, count($ret));
+        $this->assertEquals('attr2', $ret[0]->attr);
     }
 
     public function testGetEmptyCondition()
