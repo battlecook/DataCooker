@@ -14,8 +14,6 @@ class MemoryDataStore extends BufferDataStore implements DataStore
     public function __construct(DataStore $store = null)
     {
         $this->data = array();
-        //$this->buffer = array(self::INDEX => array(), self::DATA => array());
-        $this->buffer = array();
         $this->store = $store;
     }
 
