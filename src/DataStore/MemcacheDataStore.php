@@ -14,7 +14,8 @@ class MemcacheDataStore extends BufferDataStore implements DataStore
 
     public function __construct(DataStore $store = null, \Memcache $memcache, $keyPrefix)
     {
-        $this->buffer = array('index' => array(), 'data' => array());
+        parent::__construct();
+
         $this->store = $store;
         $this->memcache = $memcache;
 
@@ -57,42 +58,10 @@ class MemcacheDataStore extends BufferDataStore implements DataStore
      */
     public function set(Model $object)
     {
-        $rowCount = 0;
-        $bufferedData = $this->get($object);
-        if(!empty($bufferedData))
+        $rowCount = parent::set($object);
+        if($rowCount > 0 && $this->store)
         {
-            $data = $bufferedData[0];
-            $attributes = $object->getAttributes();
-            $isDirty = false;
-            foreach($attributes as $attribute)
-            {
-                if($data->$attribute !== $object->$attribute)
-                {
-                    $isDirty = true;
-                    break;
-                }
-            }
-            if($isDirty)
-            {
-                foreach($this->buffer as $key => $value)
-                {
-                    if($value[self::DATA] === $data)
-                    {
-                        $this->buffer[$key][self::DATA] = $object;
-                        if($value[self::STATE] !== DataState::DIRTY_ADD)
-                        {
-                            $this->buffer[$key][self::STATE] = DataState::DIRTY_SET;
-                        }
-                        $rowCount++;
-                        break;
-                    }
-                }
-            }
-
-            if($this->store)
-            {
-                $this->store->set($object);
-            }
+            $this->store->set($object);
         }
 
         return $rowCount;
@@ -117,7 +86,6 @@ class MemcacheDataStore extends BufferDataStore implements DataStore
      */
     public function remove(Model $object)
     {
-
         $rowCount = parent::remove($object);
         if($rowCount > 0 && $this->store)
         {
