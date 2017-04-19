@@ -184,6 +184,10 @@ abstract class BufferDataStore
     {
         if($depth === $maxDepth)
         {
+            if($this->buffer[$index][self::STATE] === DataState::DIRTY_DEL)
+            {
+                throw new \Exception("deleted data can not be updated.");
+            }
             $this->buffer[$index][self::DATA] = $data;
             $this->buffer[$index][self::STATE] = DataState::DIRTY_SET;
             $this->buffer[$index][self::STATE_HISTORY][] = DataState::DIRTY_SET;
@@ -225,6 +229,7 @@ abstract class BufferDataStore
             $this->autoIncrement++;
             return;
         }
+
         $identifier = $identifiers[$depth];
         $value = $data->$identifier;
         if(!isset($index[$value]))
