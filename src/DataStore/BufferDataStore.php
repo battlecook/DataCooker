@@ -8,7 +8,7 @@ abstract class BufferDataStore
     const DATA = 0;
     const STATE = 1;
     const CHANGED = 2;
-    const STATE_HISTORY = 3;
+    const FIRST_STATE = 3;
 
     protected $buffer;
     protected $index;
@@ -190,7 +190,6 @@ abstract class BufferDataStore
             }
             $this->buffer[$index][self::DATA] = $data;
             $this->buffer[$index][self::STATE] = DataState::DIRTY_SET;
-            $this->buffer[$index][self::STATE_HISTORY][] = DataState::DIRTY_SET;
             return;
         }
         $identifier = $identifiers[$depth];
@@ -225,7 +224,7 @@ abstract class BufferDataStore
         if($depth === $maxDepth)
         {
             $index = $this->autoIncrement;
-            $this->buffer[$this->autoIncrement] = array(self::DATA => $data, self::STATE => DataState::DIRTY_ADD, self::STATE_HISTORY => array(DataState::DIRTY_ADD));
+            $this->buffer[$this->autoIncrement] = array(self::DATA => $data, self::STATE => DataState::DIRTY_ADD, self::FIRST_STATE => DataState::DIRTY_ADD);
             $this->autoIncrement++;
             return;
         }
@@ -240,7 +239,7 @@ abstract class BufferDataStore
         $this->addIndex($index[$value], $data, $identifiers, $depth, $maxDepth);
     }
 
-    protected function addClear($data)
+    protected function addClear(Model $data)
     {
         $depth = 0;
         $identifiers = $data->getIdentifiers();
@@ -253,7 +252,7 @@ abstract class BufferDataStore
         if($depth === $maxDepth)
         {
             $index = $this->autoIncrement;
-            $this->buffer[$this->autoIncrement] = array(self::DATA => $data, self::STATE => DataState::CLEAR, self::STATE_HISTORY => array(DataState::CLEAR));
+            $this->buffer[$this->autoIncrement] = array(self::DATA => $data, self::STATE => DataState::CLEAR, self::FIRST_STATE => DataState::CLEAR);
             $this->autoIncrement++;
             return;
         }
@@ -293,7 +292,6 @@ abstract class BufferDataStore
                 throw new \Exception("already data removed");
             }
             $this->buffer[$index][self::STATE] = DataState::DIRTY_DEL;
-            $this->buffer[$index][self::STATE_HISTORY][] = DataState::DIRTY_DEL;
             return;
         }
         $identifier = $identifiers[$depth];

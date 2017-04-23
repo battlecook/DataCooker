@@ -156,15 +156,15 @@ class PdoDataStore extends BufferDataStore implements DataStore
             }
 
             $state = $data[self::STATE];
-            if($state === DataState::DIRTY_ADD && $data[self::STATE_HISTORY][0] === DataState::DIRTY_DEL)
+            if($state === DataState::DIRTY_ADD && $data[self::FIRST_STATE] === DataState::DIRTY_DEL)
             {
                 $state = DataState::DIRTY_SET;
             }
-            else if($state === DataState::DIRTY_SET && $data[self::STATE_HISTORY][0] === DataState::DIRTY_ADD)
+            else if($state === DataState::DIRTY_SET && $data[self::FIRST_STATE] === DataState::DIRTY_ADD)
             {
                 $state = DataState::DIRTY_ADD;
             }
-            else if($state === DataState::DIRTY_DEL && $data[self::STATE_HISTORY][0] === DataState::DIRTY_ADD)
+            else if($state === DataState::DIRTY_DEL && $data[self::FIRST_STATE] === DataState::DIRTY_ADD)
             {
                 continue;
             }
@@ -272,7 +272,7 @@ class PdoDataStore extends BufferDataStore implements DataStore
                 }
 
                 $this->buffer[$key][self::STATE] = DataState::CLEAR;
-                $this->buffer[$key][self::STATE_HISTORY] = array();
+                $this->buffer[$key][self::FIRST_STATE] = null;
             }
         }
 
