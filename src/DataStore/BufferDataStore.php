@@ -303,4 +303,9 @@ abstract class BufferDataStore
         $depth++;
         $this->removeIndex($index[$value], $data, $identifiers, $depth, $maxDepth);
     }
+
+    public function flush()
+    {
+
+    }
 }
