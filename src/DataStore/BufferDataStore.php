@@ -33,7 +33,7 @@ abstract class BufferDataStore
         return $this->lastAddedDataList;
     }
 
-    protected function getDepth($identifiers, $object)
+    private function getDepth($identifiers, $object)
     {
         $depth = 0;
         foreach($identifiers as $identifier)
@@ -180,7 +180,7 @@ abstract class BufferDataStore
         return $rowCount;
     }
 
-    protected function setIndex($index, $data, $identifiers, $depth, $maxDepth)
+    private function setIndex($index, $data, $identifiers, $depth, $maxDepth)
     {
         if($depth === $maxDepth)
         {
