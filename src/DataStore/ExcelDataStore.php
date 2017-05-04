@@ -13,6 +13,8 @@ class ExcelDataStore extends BufferDataStore implements DataStore
 
     public function __construct(DataStore $store = null, $path)
     {
+        parent::__construct();
+
         $this->buffer = array();
         $this->store = $store;
 

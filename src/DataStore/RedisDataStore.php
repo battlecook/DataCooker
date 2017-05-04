@@ -13,6 +13,8 @@ class RedisDataStore extends BufferDataStore implements DataStore
 
     public function __construct(DataStore $store = null, $keyPrefix)
     {
+        parent::__construct();
+
         $this->buffer = array();
         $this->store = $store;
 
