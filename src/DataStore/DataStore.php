@@ -26,6 +26,6 @@ interface DataStore
      */
     public function remove(Model $object);
 
-    public function flush();
+    public function flush($data);
     public function rollback();
 }

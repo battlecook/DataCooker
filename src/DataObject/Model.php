@@ -7,9 +7,6 @@ abstract class Model implements DataObject
 {
     private static $data = array();
 
-    private $identifiers = array();
-    private $autoIncrements = array();
-    private $attributes = array();
     private $shortName = null;
 
     protected $version = 1;

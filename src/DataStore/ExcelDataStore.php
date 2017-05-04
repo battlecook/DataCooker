@@ -63,15 +63,6 @@ class ExcelDataStore extends BufferDataStore implements DataStore
             }
         }
 
-        if(empty($this->buffer) && $this->store)
-        {
-            $storedData = $this->store->get($object);
-            foreach($storedData as $data)
-            {
-                parent::addClear($data);
-            }
-        }
-
         $ret = parent::get($object);
 
         return $ret;
@@ -104,7 +95,7 @@ class ExcelDataStore extends BufferDataStore implements DataStore
         // TODO: Implement remove() method.
     }
 
-    public function flush()
+    public function flush($data)
     {
         // TODO: Implement flush() method.
     }

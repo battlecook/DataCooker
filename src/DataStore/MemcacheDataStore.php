@@ -38,16 +38,9 @@ class MemcacheDataStore extends BufferDataStore implements DataStore
             }
         }
 
-        if(empty($this->buffer) && $this->store)
-        {
-            $storedData = $this->store->get($object);
-            foreach($storedData as $data)
-            {
-                parent::addClear($data);
-            }
-        }
-
         $ret = parent::get($object);
+
+        // cache set code 추가
 
         return $ret;
     }
@@ -95,7 +88,7 @@ class MemcacheDataStore extends BufferDataStore implements DataStore
         return $rowCount;
     }
 
-    public function flush()
+    public function flush($data)
     {
         foreach($this->buffer as $data)
         {

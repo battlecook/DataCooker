@@ -2,6 +2,7 @@
 
 namespace test\DataStore;
 
+use battlecook\DataStore\BufferDataStore;
 use battlecook\DataStore\PdoDataStore;
 use PHPUnit\DbUnit\DefaultTester;
 use PHPUnit\DbUnit\TestCase;
@@ -9,8 +10,6 @@ use PHPUnit\DbUnit\TestCaseTrait;
 use test\Fixture\PdoDataStore\AfterData;
 use test\Fixture\PdoDataStore\BeforeData;
 use test\Fixture\PdoDataStore\Item;
-use test\Fixture\PdoDataStore\GetOtherStore\Quest;
-use test\Fixture\PdoDataStore\Shard;
 use test\Fixture\PdoDataStore\User;
 
 require __DIR__  . '/../../vendor/autoload.php';
@@ -54,8 +53,6 @@ class PdoDataStoreTest extends TestCase
 
         $store->add($object);
 
-        $store->flush();
-
         //when
         $object = new Item();
         $object->userId = 2;
@@ -66,78 +63,6 @@ class PdoDataStoreTest extends TestCase
         //then
         $this->assertEquals(1, count($ret));
         $this->assertEquals('item2', $ret[0]->itemName);
-    }
-
-    public function testGetOtherStore()
-    {
-        //given
-        $closure =  function ()
-        {
-            $dbo = new DBO(new Config());
-            return $dbo->getPdo();
-        };
-        $store = new PdoDataStore(null, $closure);
-
-        $dbConnection = $this->createDefaultDBConnection($closure(), Config::$dbName);
-
-        $db = new DefaultTester($dbConnection);
-
-        $beforeData = \test\Fixture\PdoDataStore\GetOtherStore\BeforeData::getData();
-        $db->setDataSet($this->createArrayDataSet($beforeData));
-        $db->onSetUp();
-
-        //when
-        $object = new Quest();
-        $object->key1 = 1;
-        $object->key2 = 3;
-
-        $ret = $store->get($object);
-
-        //then
-        $this->assertEquals(2, count($ret));
-        $this->assertEquals('attr2', $ret[0]->attr);
-    }
-
-    public function testGetEmptyCondition()
-    {
-        //given
-        $store = new PdoDataStore(null, function (){
-            $dbo = new DBO(new Config());
-            return $dbo->getPdo();
-        });
-
-        $object = new Item();
-        $object->userId = 1;
-        $object->itemDesignId = 1;
-        $object->itemName = 'item1';
-
-        $store->add($object);
-
-        $object = new Item();
-        $object->userId = 2;
-        $object->itemDesignId = 2;
-        $object->itemName = 'item2';
-
-        $store->add($object);
-
-        $object = new Item();
-        $object->userId = 3;
-        $object->itemDesignId = 3;
-        $object->itemName = 'item3';
-
-        $store->add($object);
-
-        $store->flush();
-
-        //when
-        $object = new Item();
-        $object->userId = 2;
-        $object->itemDesignId = 1;
-
-        $ret = $store->get($object);
-
-        //then
-        $this->assertEquals(0, count($ret));
     }
 
     public function testGetSameUser()
@@ -169,8 +94,6 @@ class PdoDataStoreTest extends TestCase
 
         $store->add($object);
 
-        $store->flush();
-
         //when
         $object = new Item();
         $object->userId = 1;
@@ -181,51 +104,6 @@ class PdoDataStoreTest extends TestCase
         $this->assertEquals(2, count($ret));
         $this->assertEquals('item1', $ret[0]->itemName);
         $this->assertEquals('item2', $ret[1]->itemName);
-    }
-
-    public function testGetShard()
-    {
-        //given
-        $store = new PdoDataStore(null, function (){
-            $dbo = new DBO(new Config());
-            return $dbo->getPdo();
-        });
-
-        $object = new Shard();
-        $object->localId = 1;
-        $object->channelId = '1';
-        $object->shardId = 1;
-        $object->insertTime = '0000-00-00 00:00:00';
-
-        $store->add($object);
-
-        $object = new Shard();
-        $object->localId = 2;
-        $object->channelId = '2';
-        $object->shardId = 2;
-        $object->insertTime = '0000-00-00 00:00:00';
-
-        $store->add($object);
-
-        $object = new Shard();
-        $object->localId = 3;
-        $object->channelId = '3';
-        $object->shardId = 3;
-        $object->insertTime = '0000-00-00 00:00:00';
-
-        $store->add($object);
-
-        $store->flush();
-
-        //when
-        $object = new Shard();
-        $object->localId = 2;
-
-        $ret = $store->get($object);
-
-        //then
-        $this->assertEquals(1, count($ret));
-        $this->assertEquals('2', $ret[0]->channelId);
     }
 
     public function testAdd()
@@ -344,10 +222,7 @@ class PdoDataStoreTest extends TestCase
     public function testFlush()
     {
         //given
-        $store = new PdoDataStore(null, function (){
-            $dbo = new DBO(new Config());
-            return $dbo->getPdo();
-        });
+        $store = new BufferDataStore();
 
         $object = new Item();
         $object->userId = 1;
@@ -382,7 +257,13 @@ class PdoDataStoreTest extends TestCase
         $object->userId = 1;
         $object->itemDesignId = 1;
         $store->remove($object);
-        $store->flush();
+
+        $store = new PdoDataStore(null, function (){
+            $dbo = new DBO(new Config());
+            return $dbo->getPdo();
+        });
+
+        $store->flush($buffer);
 
         //then
         $this->assertEquals(1, $ret);
