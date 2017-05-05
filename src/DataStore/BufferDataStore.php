@@ -334,7 +334,7 @@ class BufferDataStore
 
             foreach($newDataList as $data)
             {
-                $this->addClear($data);
+                $this->addClear($data[self::DATA]);
             }
 
             //index도 제거
