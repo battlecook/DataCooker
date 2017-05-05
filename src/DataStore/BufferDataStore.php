@@ -304,6 +304,7 @@ class BufferDataStore
         if($this->store)
         {
             $this->store->flush($this->buffer);
+            $this->lastAddedDataList = $this->store->getLastAddedDataList();
         }
 
         try {
@@ -331,6 +332,7 @@ class BufferDataStore
             }
             $this->buffer = array();
             $this->index = array();
+            $this->autoIncrement = 0;
 
             foreach($newDataList as $data)
             {
