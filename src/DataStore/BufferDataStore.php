@@ -350,9 +350,7 @@ class BufferDataStore implements DataStore
 
         $this->lastAddedDataList = $lastAddedDataList;
 
-
-
-
+        $this->store->flush();
 
         try {
             foreach ($this->buffer as $key => $data)
@@ -392,11 +390,6 @@ class BufferDataStore implements DataStore
 
             $this->store->rollback();
         }
-    }
-
-    private function unsetIndex($key)
-    {
-
     }
 
     /**

@@ -85,8 +85,7 @@ class BufferDataStoreTest extends TestCase
         $object = new User();
         $object->userId = 1;
         $object->userName = 'user';
-
-
+        
         //when
         $ret = $store->remove($object);
 

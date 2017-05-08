@@ -30,21 +30,30 @@ class MemcacheDataStore implements DataStore
 
         $rootIdentifier = $identifiers[0];
 
-        $key = $this->keyPrefix . '/' . $object->getShortName() . '/' . 'v:' . $object->getVersion() . '/' . $rootIdentifier;
+        $key = $this->keyPrefix . '/' . $object->getShortName() . '/' . 'v:' . $object->getVersion() . '/' . $rootIdentifier . ':' . $object->$rootIdentifier;
 
-        $cachedData = $this->memcache->get($key);
-        if($cachedData)
+        $dataList = $this->memcache->get($key);
+        if($dataList)
         {
-
-            foreach($cachedData as $data)
+            foreach($dataList as $data)
             {
-                //parent::addClear($data);
+                foreach($identifiers as $identifier)
+                {
+                    if($data->$identifier === $object->$identifier)
+                    {
+                        $count++;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                if($count >= $depth)
+                {
+                    $ret[] = $data;
+                }
             }
-
-        }
-        else
-        {
-
         }
 
         return $ret;
@@ -74,6 +83,20 @@ class MemcacheDataStore implements DataStore
      */
     public function set(Model $object)
     {
+        $identifiers = $object->getIdentifiers();
+        $rootIdentifier = $identifiers[0];
+
+        $key = $this->keyPrefix . '/' . $object->getShortName() . '/' . 'v:' . $object->getVersion() . '/' . $rootIdentifier . ':' . $object->$rootIdentifier;
+
+        $dataList = $this->memcache->get($key);
+        if($dataList)
+        {
+
+        }
+        else
+        {
+            return 0;
+        }
     }
 
     /**

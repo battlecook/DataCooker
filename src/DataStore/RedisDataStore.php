@@ -45,8 +45,6 @@ class RedisDataStore implements DataStore
             }
         }
 
-        $ret = parent::get($object);
-
         return $ret;
     }
 

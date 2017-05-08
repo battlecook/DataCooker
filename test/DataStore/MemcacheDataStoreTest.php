@@ -36,7 +36,10 @@ class MemcacheDataStoreTest extends TestCase
 
         $value[] = $object;
 
-        apcu_store($key, $value);
+        $memcache = new \Memcache();
+        $memcache->addServer('localhost', 11211);
+
+        $memcache->set($key, $value);
     }
 
     public function testGet()
@@ -57,6 +60,6 @@ class MemcacheDataStoreTest extends TestCase
         $ret = $store->get($object);
 
         //then
-        $this->assertEquals(0, count($ret));
+        $this->assertEquals(1, count($ret));
     }
 }
