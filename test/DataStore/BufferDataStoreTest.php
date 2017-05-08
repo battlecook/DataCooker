@@ -30,14 +30,18 @@ class BufferDataStoreTest extends TestCase
     public function testSet()
     {
         //given
+        $store = new BufferDataStore();
+
         $object = new User();
         $object->userId = 1;
         $object->userName = 'user';
 
-        $store = new BufferDataStore();
+        $store->add($object);
+
+        $object->userName = 'user2';
 
         //when
-        $store->add($object);
+        $store->set($object);
 
         //then
         $actual = $store->get($object)[0];
@@ -47,34 +51,71 @@ class BufferDataStoreTest extends TestCase
     public function testRemove()
     {
         //given
+        $store = new BufferDataStore();
+
+        $object = new User();
+        $object->userId = 1;
+        $object->userName = 'user1';
+
+        $store->add($object);
+
+        $object = new User();
+        $object->userId = 2;
+        $object->userName = 'user2';
+
+        $store->add($object);
+
+        //when
+        $ret = $store->remove($object);
+
+        //then
+        $this->assertEquals(1, $ret);
+
+        $object = new User();
+        $object->userId = 2;
+        $ret = $store->get($object);
+        $this->assertEquals(0, count($ret));
+    }
+
+    public function testRemoveWithEmptyData()
+    {
+        //given
+        $store = new BufferDataStore();
+
         $object = new User();
         $object->userId = 1;
         $object->userName = 'user';
 
-        $store = new BufferDataStore();
 
         //when
-        $store->add($object);
+        $ret = $store->remove($object);
 
         //then
-        $actual = $store->get($object)[0];
-        $this->assertEquals($object, $actual);
+        $this->assertEquals(0, $ret);
     }
 
     public function testGet()
     {
         //given
-        $object = new User();
-        $object->userId = 1;
-        $object->userName = 'user';
-
         $store = new BufferDataStore();
 
-        //when
+        $object = new User();
+        $object->userId = 1;
+        $object->userName = 'user1';
+
         $store->add($object);
 
+        $object = new User();
+        $object->userId = 2;
+        $object->userName = 'user2';
+
+        $store->add($object);
+
+        //when
+        $ret = $store->get($object);
+
         //then
-        $actual = $store->get($object)[0];
+        $actual = $ret[0];
         $this->assertEquals($object, $actual);
     }
 }
