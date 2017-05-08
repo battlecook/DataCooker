@@ -26,4 +26,55 @@ class BufferDataStoreTest extends TestCase
         $actual = $store->get($object)[0];
         $this->assertEquals($object, $actual);
     }
+
+    public function testSet()
+    {
+        //given
+        $object = new User();
+        $object->userId = 1;
+        $object->userName = 'user';
+
+        $store = new BufferDataStore();
+
+        //when
+        $store->add($object);
+
+        //then
+        $actual = $store->get($object)[0];
+        $this->assertEquals($object, $actual);
+    }
+
+    public function testRemove()
+    {
+        //given
+        $object = new User();
+        $object->userId = 1;
+        $object->userName = 'user';
+
+        $store = new BufferDataStore();
+
+        //when
+        $store->add($object);
+
+        //then
+        $actual = $store->get($object)[0];
+        $this->assertEquals($object, $actual);
+    }
+
+    public function testGet()
+    {
+        //given
+        $object = new User();
+        $object->userId = 1;
+        $object->userName = 'user';
+
+        $store = new BufferDataStore();
+
+        //when
+        $store->add($object);
+
+        //then
+        $actual = $store->get($object)[0];
+        $this->assertEquals($object, $actual);
+    }
 }

@@ -4,7 +4,7 @@ namespace battlecook\DataStore;
 
 use battlecook\DataObject\Model;
 
-class ApcuDataStore extends BufferDataStore implements DataStore
+class ApcuDataStore implements DataStore
 {
     private $store;
 
@@ -12,9 +12,6 @@ class ApcuDataStore extends BufferDataStore implements DataStore
 
     public function __construct(DataStore $store = null, $keyPrefix)
     {
-        parent::__construct();
-
-        $this->buffer = array();
         $this->store = $store;
 
         $this->keyPrefix = $keyPrefix;
@@ -26,44 +23,61 @@ class ApcuDataStore extends BufferDataStore implements DataStore
         $rootIdentifier = $identifiers[0];
         $key = $this->keyPrefix . '/' . $object->getShortName() . '/' . 'v:' . $object->getVersion() . '/' . $rootIdentifier;
 
-        if(empty($this->buffer))
+        $ret = array();
+        $count = 0;
+        $depth = $this->getDepth($identifiers, $object);
+
+        $success = false;
+        $dataList = apcu_fetch($key, $success);
+        if($success)
         {
-            $isSuccess = false;
-            $cachedData = apcu_fetch($key, $isSuccess);
-            if($isSuccess)
+            foreach($dataList as $data)
             {
-                foreach($cachedData as $data)
+                foreach($identifiers as $identifier)
                 {
-                    parent::addClear($data);
+                    if($data->$identifier === $object->$identifier)
+                    {
+                        $count++;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                if($count >= $depth)
+                {
+                    $ret[] = $data;
                 }
             }
         }
-
-        if(empty($this->buffer) && $this->store)
+        else
         {
-            $storedData = $this->store->get($object);
-            foreach($storedData as $data)
-            {
-                parent::addClear($data);
-            }
-            //have to filled at apc from buffer
-            apcu_store($key, $this->buffer);
+            //뒷단 store에서 채워야 하는가 ?
+            //apcu_store($key, $this->buffer);
+            return $ret;
+
         }
-
-
-        if(empty($this->buffer) && $this->store)
-        {
-            $storedData = $this->store->get($object);
-            foreach($storedData as $data)
-            {
-                $this->addClear($data);
-            }
-        }
-
-
-        $ret = parent::get($object);
 
         return $ret;
+    }
+
+    private function getDepth($identifiers, $object)
+    {
+        $depth = 0;
+        foreach($identifiers as $identifier)
+        {
+            if(isset($object->$identifier))
+            {
+                $depth++;
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        return $depth;
     }
 
     /**
@@ -93,13 +107,27 @@ class ApcuDataStore extends BufferDataStore implements DataStore
         // TODO: Implement remove() method.
     }
 
-    public function flush($data)
+    public function flush()
     {
-        // TODO: Implement flush() method.
+        throw new \Exception('not use this function');
     }
 
     public function rollback()
     {
         // TODO: Implement rollback() method.
+    }
+
+    /**
+     * @param Model[] $objects
+     * @return int
+     */
+    public function removeMulti($objects)
+    {
+        // TODO: Implement removeMulti() method.
+    }
+
+    public function setChangedAttributes(Model $object, $changedAttributes)
+    {
+        // TODO: Implement setChangedAttributes() method.
     }
 }

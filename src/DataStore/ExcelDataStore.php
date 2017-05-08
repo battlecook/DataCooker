@@ -5,7 +5,7 @@ namespace battlecook\DataStore;
 use battlecook\DataObject\Model;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
-class ExcelDataStore extends BufferDataStore implements DataStore
+class ExcelDataStore implements DataStore
 {
     private $store;
 
@@ -13,9 +13,6 @@ class ExcelDataStore extends BufferDataStore implements DataStore
 
     public function __construct(DataStore $store = null, $path)
     {
-        parent::__construct();
-
-        $this->buffer = array();
         $this->store = $store;
 
         $this->path = $path;
@@ -23,49 +20,88 @@ class ExcelDataStore extends BufferDataStore implements DataStore
 
     public function get(Model $object)
     {
-        if(empty($this->buffer))
+        $inputFileName = $this->path;
+        $spreadsheet = IOFactory::load($inputFileName);
+        $highest = $spreadsheet->getActiveSheet()->getHighestRowAndColumn();
+
+        $fields = array();
+        $data = array();
+        for($row=1; $row<=$highest['row']; $row++)
         {
-            $inputFileName = $this->path;
-            $spreadsheet = IOFactory::load($inputFileName);
-            $highest = $spreadsheet->getActiveSheet()->getHighestRowAndColumn();
-
-            $fields = array();
-            $data = array();
-            for($row=1; $row<=$highest['row']; $row++)
+            $loadedData = array();
+            foreach (range('A', $highest['column']) as $column)
             {
-                $loadedData = array();
-                foreach (range('A', $highest['column']) as $column)
-                {
-                    $value = $spreadsheet->getActiveSheet()->getCell($column . $row)->getValue();
-                    $loadedData[] = $value;
-                }
-                if($row === 1)
-                {
-                    $fields = $loadedData;
-                }
-                else
-                {
-                    $data[] = $loadedData;
-                }
+                $value = $spreadsheet->getActiveSheet()->getCell($column . $row)->getValue();
+                $loadedData[] = $value;
             }
-
-            $className = get_class($object);
-            foreach($data as $datum)
+            if($row === 1)
             {
-                $object = new $className;
-                for($i=0; $i<count($datum)-1; $i++)
-                {
-                    $name = $fields[$i];
-                    $value = $datum[$i];
-                    $object->$name = $value;
-                }
-                parent::addClear($object);
+                $fields = $loadedData;
+            }
+            else
+            {
+                $data[] = $loadedData;
             }
         }
 
-        $ret = parent::get($object);
+        $dataList = array();
+        $className = get_class($object);
+        foreach($data as $datum)
+        {
+            $object = new $className;
+            for($i=0; $i<count($datum); $i++)
+            {
+                $name = $fields[$i];
+                $value = $datum[$i];
+                $object->$name = $value;
+            }
+            $dataList[] = $object;
+        }
+
+        $identifiers = $object->getIdentifiers();
+        $ret = array();
+        $count = 0;
+        $depth = $this->getDepth($identifiers, $object);
+
+        foreach($dataList as $data)
+        {
+            foreach($identifiers as $identifier)
+            {
+                if($data->$identifier === $object->$identifier)
+                {
+                    $count++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            if($count >= $depth)
+            {
+                $ret[] = $data;
+            }
+        }
 
         return $ret;
+    }
+
+    private function getDepth($identifiers, $object)
+    {
+        $depth = 0;
+        foreach($identifiers as $identifier)
+        {
+            if(isset($object->$identifier))
+            {
+                $depth++;
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        return $depth;
     }
 
     /**
@@ -95,13 +131,27 @@ class ExcelDataStore extends BufferDataStore implements DataStore
         // TODO: Implement remove() method.
     }
 
-    public function flush($data)
+    public function flush()
     {
-        // TODO: Implement flush() method.
+        throw new \Exception('not use this function');
     }
 
     public function rollback()
     {
         // TODO: Implement rollback() method.
+    }
+
+    /**
+     * @param Model[] $objects
+     * @return int
+     */
+    public function removeMulti($objects)
+    {
+        // TODO: Implement removeMulti() method.
+    }
+
+    public function setChangedAttributes(Model $object, $changedAttributes)
+    {
+        // TODO: Implement setChangedAttributes() method.
     }
 }

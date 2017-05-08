@@ -3,7 +3,7 @@ namespace battlecook\DataStore;
 
 use battlecook\DataObject\Model;
 
-class BufferDataStore
+class BufferDataStore implements DataStore
 {
     const DATA = 0;
     const STATE = 1;
@@ -299,13 +299,60 @@ class BufferDataStore
         $this->removeIndex($index[$value], $data, $identifiers, $depth, $maxDepth);
     }
 
-    public function flush($data)
+    public function flush()
     {
-        if($this->store)
+        if(!$this->store)
         {
-            $this->store->flush($this->buffer);
-            $this->lastAddedDataList = $this->store->getLastAddedDataList();
+            throw new \Exception("not exist store that BufferDataStore can do");
         }
+
+        $lastAddedDataList = array();
+        $removedDataList = array();
+        foreach($this->buffer as $key => $data)
+        {
+            /** @var Model $object */
+            $object = $data[BufferDataStore::DATA];
+            $state = $data[BufferDataStore::STATE];
+            if($state === DataState::DIRTY_ADD && $data[BufferDataStore::FIRST_STATE] === DataState::DIRTY_DEL)
+            {
+                $state = DataState::DIRTY_SET;
+            }
+            else if($state === DataState::DIRTY_SET && $data[BufferDataStore::FIRST_STATE] === DataState::DIRTY_ADD)
+            {
+                $state = DataState::DIRTY_ADD;
+            }
+            else if($state === DataState::DIRTY_DEL && $data[BufferDataStore::FIRST_STATE] === DataState::DIRTY_ADD)
+            {
+                continue;
+            }
+
+            if($state === DataState::DIRTY_ADD)
+            {
+                $this->store->add($object);
+                $lastAddedDataList[] = $data[BufferDataStore::DATA];
+            }
+            elseif($state === DataState::DIRTY_DEL)
+            {
+                //todo remove 된 녀석들 끼리 모아서 where 절에서 한번에 제거
+                $removedDataList[] = $data[BufferDataStore::DATA];
+            }
+            elseif($state === DataState::DIRTY_SET)
+            {
+                $changedAttributes = $data[BufferDataStore::CHANGED];
+                $this->store->setChangedAttributes($object, $changedAttributes);
+            }
+        }
+
+        if(!empty($removedDataList))
+        {
+            $this->store->removeMulti($removedDataList);
+        }
+
+        $this->lastAddedDataList = $lastAddedDataList;
+
+
+
+
 
         try {
             foreach ($this->buffer as $key => $data)
@@ -350,5 +397,24 @@ class BufferDataStore
     private function unsetIndex($key)
     {
 
+    }
+
+    /**
+     * @param Model[] $objects
+     * @return int
+     */
+    public function removeMulti($objects)
+    {
+        // TODO: Implement removeMulti() method.
+    }
+
+    public function rollback()
+    {
+        // TODO: Implement rollback() method.
+    }
+
+    public function setChangedAttributes(Model $object, $changedAttributes)
+    {
+        // TODO: Implement setChangedAttributes() method.
     }
 }

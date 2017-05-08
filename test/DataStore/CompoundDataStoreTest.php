@@ -2,7 +2,9 @@
 
 namespace test\DataStore;
 
+use battlecook\DataStore\ApcuDataStore;
 use battlecook\DataStore\BufferDataStore;
+use battlecook\DataStore\ExcelDataStore;
 use battlecook\DataStore\PdoDataStore;
 use PHPUnit\Framework\TestCase;
 use test\Fixture\MemoryDataStore\Item;
@@ -12,7 +14,7 @@ require __DIR__  . '/../../vendor/autoload.php';
 
 class CompoundDataStoreTest extends TestCase
 {
-    public function testGet()
+    public function testGetStorageDataCombination()
     {
         //given
         $store = new BufferDataStore(new PdoDataStore(null, function (){
@@ -53,48 +55,7 @@ class CompoundDataStoreTest extends TestCase
         $this->assertEquals('user2', $ret[0]->itemName);
     }
 
-    public function testGetSameUser()
-    {
-        //given
-        $store = new BufferDataStore(new PdoDataStore(null, function (){
-            $dbo = new DBO(new Config());
-            return $dbo->getPdo();
-        }));
-
-        $object = new Item();
-        $object->userId = 1;
-        $object->itemDesignId = 1;
-        $object->itemName = 'item1';
-
-        $store->add($object);
-
-        $object = new Item();
-        $object->userId = 1;
-        $object->itemDesignId = 2;
-        $object->itemName = 'item2';
-
-        $store->add($object);
-
-        $object = new Item();
-        $object->userId = 2;
-        $object->itemDesignId = 1;
-        $object->itemName = 'item1';
-
-        $store->add($object);
-
-        //when
-        $object = new Item();
-        $object->userId = 1;
-
-        $ret = $store->get($object);
-
-        //then
-        $this->assertEquals(2, count($ret));
-        $this->assertEquals('item1', $ret[0]->itemName);
-        $this->assertEquals('item2', $ret[1]->itemName);
-    }
-
-    public function testAdd()
+    public function testAddStorageDataCombination()
     {
         //given
         $store = new BufferDataStore(new PdoDataStore(null, function (){
@@ -114,7 +75,7 @@ class CompoundDataStoreTest extends TestCase
         $this->assertEquals($object, $actual);
     }
 
-    public function testSet()
+    public function testSetStorageDataCombination()
     {
         //given
         $store = new BufferDataStore(new PdoDataStore(null, function (){
@@ -161,7 +122,7 @@ class CompoundDataStoreTest extends TestCase
         $this->assertEquals('user2-2', $ret[0]->itemName);
     }
 
-    public function testRemove()
+    public function testRemoveStorageDataCombination()
     {
         //given
         $store = new BufferDataStore(new PdoDataStore(null, function (){
@@ -206,4 +167,19 @@ class CompoundDataStoreTest extends TestCase
         $ret = $store->get($object);
         $this->assertEquals(array(), $ret);
     }
+
+    /*
+    public function testGetDesignDataCombination()
+    {
+        //given
+        $keyPrefix = 'ProjectName';
+        $path = __DIR__ . '/../Fixture/ExcelDataStore/monster.xlsx';
+        $store = new BufferDataStore(new ApcuDataStore(new ExcelDataStore(null, $path), $keyPrefix));
+
+        //when
+        //$store->get()
+
+        //then
+    }
+    */
 }

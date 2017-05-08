@@ -3,46 +3,69 @@
 namespace battlecook\DataStore;
 
 use battlecook\DataObject\Model;
+use Closure;
 
-class MemcacheDataStore extends BufferDataStore implements DataStore
+class MemcacheDataStore implements DataStore
 {
-    private $buffer;
     private $store;
 
     private $keyPrefix;
+    /** @var \Memcache $memcache */
     private $memcache;
 
-    public function __construct(DataStore $store = null, \Memcache $memcache, $keyPrefix)
+    public function __construct(DataStore $store = null, Closure $closure, $keyPrefix)
     {
-        parent::__construct();
-
         $this->store = $store;
-        $this->memcache = $memcache;
-
         $this->keyPrefix = $keyPrefix;
+        $this->memcache = $closure();
     }
 
     public function get(Model $object)
     {
-        if(empty($this->buffer))
+        $identifiers = $object->getIdentifiers();
+
+        $ret = array();
+        $count = 0;
+        $depth = $this->getDepth($identifiers, $object);
+
+        $rootIdentifier = $identifiers[0];
+
+        $key = $this->keyPrefix . '/' . $object->getShortName() . '/' . 'v:' . $object->getVersion() . '/' . $rootIdentifier;
+
+        $cachedData = $this->memcache->get($key);
+        if($cachedData)
         {
-            $identifiers = $object->getIdentifiers();
-            $rootIdentifier = $identifiers[0];
 
-            $key = $this->keyPrefix . '/' . $object->getShortName() . '/' . 'v:' . $object->getVersion() . '/' . $rootIdentifier;
-
-            $cachedData = $this->memcache->get($key);
             foreach($cachedData as $data)
             {
-                parent::addClear($data);
+                //parent::addClear($data);
+            }
+
+        }
+        else
+        {
+
+        }
+
+        return $ret;
+    }
+
+    private function getDepth($identifiers, $object)
+    {
+        $depth = 0;
+        foreach($identifiers as $identifier)
+        {
+            if(isset($object->$identifier))
+            {
+                $depth++;
+            }
+            else
+            {
+                break;
             }
         }
 
-        $ret = parent::get($object);
-
-        // cache set code 추가
-
-        return $ret;
+        return $depth;
     }
 
     /**
@@ -51,13 +74,6 @@ class MemcacheDataStore extends BufferDataStore implements DataStore
      */
     public function set(Model $object)
     {
-        $rowCount = parent::set($object);
-        if($rowCount > 0 && $this->store)
-        {
-            $this->store->set($object);
-        }
-
-        return $rowCount;
     }
 
     /**
@@ -66,11 +82,6 @@ class MemcacheDataStore extends BufferDataStore implements DataStore
      */
     public function add(Model $object)
     {
-        parent::add($object);
-        if($this->store)
-        {
-            $this->store->add($object);
-        }
     }
 
     /**
@@ -79,25 +90,29 @@ class MemcacheDataStore extends BufferDataStore implements DataStore
      */
     public function remove(Model $object)
     {
-        $rowCount = parent::remove($object);
-        if($rowCount > 0 && $this->store)
-        {
-            $this->store->remove($object);
-        }
-
-        return $rowCount;
     }
 
-    public function flush($data)
+    public function flush()
     {
-        foreach($this->buffer as $data)
-        {
-
-        }
+        throw new \Exception('not use this function');
     }
 
     public function rollback()
     {
         // TODO: Implement rollback() method.
+    }
+
+    /**
+     * @param Model[] $objects
+     * @return int
+     */
+    public function removeMulti($objects)
+    {
+        // TODO: Implement removeMulti() method.
+    }
+
+    public function setChangedAttributes(Model $object, $changedAttributes)
+    {
+        // TODO: Implement setChangedAttributes() method.
     }
 }

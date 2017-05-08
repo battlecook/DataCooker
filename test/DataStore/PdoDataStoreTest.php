@@ -25,10 +25,10 @@ class PdoDataStoreTest extends TestCase
 
     public function testGet()
     {
+        $dbo = new DBO(new Config());
         //given
-        $store = new PdoDataStore(null, function ()
+        $store = new PdoDataStore(null, function () use ($dbo)
         {
-            $dbo = new DBO(new Config());
             return $dbo->getPdo();
         });
 
@@ -222,7 +222,12 @@ class PdoDataStoreTest extends TestCase
     public function testFlush()
     {
         //given
-        $store = new BufferDataStore();
+        $pdoDataStore = new PdoDataStore(null, function (){
+            $dbo = new DBO(new Config());
+            return $dbo->getPdo();
+        });
+
+        $store = new BufferDataStore($pdoDataStore);
 
         $object = new Item();
         $object->userId = 1;
@@ -258,12 +263,7 @@ class PdoDataStoreTest extends TestCase
         $object->itemDesignId = 1;
         $store->remove($object);
 
-        $store = new PdoDataStore(null, function (){
-            $dbo = new DBO(new Config());
-            return $dbo->getPdo();
-        });
-
-        $store->flush($buffer);
+        $store->flush();
 
         //then
         $this->assertEquals(1, $ret);

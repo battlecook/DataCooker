@@ -16,6 +16,7 @@ interface DataStore
      * @return int $rowCount;
      */
     public function set(Model $object);
+    public function setChangedAttributes(Model $object, $changedAttributes);
     /**
      * @param Model $object
      */
@@ -25,7 +26,12 @@ interface DataStore
      * @return int
      */
     public function remove(Model $object);
+    /**
+     * @param Model[] $objects
+     * @return int
+     */
+    public function removeMulti($objects);
 
-    public function flush($data);
+    public function flush();
     public function rollback();
 }

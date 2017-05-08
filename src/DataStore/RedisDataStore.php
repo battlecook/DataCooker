@@ -4,7 +4,7 @@ namespace battlecook\DataStore;
 
 use battlecook\DataObject\Model;
 
-class RedisDataStore extends BufferDataStore implements DataStore
+class RedisDataStore implements DataStore
 {
     private $buffer;
     private $store;
@@ -13,7 +13,6 @@ class RedisDataStore extends BufferDataStore implements DataStore
 
     public function __construct(DataStore $store = null, $keyPrefix)
     {
-        parent::__construct();
 
         $this->buffer = array();
         $this->store = $store;
@@ -86,5 +85,19 @@ class RedisDataStore extends BufferDataStore implements DataStore
     public function rollback()
     {
         // TODO: Implement rollback() method.
+    }
+
+    public function setChangedAttributes(Model $object, $changedAttributes)
+    {
+        // TODO: Implement setChangedAttributes() method.
+    }
+
+    /**
+     * @param Model[] $objects
+     * @return int
+     */
+    public function removeMulti($objects)
+    {
+        // TODO: Implement removeMulti() method.
     }
 }

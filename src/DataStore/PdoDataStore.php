@@ -21,6 +21,7 @@ class PdoDataStore implements DataStore
 
         $this->shardStrategy = $shardStrategy;
         $this->pdo = $closure();
+        $this->lastAddedDataList = array();
     }
 
     public function get(Model $object)
@@ -106,7 +107,6 @@ class PdoDataStore implements DataStore
         $attributes = $object->getAttributes();
         $autoIncrements = $object->getAutoIncrements();
 
-
         $fields = array_diff($attributes, $autoIncrements);
 
         $sql = "UPDATE $tableName SET ";
@@ -155,6 +155,55 @@ class PdoDataStore implements DataStore
         return $rowCount;
     }
 
+    public function setChangedAttributes(Model $object, $changedAttributes)
+    {
+        $tableName = $object->getShortName();
+        $pdo = $this->pdo;
+
+        $identifiers = $object->getIdentifiers();
+        $sql = "UPDATE $tableName SET ";
+        foreach($changedAttributes as $changedAttribute)
+        {
+            $key = $changedAttribute['name'];
+            $sql .= $key;
+            $sql .= ' = ';
+            $sql .= ":$key";
+            $sql .= ' , ';
+        }
+
+        $sql = substr($sql, 0, -2);
+        $delimiter = ' where ';
+        foreach ($identifiers as $identifier)
+        {
+            $identifierValue = $object->$identifier;
+            if($identifierValue === null)
+            {
+                throw new \exception("FAILURE: no identifier: ");
+            }
+            $identifierName = $identifier;
+            $sql .= $delimiter . $identifierName . ' = :' . $identifierName;
+            $delimiter = ' and ';
+        }
+        $sql .= ';';
+
+        $pdoStatement = $pdo->prepare($sql);
+
+        foreach($changedAttributes as $attributes)
+        {
+            $pdoStatement->bindValue(':' . $attributes['name'], $attributes['value'], $attributes['dataType']);
+        }
+        foreach ($identifiers as $identifier)
+        {
+            $pdoStatement->bindValue(':' . $identifier, $object->$identifier);
+        }
+
+        $this->execute($pdoStatement, $sql);
+        if ($pdoStatement->rowCount() == 0)
+        {
+            throw new \exception("FAILURE: no affected row");
+        }
+    }
+
     public function add(Model $object)
     {
         $tableName = $object->getShortName();
@@ -199,6 +248,8 @@ class PdoDataStore implements DataStore
             $lastInsertId = $this->pdo->lastInsertId();
             $object->$autoIncrement = (int)$lastInsertId;
         }
+
+        $this->lastAddedDataList[] = $object;
     }
 
     public function remove(Model $object)
@@ -235,131 +286,45 @@ class PdoDataStore implements DataStore
         return $pdoStatement->rowCount();
     }
 
-    public function flush($buffer)
+    public function removeMulti($objects)
     {
-        $lastAddedDataList = array();
-        $removedDataList = array();
-        foreach($buffer as $key => $data)
+        $tableName = $objects[0]->getShortName();
+        foreach($objects as $removedData)
         {
-            /** @var Model $object */
-            $object = $data[BufferDataStore::DATA];
-            $tableName = $object->getShortName();
-            if($this->shardStrategy)
+            $identifiers = $removedData->getIdentifiers();
+            $sql = "delete from $tableName";
+            $delimiter = ' where ';
+            foreach ($identifiers as $identifier)
             {
-                $shardKey = $object->getShardKey();
-                $shardId = $this->shardStrategy->getShardId($shardKey);
-            }
-
-            $state = $data[BufferDataStore::STATE];
-            if($state === DataState::DIRTY_ADD && $data[BufferDataStore::FIRST_STATE] === DataState::DIRTY_DEL)
-            {
-                $state = DataState::DIRTY_SET;
-            }
-            else if($state === DataState::DIRTY_SET && $data[BufferDataStore::FIRST_STATE] === DataState::DIRTY_ADD)
-            {
-                $state = DataState::DIRTY_ADD;
-            }
-            else if($state === DataState::DIRTY_DEL && $data[BufferDataStore::FIRST_STATE] === DataState::DIRTY_ADD)
-            {
-                continue;
-            }
-
-            if($state === DataState::DIRTY_ADD)
-            {
-                $this->add($object);
-                $lastAddedDataList[] = $data[BufferDataStore::DATA];
-            }
-            elseif($state === DataState::DIRTY_DEL)
-            {
-                //todo remove 된 녀석들 끼리 모아서 where 절에서 한번에 제거
-                $removedDataList[] = $data[BufferDataStore::DATA];
-            }
-            elseif($state === DataState::DIRTY_SET)
-            {
-                $pdo = $this->pdo;
-
-                $changedAttributes = $data[BufferDataStore::CHANGED];
-                $identifiers = $object->getIdentifiers();
-                $sql = "UPDATE $tableName SET ";
-                foreach($changedAttributes as $changedAttribute)
+                $identifierValue = $removedData->$identifier;
+                if($identifierValue === null)
                 {
-                    $key = $changedAttribute['name'];
-                    $sql .= $key;
-                    $sql .= ' = ';
-                    $sql .= ":$key";
-                    $sql .= ' , ';
+                    continue;
                 }
-
-                $sql = substr($sql, 0, -2);
-                $delimiter = ' where ';
-                foreach ($identifiers as $identifier)
-                {
-                    $identifierValue = $object->$identifier;
-                    if($identifierValue === null)
-                    {
-                        throw new \exception("FAILURE: no identifier: ");
-                    }
-                    $identifierName = $identifier;
-                    $sql .= $delimiter . $identifierName . ' = :' . $identifierName;
-                    $delimiter = ' and ';
-                }
-                $sql .= ';';
-
-                $pdoStatement = $pdo->prepare($sql);
-
-                foreach($changedAttributes as $attributes)
-                {
-                    $pdoStatement->bindValue(':' . $attributes['name'], $attributes['value'], $attributes['dataType']);
-                }
-                foreach ($identifiers as $identifier)
-                {
-                    $pdoStatement->bindValue(':' . $identifier, $object->$identifier);
-                }
-
-                $this->execute($pdoStatement, $sql);
-                if ($pdoStatement->rowCount() == 0)
-                {
-                    throw new \exception("FAILURE: no affected row");
-                }
+                $sql .= $delimiter . $identifier . ' = :' . $identifier;
+                $delimiter = ' and ';
             }
+            $sql .= ';';
+
+            $pdoStatement = $this->pdo->prepare($sql);
+            foreach ($identifiers as $identifier)
+            {
+                $identifierValue =  $removedData->$identifier;
+                if($identifierValue === null)
+                {
+                    continue;
+                }
+                $pdoStatement->bindValue(':' . $identifier, $identifierValue);
+            }
+
+            $this->execute($pdoStatement, $sql);
         }
+    }
 
-        if(!empty($removedDataList))
-        {
-            foreach($removedDataList as $removedData)
-            {
-                $identifiers = $removedData->getIdentifiers();
-                $sql = "delete from $tableName";
-                $delimiter = ' where ';
-                foreach ($identifiers as $identifier)
-                {
-                    $identifierValue = $removedData->$identifier;
-                    if($identifierValue === null)
-                    {
-                        continue;
-                    }
-                    $sql .= $delimiter . $identifier . ' = :' . $identifier;
-                    $delimiter = ' and ';
-                }
-                $sql .= ';';
-
-                $pdoStatement = $this->pdo->prepare($sql);
-                foreach ($identifiers as $identifier)
-                {
-                    $identifierValue =  $removedData->$identifier;
-                    if($identifierValue === null)
-                    {
-                        continue;
-                    }
-                    $pdoStatement->bindValue(':' . $identifier, $identifierValue);
-                }
-
-                $this->execute($pdoStatement, $sql);
-            }
-        }
-
-        $this->lastAddedDataList = $lastAddedDataList;
-
+    public function flush()
+    {
+        $this->lastAddedDataList = array();
+        //todo rollback query 제거
         //todo rollback 이 가능하도록 rollback 쿼리 작성할 것
     }
 

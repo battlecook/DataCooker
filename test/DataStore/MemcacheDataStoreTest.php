@@ -2,7 +2,7 @@
 
 namespace test\DataStore;
 
-use battlecook\DataStore\ApcuDataStore;
+use battlecook\DataStore\MemcacheDataStore;
 use PHPUnit\Framework\TestCase;
 use test\Fixture\ExcelDataStore\Monster;
 
@@ -43,7 +43,11 @@ class MemcacheDataStoreTest extends TestCase
     {
         //given
         $keyPrefix = 'ProjectName';
-        $store = new ApcuDataStore(null, $keyPrefix);
+        $store = new MemcacheDataStore(null, function (){
+            $memcache = new \Memcache();
+            $memcache->addServer('localhost', 11211);
+            return $memcache;
+        }, $keyPrefix);
 
         //when
         $object = new Monster();
@@ -53,6 +57,6 @@ class MemcacheDataStoreTest extends TestCase
         $ret = $store->get($object);
 
         //then
-        $this->assertEquals(1, count($ret));
+        $this->assertEquals(0, count($ret));
     }
 }
