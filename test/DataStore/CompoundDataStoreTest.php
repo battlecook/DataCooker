@@ -2,9 +2,9 @@
 
 namespace test\DataStore;
 
+use battlecook\DataStore\BufferDataStore;
 use battlecook\DataStore\PdoDataStore;
 use PHPUnit\Framework\TestCase;
-use battlecook\DataStore\MemoryDataStore;
 use test\Fixture\MemoryDataStore\Item;
 use test\Fixture\MemoryDataStore\User;
 
@@ -15,7 +15,7 @@ class CompoundDataStoreTest extends TestCase
     public function testGet()
     {
         //given
-        $store = new MemoryDataStore(new PdoDataStore(null, function (){
+        $store = new BufferDataStore(new PdoDataStore(null, function (){
             $dbo = new DBO(new Config());
             return $dbo->getPdo();
         }));
@@ -56,7 +56,7 @@ class CompoundDataStoreTest extends TestCase
     public function testGetSameUser()
     {
         //given
-        $store = new MemoryDataStore(new PdoDataStore(null, function (){
+        $store = new BufferDataStore(new PdoDataStore(null, function (){
             $dbo = new DBO(new Config());
             return $dbo->getPdo();
         }));
@@ -97,7 +97,7 @@ class CompoundDataStoreTest extends TestCase
     public function testAdd()
     {
         //given
-        $store = new MemoryDataStore(new PdoDataStore(null, function (){
+        $store = new BufferDataStore(new PdoDataStore(null, function (){
             $dbo = new DBO(new Config());
             return $dbo->getPdo();
         }));
@@ -117,7 +117,7 @@ class CompoundDataStoreTest extends TestCase
     public function testSet()
     {
         //given
-        $store = new MemoryDataStore(new PdoDataStore(null, function (){
+        $store = new BufferDataStore(new PdoDataStore(null, function (){
             $dbo = new DBO(new Config());
             return $dbo->getPdo();
         }));
@@ -164,7 +164,7 @@ class CompoundDataStoreTest extends TestCase
     public function testRemove()
     {
         //given
-        $store = new MemoryDataStore(new PdoDataStore(null, function (){
+        $store = new BufferDataStore(new PdoDataStore(null, function (){
             $dbo = new DBO(new Config());
             return $dbo->getPdo();
         }));

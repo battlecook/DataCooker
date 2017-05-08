@@ -266,47 +266,7 @@ class PdoDataStore implements DataStore
 
             if($state === DataState::DIRTY_ADD)
             {
-                $identifiers = $object->getIdentifiers();
-                $attributes = $object->getAttributes();
-                $autoIncrements = $object->getAutoIncrements();
-
-                $fields = array_merge($identifiers, $attributes);
-                $fields = array_diff($fields, $autoIncrements);
-
-                $sql = "insert into {$tableName}";
-                $delimiter = ' (';
-                foreach ($fields as $field)
-                {
-                    $sql .= $delimiter . $field;
-                    $delimiter = ', ';
-                }
-                $delimiter = ') values (';
-                foreach ($fields as $field)
-                {
-                    $sql .= $delimiter . ':' . $field;
-                    $delimiter = ', ';
-                }
-                $sql .= ");";
-
-                $pdoStatement = $this->pdo->prepare($sql);
-                foreach ($fields as $field)
-                {
-                    $name = $field;
-                    $value = $object->$field;
-                    $pdoStatement->bindValue(':' . $name, $value);
-                }
-
-                $this->execute($pdoStatement, $sql);
-                if ($pdoStatement->rowCount() == 0)
-                {
-                    throw new \exception("FAILURE: no affected row");
-                }
-
-                foreach ($autoIncrements as $autoIncrement) //should be exact once
-                {
-                    $lastInsertId = $this->pdo->lastInsertId();
-                    $object->$autoIncrement = (int)$lastInsertId;
-                }
+                $this->add($object);
                 $lastAddedDataList[] = $data[BufferDataStore::DATA];
             }
             elseif($state === DataState::DIRTY_DEL)
