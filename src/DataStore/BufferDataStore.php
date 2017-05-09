@@ -195,14 +195,14 @@ class BufferDataStore implements DataStore
                 $depth = 0;
                 $identifiers = $data->getIdentifiers();
                 $maxDepth = $this->getDepth($identifiers, $data);
-                $this->setIndex($this->index, $object, $identifiers, $depth, $maxDepth);
+                $this->setIndex($this->index, $object, $identifiers, $depth, $maxDepth, $changedAttributes);
             }
         }
 
         return $rowCount;
     }
 
-    private function setIndex($index, $data, $identifiers, $depth, $maxDepth)
+    private function setIndex($index, $data, $identifiers, $depth, $maxDepth, $changedAttributes)
     {
         if($depth === $maxDepth)
         {
@@ -211,6 +211,7 @@ class BufferDataStore implements DataStore
                 throw new \Exception("deleted data can not be updated.");
             }
             $this->buffer[$index][self::DATA] = $data;
+            $this->buffer[$index][self::CHANGED] = $changedAttributes;
             $this->buffer[$index][self::STATE] = DataState::DIRTY_SET;
             return;
         }
@@ -221,7 +222,7 @@ class BufferDataStore implements DataStore
             throw new \Exception("not exist set date");
         }
         $depth++;
-        $this->setIndex($index[$value], $data, $identifiers, $depth, $maxDepth);
+        $this->setIndex($index[$value], $data, $identifiers, $depth, $maxDepth, $changedAttributes);
     }
 
     public function add(Model $object)

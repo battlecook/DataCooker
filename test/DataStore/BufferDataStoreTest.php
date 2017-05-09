@@ -34,10 +34,13 @@ class BufferDataStoreTest extends TestCase
 
         $object = new User();
         $object->userId = 1;
-        $object->userName = 'user';
+        $object->userName = 'user1';
 
         $store->add($object);
 
+        //todo if client don't use new instance , store internal variable is changed. later will have to fix.
+        $object = new User();
+        $object->userId = 1;
         $object->userName = 'user2';
 
         //when
