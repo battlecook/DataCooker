@@ -4,7 +4,6 @@ namespace test\DataStore;
 
 use battlecook\DataStore\BufferDataStore;
 use battlecook\DataStore\PdoDataStore;
-use PHPUnit\DbUnit\DefaultTester;
 use PHPUnit\DbUnit\TestCase;
 use PHPUnit\DbUnit\TestCaseTrait;
 use test\Fixture\PdoDataStore\AfterData;

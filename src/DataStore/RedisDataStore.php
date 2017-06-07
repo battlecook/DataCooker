@@ -3,49 +3,79 @@
 namespace battlecook\DataStore;
 
 use battlecook\DataObject\Model;
+use Closure;
+use Redis;
 
 class RedisDataStore implements DataStore
 {
-    private $buffer;
     private $store;
 
     private $keyPrefix;
+    /** @var redis $redis */
+    private $redis;
 
-    public function __construct(DataStore $store = null, $keyPrefix)
+    public function __construct(DataStore $store = null, Closure $closure, $keyPrefix)
     {
-
-        $this->buffer = array();
         $this->store = $store;
-
         $this->keyPrefix = $keyPrefix;
+        $this->redis = $closure();
     }
 
     public function get(Model $object)
     {
-        if(empty($this->buffer))
+        $identifiers = $object->getIdentifiers();
+
+        $ret = array();
+        $count = 0;
+        $depth = $this->getDepth($identifiers, $object);
+
+        $rootIdentifier = $identifiers[0];
+
+        $key = $this->keyPrefix . '/' . $object->getShortName() . '/' . 'v:' . $object->getVersion() . '/' . $rootIdentifier . ':' . $object->$rootIdentifier;
+
+        $dataList = $this->redis->get($key);
+        if($dataList)
         {
-            $identifiers = $object->getIdentifiers();
-            $rootIdentifier = $identifiers[0];
-
-            $key = $this->keyPrefix . '/' . $object->getShortName() . '/' . 'v:' . $object->getVersion() . '/' . $rootIdentifier;
-
-            $cachedData = apcu_fetch($key);
-            foreach($cachedData as $data)
+            foreach($dataList as $data)
             {
-                $this->buffer[] = array(self::DATA => $data, self::STATE => DataState::CLEAR);
-            }
-        }
+                foreach($identifiers as $identifier)
+                {
+                    if($data->$identifier === $object->$identifier)
+                    {
+                        $count++;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
 
-        if(empty($this->buffer) && $this->store)
-        {
-            $storedData = $this->store->get($object);
-            foreach($storedData as $data)
-            {
-                $this->buffer[] = array(self::DATA => $data, self::STATE => DataState::CLEAR);
+                if($count >= $depth)
+                {
+                    $ret[] = $data;
+                }
             }
         }
 
         return $ret;
+    }
+
+    private function getDepth($identifiers, $object)
+    {
+        $depth = 0;
+        foreach($identifiers as $identifier)
+        {
+            if(isset($object->$identifier))
+            {
+                $depth++;
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        return $depth;
     }
 
     /**
