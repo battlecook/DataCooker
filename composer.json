@@ -13,6 +13,7 @@
         "psr-4": {
             "battlecook\\DataStore\\": "src\\DataStore",
             "battlecook\\DataObject\\": "src\\DataObject",
+            "battlecook\\": "src",
             "test\\": "test"
         }
     }

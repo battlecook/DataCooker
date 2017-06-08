@@ -34,4 +34,6 @@ interface DataStore
 
     public function flush();
     public function rollback();
+
+    public function getLastAddedDataList();
 }
