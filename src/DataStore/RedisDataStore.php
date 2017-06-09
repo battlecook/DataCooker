@@ -98,7 +98,7 @@ class RedisDataStore implements DataStore
         }
 
         $key = $this->getKey($object);
-        $rowCount = $this->redis->sAdd($key, $object);
+        $rowCount = $this->redis->sAdd($key, serialize($object));
 
         return $rowCount;
     }
@@ -126,7 +126,9 @@ class RedisDataStore implements DataStore
         }
 
         $key = $this->getKey($object);
-        $this->redis->sRem($key, serialize($object));
+        $rowCount = $this->redis->sRem($key, serialize($object));
+
+        return $rowCount;
     }
 
     public function flush()

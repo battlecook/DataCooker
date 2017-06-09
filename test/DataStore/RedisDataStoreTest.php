@@ -17,6 +17,7 @@ class RedisDataStoreTest extends TestCase
         $redis->pconnect("localhost", 6379);
         $config = new Config();
         $redis->auth($config->getRedisPassword());
+        //$redis->setOption(\Redis::OPT_SERIALIZER, \Redis::SERIALIZER_PHP);
 
         $redis->flushAll();
     }
@@ -34,7 +35,6 @@ class RedisDataStoreTest extends TestCase
             return $redis;
         }, $keyPrefix);
 
-        //when
         $object = new Quest();
         $object->key1 = 1;
         $object->key2 = 1;
@@ -59,18 +59,82 @@ class RedisDataStoreTest extends TestCase
 
         $store->add($object);
 
-        //then
+        //when
         $object = new Quest();
         $object->key1 = 1;
         $object->key2 = 2;
         $object->key3 = 1;
 
         $ret = $store->get($object);
+
+        //then
         $this->assertEquals(1, count($ret));
         $this->assertEquals('attr3', $ret[0]->attr);
     }
 
     public function testAdd()
+    {
+        //given
+        $keyPrefix = 'ProjectName';
+        $store = new RedisDataStore(null, function (){
+            $redis = new \Redis();
+            $redis->pconnect("localhost", 6379);
+            $config = new Config();
+            $redis->auth($config->getRedisPassword());
+
+            return $redis;
+        }, $keyPrefix);
+
+        //when
+        $object = new Monster();
+        $object->id = 2;
+        $object->x = 2;
+        $object->y = 3;
+
+        $store->add($object);
+
+        //then
+        $ret = $store->get($object);
+        $this->assertEquals(array($object), $ret);
+    }
+
+    public function testSet()
+    {
+        //given
+        $keyPrefix = 'ProjectName';
+        $store = new RedisDataStore(null, function (){
+            $redis = new \Redis();
+            $redis->pconnect("localhost", 6379);
+            $config = new Config();
+            $redis->auth($config->getRedisPassword());
+
+            return $redis;
+        }, $keyPrefix);
+
+        $object = new Monster();
+        $object->id = 2;
+        $object->x = 2;
+        $object->y = 3;
+
+        $store->add($object);
+
+        //when
+        $object = new Monster();
+        $object->id = 2;
+        $object->x = 3;
+        $object->y = 3;
+
+        $ret = $store->set($object);
+
+        //then
+        $this->assertEquals(1, $ret);
+
+
+        $ret = $store->get($object);
+        $this->assertEquals(array($object), $ret);
+    }
+
+    public function testRemove()
     {
         //given
         $keyPrefix = 'ProjectName';
