@@ -123,4 +123,9 @@ class ApcuDataStore implements DataStore
     {
         // TODO: Implement setChangedAttributes() method.
     }
+
+    public function getLastAddedDataList()
+    {
+        // TODO: Implement getLastAddedDataList() method.
+    }
 }

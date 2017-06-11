@@ -2,50 +2,88 @@
 
 namespace battlecook\DataStore;
 
+use battlecook\DataCookerException;
 use battlecook\DataObject\Model;
+use Closure;
+use Redis;
 
 class RedisDataStore implements DataStore
 {
-    private $buffer;
     private $store;
 
     private $keyPrefix;
+    /** @var redis $redis */
+    private $redis;
 
-    public function __construct(DataStore $store = null, $keyPrefix)
+    public function __construct(DataStore $store = null, Closure $closure, $keyPrefix)
     {
-
-        $this->buffer = array();
         $this->store = $store;
-
         $this->keyPrefix = $keyPrefix;
+        $this->redis = $closure();
+    }
+
+    private function getKey(Model $object)
+    {
+        $identifiers = $object->getIdentifiers();
+        $rootIdentifier = $identifiers[0];
+        $key = $this->keyPrefix . '/' . $object->getShortName() . '/' . 'v:' . $object->getVersion() . '/' . $rootIdentifier . ':' . $object->$rootIdentifier;
+
+        return $key;
     }
 
     public function get(Model $object)
     {
-        if(empty($this->buffer))
+        $identifiers = $object->getIdentifiers();
+
+        $ret = array();
+        $depth = $this->getDepth($identifiers, $object);
+
+        $key = $this->getKey($object);
+        $dataList = $this->redis->sMembers($key);
+        if($dataList)
         {
-            $identifiers = $object->getIdentifiers();
-            $rootIdentifier = $identifiers[0];
-
-            $key = $this->keyPrefix . '/' . $object->getShortName() . '/' . 'v:' . $object->getVersion() . '/' . $rootIdentifier;
-
-            $cachedData = apcu_fetch($key);
-            foreach($cachedData as $data)
+            foreach($dataList as $data)
             {
-                $this->buffer[] = array(self::DATA => $data, self::STATE => DataState::CLEAR);
-            }
-        }
+                $count = 0;
+                $data = unserialize($data);
+                foreach($identifiers as $identifier)
+                {
+                    if($data->$identifier === $object->$identifier)
+                    {
+                        $count++;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
 
-        if(empty($this->buffer) && $this->store)
-        {
-            $storedData = $this->store->get($object);
-            foreach($storedData as $data)
-            {
-                $this->buffer[] = array(self::DATA => $data, self::STATE => DataState::CLEAR);
+                if($count >= $depth)
+                {
+                    $ret[] = $data;
+                }
             }
         }
 
         return $ret;
+    }
+
+    private function getDepth($identifiers, $object)
+    {
+        $depth = 0;
+        foreach($identifiers as $identifier)
+        {
+            if(isset($object->$identifier))
+            {
+                $depth++;
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        return $depth;
     }
 
     /**
@@ -54,16 +92,26 @@ class RedisDataStore implements DataStore
      */
     public function set(Model $object)
     {
-        // TODO: Implement set() method.
+        if($this->store)
+        {
+            $this->store->set($object);
+        }
+
+        $key = $this->getKey($object);
+        $rowCount = $this->redis->sAdd($key, serialize($object));
+
+        return $rowCount;
     }
 
-    /**
-     * @param Model $object
-     * @return Model[];
-     */
     public function add(Model $object)
     {
-        // TODO: Implement add() method.
+        if($this->store)
+        {
+            $this->store->add($object);
+        }
+
+        $key = $this->getKey($object);
+        $this->redis->sAdd($key, serialize($object));
     }
 
     /**
@@ -72,7 +120,15 @@ class RedisDataStore implements DataStore
      */
     public function remove(Model $object)
     {
-        // TODO: Implement remove() method.
+        if($this->store)
+        {
+            $this->store->remove($object);
+        }
+
+        $key = $this->getKey($object);
+        $rowCount = $this->redis->sRem($key, serialize($object));
+
+        return $rowCount;
     }
 
     public function flush()
@@ -97,5 +153,15 @@ class RedisDataStore implements DataStore
     public function removeMulti($objects)
     {
         // TODO: Implement removeMulti() method.
+    }
+
+    public function getLastAddedDataList()
+    {
+        if($this->store)
+        {
+            return $this->store->getLastAddedDataList();
+        }
+
+        throw new DataCookerException("RedisDataStore is not supported getLastAddedDataList.");
     }
 }

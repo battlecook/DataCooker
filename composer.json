@@ -1,7 +1,7 @@
 {
     "minimum-stability": "stable",
     "require": {
-        "php": "^7.0.0",
+        "php": "^7.1.0",
         "phpoffice/phpspreadsheet": "dev-master"
     },
     "require-dev": {
@@ -13,6 +13,7 @@
         "psr-4": {
             "battlecook\\DataStore\\": "src\\DataStore",
             "battlecook\\DataObject\\": "src\\DataObject",
+            "battlecook\\": "src",
             "test\\": "test"
         }
     }
