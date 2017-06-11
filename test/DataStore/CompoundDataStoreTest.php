@@ -7,6 +7,7 @@ use battlecook\DataStore\BufferDataStore;
 use battlecook\DataStore\ExcelDataStore;
 use battlecook\DataStore\PdoDataStore;
 use PHPUnit\Framework\TestCase;
+use test\Fixture\ExcelDataStore\Monster;
 use test\Fixture\MemoryDataStore\Item;
 use test\Fixture\MemoryDataStore\User;
 
@@ -168,7 +169,6 @@ class CompoundDataStoreTest extends TestCase
         $this->assertEquals(array(), $ret);
     }
 
-    /*
     public function testGetDesignDataCombination()
     {
         //given
@@ -177,9 +177,12 @@ class CompoundDataStoreTest extends TestCase
         $store = new BufferDataStore(new ApcuDataStore(new ExcelDataStore(null, $path), $keyPrefix));
 
         //when
-        //$store->get()
+        $object = new Monster();
+        $object->id = 2;
+
+        $ret = $store->get($object);
 
         //then
+        $this->assertEquals(1, count($ret));
     }
-    */
 }

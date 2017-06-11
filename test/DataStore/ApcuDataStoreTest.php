@@ -61,7 +61,6 @@ class ApcuDataStoreTest extends TestCase
         //when
         $object = new Monster();
         $object->id = 2;
-        $object->x = 2;
 
         $ret = $store->get($object);
 

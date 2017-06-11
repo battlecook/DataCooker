@@ -20,13 +20,13 @@ class ApcuDataStore implements DataStore
     public function get(Model $object)
     {
         $identifiers = $object->getIdentifiers();
-        $rootIdentifier = $identifiers[0];
-        $key = $this->keyPrefix . '/' . $object->getShortName() . '/' . 'v:' . $object->getVersion() . '/' . $rootIdentifier;
 
         $ret = array();
         $count = 0;
         $depth = $this->getDepth($identifiers, $object);
 
+        $rootIdentifier = $identifiers[0];
+        $key = $this->keyPrefix . '/' . $object->getShortName() . '/' . 'v:' . $object->getVersion() . '/' . $rootIdentifier . ':' . $object->$rootIdentifier;
         $success = false;
         $dataList = apcu_fetch($key, $success);
         if($success)
@@ -50,13 +50,6 @@ class ApcuDataStore implements DataStore
                     $ret[] = $data;
                 }
             }
-        }
-        else
-        {
-            //뒷단 store에서 채워야 하는가 ?
-            //apcu_store($key, $this->buffer);
-            return $ret;
-
         }
 
         return $ret;
