@@ -67,7 +67,7 @@ class ExcelDataStore implements DataStore
         {
             foreach($identifiers as $identifier)
             {
-                if($data->$identifier === $object->$identifier)
+                if($data->$identifier == $object->$identifier)
                 {
                     $count++;
                 }
