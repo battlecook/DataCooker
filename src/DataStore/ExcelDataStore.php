@@ -48,14 +48,14 @@ class ExcelDataStore implements DataStore
         $className = get_class($object);
         foreach($data as $datum)
         {
-            $object = new $className;
+            $data = new $className;
             for($i=0; $i<count($datum); $i++)
             {
                 $name = $fields[$i];
                 $value = $datum[$i];
-                $object->$name = $value;
+                $data->$name = $value;
             }
-            $dataList[] = $object;
+            $dataList[] = $data;
         }
 
         $identifiers = $object->getIdentifiers();
