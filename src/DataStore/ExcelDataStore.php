@@ -2,6 +2,7 @@
 
 namespace battlecook\DataStore;
 
+use battlecook\DataCookerException;
 use battlecook\DataObject\Model;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
@@ -13,8 +14,11 @@ class ExcelDataStore implements DataStore
 
     public function __construct(DataStore $store = null, $path)
     {
+        if(!file_exists($path))
+        {
+            throw new DataCookerException("this path is invalid path.");
+        }
         $this->store = $store;
-
         $this->path = $path;
     }
 
