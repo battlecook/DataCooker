@@ -104,11 +104,7 @@ class ExcelDataStore implements DataStore
         return $depth;
     }
 
-    /**
-     * @param Model $object
-     * @return int $rowCount;
-     */
-    public function set(Model $object)
+    public function set(Model $object): int
     {
         // TODO: Implement set() method.
     }
@@ -122,11 +118,7 @@ class ExcelDataStore implements DataStore
         // TODO: Implement add() method.
     }
 
-    /**
-     * @param Model $object
-     * @return int
-     */
-    public function remove(Model $object)
+    public function remove(Model $object): int
     {
         // TODO: Implement remove() method.
     }
@@ -141,11 +133,7 @@ class ExcelDataStore implements DataStore
         // TODO: Implement rollback() method.
     }
 
-    /**
-     * @param Model[] $objects
-     * @return int
-     */
-    public function removeMulti($objects)
+    public function removeMulti($objects): int
     {
         // TODO: Implement removeMulti() method.
     }
@@ -158,5 +146,10 @@ class ExcelDataStore implements DataStore
     public function getLastAddedDataList()
     {
         // TODO: Implement getLastAddedDataList() method.
+    }
+
+    public function reset()
+    {
+        // TODO: Implement reset() method.
     }
 }

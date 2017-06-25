@@ -86,11 +86,7 @@ class RedisDataStore implements DataStore
         return $depth;
     }
 
-    /**
-     * @param Model $object
-     * @return int $rowCount;
-     */
-    public function set(Model $object)
+    public function set(Model $object): int
     {
         if($this->store)
         {
@@ -114,11 +110,7 @@ class RedisDataStore implements DataStore
         $this->redis->sAdd($key, serialize($object));
     }
 
-    /**
-     * @param Model $object
-     * @return int
-     */
-    public function remove(Model $object)
+    public function remove(Model $object): int
     {
         if($this->store)
         {
@@ -150,7 +142,7 @@ class RedisDataStore implements DataStore
      * @param Model[] $objects
      * @return int
      */
-    public function removeMulti($objects)
+    public function removeMulti($objects): int
     {
         // TODO: Implement removeMulti() method.
     }
@@ -163,5 +155,10 @@ class RedisDataStore implements DataStore
         }
 
         throw new DataCookerException("RedisDataStore is not supported getLastAddedDataList.");
+    }
+
+    public function reset()
+    {
+        // TODO: Implement reset() method.
     }
 }

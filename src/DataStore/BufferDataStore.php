@@ -21,10 +21,16 @@ class BufferDataStore implements DataStore
 
     public function __construct(DataStore $store = null)
     {
+        $this->init();
+        $this->store = $store;
+    }
+
+    private function init()
+    {
         $this->buffer = array();
         $this->index = array();
-
-        $this->store = $store;
+        $this->lastAddedDataList = null;
+        $this->autoIncrement = 0;
     }
 
     public function getLastAddedDataList()
@@ -165,7 +171,7 @@ class BufferDataStore implements DataStore
         return $data[self::STATE] === DataState::DIRTY_DEL;
     }
 
-    public function set(Model $object)
+    public function set(Model $object): int
     {
         $rowCount = 0;
         $bufferedData = $this->get($object);
@@ -262,7 +268,7 @@ class BufferDataStore implements DataStore
         $this->addIndex($index[$value], $data, $identifiers, $depth, $maxDepth, $firstState);
     }
 
-    public function remove(Model $object)
+    public function remove(Model $object): int
     {
         $rowCount = 0;
         $bufferedData = $this->get($object);
@@ -393,11 +399,7 @@ class BufferDataStore implements DataStore
         }
     }
 
-    /**
-     * @param Model[] $objects
-     * @return int
-     */
-    public function removeMulti($objects)
+    public function removeMulti($objects): int
     {
         // TODO: Implement removeMulti() method.
     }
@@ -410,5 +412,10 @@ class BufferDataStore implements DataStore
     public function setChangedAttributes(Model $object, $changedAttributes)
     {
         // TODO: Implement setChangedAttributes() method.
+    }
+
+    public function reset()
+    {
+        $this->init();
     }
 }

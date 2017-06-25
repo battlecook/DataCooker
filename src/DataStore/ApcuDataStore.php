@@ -27,6 +27,7 @@ class ApcuDataStore implements DataStore
 
         $rootIdentifier = $identifiers[0];
         $key = $this->keyPrefix . '/' . $object->getShortName() . '/' . 'v:' . $object->getVersion() . '/' . $rootIdentifier . ':' . $object->$rootIdentifier;
+
         $success = false;
         $dataList = apcu_fetch($key, $success);
         if($success)
@@ -73,11 +74,7 @@ class ApcuDataStore implements DataStore
         return $depth;
     }
 
-    /**
-     * @param Model $object
-     * @return int $rowCount;
-     */
-    public function set(Model $object)
+    public function set(Model $object): int
     {
         // TODO: Implement set() method.
     }
@@ -91,11 +88,7 @@ class ApcuDataStore implements DataStore
         // TODO: Implement add() method.
     }
 
-    /**
-     * @param Model $object
-     * @return int
-     */
-    public function remove(Model $object)
+    public function remove(Model $object): int
     {
         // TODO: Implement remove() method.
     }
@@ -114,7 +107,7 @@ class ApcuDataStore implements DataStore
      * @param Model[] $objects
      * @return int
      */
-    public function removeMulti($objects)
+    public function removeMulti($objects): int
     {
         // TODO: Implement removeMulti() method.
     }
@@ -127,5 +120,10 @@ class ApcuDataStore implements DataStore
     public function getLastAddedDataList()
     {
         // TODO: Implement getLastAddedDataList() method.
+    }
+
+    public function reset()
+    {
+
     }
 }

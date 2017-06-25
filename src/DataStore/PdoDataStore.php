@@ -98,7 +98,7 @@ class PdoDataStore implements DataStore
         return $ret;
     }
 
-    public function set(Model $object)
+    public function set(Model $object): int
     {
         $tableName = $object->getShortName();
         $pdo = $this->pdo;
@@ -252,7 +252,7 @@ class PdoDataStore implements DataStore
         $this->lastAddedDataList[] = $object;
     }
 
-    public function remove(Model $object)
+    public function remove(Model $object): int
     {
         $tableName = $object->getShortName();
         $identifiers = $object->getIdentifiers();
@@ -286,7 +286,7 @@ class PdoDataStore implements DataStore
         return $pdoStatement->rowCount();
     }
 
-    public function removeMulti($objects)
+    public function removeMulti($objects): int
     {
         $tableName = $objects[0]->getShortName();
         foreach($objects as $removedData)
@@ -336,5 +336,10 @@ class PdoDataStore implements DataStore
     public function getLastAddedDataList()
     {
         return $this->lastAddedDataList;
+    }
+
+    public function reset()
+    {
+        // TODO: Implement reset() method.
     }
 }

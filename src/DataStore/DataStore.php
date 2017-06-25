@@ -11,29 +11,20 @@ interface DataStore
      * @return Model[];
      */
     public function get(Model $object);
-    /**
-     * @param Model $object
-     * @return int $rowCount;
-     */
-    public function set(Model $object);
+    public function set(Model $object): int;
     public function setChangedAttributes(Model $object, $changedAttributes);
-    /**
-     * @param Model $object
-     */
     public function add(Model $object);
-    /**
-     * @param Model $object
-     * @return int
-     */
-    public function remove(Model $object);
+    public function remove(Model $object): int;
     /**
      * @param Model[] $objects
      * @return int
      */
-    public function removeMulti($objects);
+    public function removeMulti($objects): int;
 
     public function flush();
     public function rollback();
 
     public function getLastAddedDataList();
+
+    public function reset();
 }
