@@ -27,7 +27,7 @@ class ApcuDataStoreTest extends TestCase
         $object->id = 2;
         $rootIdentifier = $object->getIdentifiers()[0];
 
-        $key = $keyPrefix . '/' . $object->getShortName() . '/' . 'v:' . $object->getVersion() . '/' . $rootIdentifier;
+        $key = $keyPrefix . '/' . $object->getShortName() . '/' . 'v:' . $object->getVersion() . '/' . $rootIdentifier . ':' . $object->$rootIdentifier;
 
         $value = array();
 

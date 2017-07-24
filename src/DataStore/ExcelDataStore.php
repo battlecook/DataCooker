@@ -84,6 +84,7 @@ class ExcelDataStore implements DataStore
             if($count >= $depth)
             {
                 $ret[] = $data;
+                $count = 0;
             }
         }
 
