@@ -6,7 +6,7 @@ namespace battlecook\DataStorage;
 use battlecook\Data\Model;
 use battlecook\DataCookerException;
 
-class Memory implements IDataStorage
+class Memory
 {
     const NONE = 0;
     const INSERT = 1;
@@ -28,11 +28,12 @@ class Memory implements IDataStorage
 
     }
 
-    /**
-     * @param Model $object
-     * @return Model
-     * @throws DataCookerException
-     */
+    public function add($object)
+    {
+
+    }
+
+    /*
     public function add(Model $object): Model
     {
         $identifiers = $object->getIdentifiers();
@@ -68,6 +69,7 @@ class Memory implements IDataStorage
 
         return clone $object;
     }
+    */
 
     public function get(Model $object)
     {
