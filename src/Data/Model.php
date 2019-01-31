@@ -44,7 +44,7 @@ abstract class Model implements IData
 
     abstract public function getAttributes(): array;
 
-    public function getVersion()
+    public function getVersion(): int
     {
         return $this->version;
     }

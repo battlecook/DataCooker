@@ -8,31 +8,31 @@ require __DIR__  . '/../../../vendor/autoload.php';
 final class Item
 {
     /**
-     * @DataCookerVersion
+     * @dataCookerVersion
      */
     public $version;
     /**
-     * @DataCookerIdentifier
+     * @dataCookerIdentifier
      */
     public $id1;
     /**
-     * @DataCookerIdentifier
+     * @dataCookerIdentifier
      */
     public $id2;
     /**
-     * @DataCookerIdentifier
+     * @dataCookerIdentifier
      */
     public $id3;
     /**
-     * @DataCookerAutoIncrement
+     * @dataCookerAutoIncrement
      */
     public $auto1;
     /**
-     * @DataCookerAttribute
+     * @dataCookerAttribute
      */
     public $attr2;
     /**
-     * @DataCookerAttribute
+     * @dataCookerAttribute
      */
     public $attr3;
 }
