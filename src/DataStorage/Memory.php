@@ -5,7 +5,7 @@ namespace battlecook\DataStorage;
 
 use battlecook\Data\Model;
 use battlecook\DataCookerException;
-use battlecook\DataObject\Field;
+use battlecook\DataStructure\Tree;
 
 final class Memory
 {
@@ -15,11 +15,13 @@ final class Memory
     const UPDATE = 3;
 
     const IDENTIFIERS = 0;
-    const ATTRIBUTES = 0;
-    const AUTOINCREMENT = 0;
+    const AUTOINCREMENT = 1;
+    const ATTRIBUTES = 2;
 
-    private $statusTree;
-    private $dataTree;
+    /**
+     * @var $trees Tree[]
+     */
+    private $trees;
 
     private $cachedFieldMap = array();
 
@@ -28,6 +30,7 @@ final class Memory
     public function __construct(IDataStorage $storage = null)
     {
         $this->storage = $storage;
+        $this->trees = array();
     }
 
     private function addToTree(Model $object)
@@ -39,24 +42,23 @@ final class Memory
      * @param $object
      * @throws DataCookerException
      */
-    private function setField($object)
+    public function add($object)
     {
-        if($object instanceof Model)
+        $cacheKey = get_class($object);
+        if(isset($this->cachedFieldMap[$cacheKey]))
         {
-            $identifiers = $object->getIdentifiers();
-            $autoIncrement = $object->getAutoIncrement();
-            $attributes = $object->getAttributes();
-            $version = $object->getVersion();
+            $identifiers = $this->cachedFieldMap[$cacheKey][self::IDENTIFIERS];
+            $autoIncrement = $this->cachedFieldMap[$cacheKey][self::AUTOINCREMENT];
+            $attributes = $this->cachedFieldMap[$cacheKey][self::ATTRIBUTES];
         }
         else
         {
-            $identifiers = array();
-            $attributes = array();
-            $autoIncrement = array();
-            $version = 0;
-
             try
             {
+                $identifiers = array();
+                $autoIncrement = array();
+                $attributes = array();
+
                 $class = get_class($object);
                 $rc = new \ReflectionClass($class);
                 $properties = $rc->getProperties();
@@ -65,7 +67,7 @@ final class Memory
                     $doc = $property->getDocComment();
                     if(stripos('@dataCookerVersion', $doc))
                     {
-                        $version = $property->getName();
+
                     }
                     else if(stripos('@dataCookerIdentifier', $doc))
                     {
@@ -80,123 +82,17 @@ final class Memory
                         $attributes[] = $property->getName();
                     }
                 }
+
+                $this->cachedFieldMap[$cacheKey][self::IDENTIFIERS] = $identifiers;
+                $this->cachedFieldMap[$cacheKey][self::AUTOINCREMENT] = $autoIncrement;
+                $this->cachedFieldMap[$cacheKey][self::ATTRIBUTES] = $attributes;
+
             }
             catch(\ReflectionException $e)
             {
-                throw new DataCookerException("Reflection Exception");
+                throw new DataCookerException("reflection error");
             }
         }
-
-        $cacheKey = get_class($object);
-        $this->cachedFieldMap[$cacheKey] = new Field($identifiers, $autoIncrement, $attributes);
-    }
-
-    /**
-     * @param $object
-     * @throws DataCookerException
-     */
-    public function add($object)
-    {
-        $cacheKey = get_class($object);
-        if(isset($this->cachedFieldMap[$cacheKey]))
-        {
-
-
-        }
-        else
-        {
-            $this->setField($object);
-
-
-            if($object instanceof Model)
-            {
-                $identifiers = $object->getIdentifiers();
-                $attributes = $object->getAttributes();
-                $autoIncrement = $object->getAutoIncrement();
-
-                $fields = array_merge($identifiers, $attributes);
-                $fields = array_diff($fields, array($autoIncrement));
-
-                foreach($fields as $field)
-                {
-                    //is_null 이 더 맞는거 같지만 exception 이 빠져버림
-                    if(empty($object->$field) === true)
-                    {
-                        throw new DataCookerException("fields don't fill all");
-                    }
-                }
-
-                if(in_array($autoIncrement, $identifiers, true) === true && empty($object->$autoIncrement) === true)
-                {
-                    if($this->storage === null)
-                    {
-                        throw new DataCookerException("autoIncrement value is null");
-                    }
-                    else
-                    {
-                        //rollback 을 위해 적어 둬야 하나 ...(일단 적고 나중에 옵션질...)
-                        $object = $this->storage->add($object);
-                    }
-                }
-
-                $this->addToTree($object);
-            }
-            else
-            {
-                try
-                {
-                    $cacheKey = get_class($object);
-                    if(isset($this->cachedFieldMap[$cacheKey]))
-                    {
-
-                    }
-                    else
-                    {
-                        $identifiers = array();
-                        $attributes = array();
-                        $autoIncrement = array();
-
-                        $class = get_class($object);
-                        $rc = new \ReflectionClass($class);
-                        $properties = $rc->getProperties();
-                        foreach($properties as $property)
-                        {
-                            $doc = $property->getDocComment();
-                            if(stripos('@dataCookerVersion', $doc))
-                            {
-
-                            }
-                            else if(stripos('@dataCookerIdentifier', $doc))
-                            {
-                                $identifiers[] = $property->getName();
-                            }
-                            else if(stripos('@dataCookerAutoIncrement', $doc))
-                            {
-                                $autoIncrement[] = $property->getName();
-                            }
-                            else if(stripos('@dataCookerAttribute', $doc))
-                            {
-                                $attributes[] = $property->getName();
-                            }
-                        }
-                    }
-                }
-                catch(\ReflectionException $e)
-                {
-                    throw new DataCookerException("reflection error");
-                }
-            }
-        }
-
-        //return clone $object();
-    }
-
-    /*
-    public function add(Model $object): Model
-    {
-        $identifiers = $object->getIdentifiers();
-        $attributes = $object->getAttributes();
-        $autoIncrement = $object->getAutoIncrement();
 
         $fields = array_merge($identifiers, $attributes);
         $fields = array_diff($fields, array($autoIncrement));
@@ -214,7 +110,7 @@ final class Memory
         {
             if($this->storage === null)
             {
-                throw new DataCookerException("autoIncrement value is null");
+                //throw new DataCookerException("autoIncrement value is null");
             }
             else
             {
@@ -227,7 +123,6 @@ final class Memory
 
         return clone $object;
     }
-    */
 
     public function get(Model $object)
     {
