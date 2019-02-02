@@ -12,7 +12,7 @@ final class LeafNode extends Node
 
     private $data;
     private $keys;
-    private $status;
+    private $currentStatus;
 
     public function __construct($pointer, array $data, array $keys)
     {
@@ -24,12 +24,12 @@ final class LeafNode extends Node
 
     public function getStatus(): int
     {
-        return $this->status;
+        return $this->currentStatus;
     }
 
     public function update(array $data): bool
     {
-        if($this->status === self::DELETED)
+        if($this->currentStatus === self::DELETED)
         {
             return false;
         }
@@ -48,9 +48,11 @@ final class LeafNode extends Node
             }
         }
 
-        if($isChanged === true && $this->status !== self::UPDATED)
+        if($isChanged === true && $this->currentStatus !== self::UPDATED)
         {
-            $this->status = self::UPDATED;
+            $this->currentStatus = self::UPDATED;
         }
+
+        return true;
     }
 }
