@@ -15,6 +15,16 @@ final class Status
     const UNSET = 4;
 
     /**
+     *     current       next       changed
+     *
+     * None, Set -----    Set    -->    Set
+     *            ㄴ      Add    -->   error
+     *            ㄴ      Del    -->    Del
+     *
+     *      Del  ----     Set    -->     error
+     *            ㄴ      Add    -->      Set
+     *            ㄴ      Del    -->     error
+     *
      * @param int $before
      * @param int $after
      * @return int
@@ -31,7 +41,7 @@ final class Status
             }
             else if($after === self::INSERTED)
             {
-                throw new DataCookerException("invalid status before : $before , after : $after , with auto increment : $withAutoIncrement");
+                throw new DataCookerException("invalid status before : $before , after : $after ");
             }
             else if($after === self::DELETED)
             {
@@ -39,14 +49,14 @@ final class Status
             }
             else
             {
-                throw new DataCookerException("invalid status before : $before , after : $after , with auto increment : $withAutoIncrement");
+                throw new DataCookerException("invalid status before : $before , after : $after ");
             }
         }
         else if($before === self::DELETED)
         {
             if($after === self::UPDATED)
             {
-                throw new DataCookerException("invalid status before : $before , after : $after , with auto increment : $withAutoIncrement");
+                throw new DataCookerException("invalid status before : $before , after : $after ");
             }
             else if($after === self::INSERTED)
             {
@@ -54,11 +64,11 @@ final class Status
             }
             else if($after === self::DELETED)
             {
-                throw new DataCookerException("invalid status before : $before , after : $after , with auto increment : $withAutoIncrement");
+                throw new DataCookerException("invalid status before : $before , after : $after ");
             }
             else
             {
-                throw new DataCookerException("invalid status before : $before , after : $after , with auto increment : $withAutoIncrement");
+                throw new DataCookerException("invalid status before : $before , after : $after ");
             }
         }
 
@@ -71,18 +81,9 @@ final class Status
      *
      *     current       next       changed
      *
-     * None, Set -----    Set    -->    Set
-     *            ㄴ      Add    -->   error
-     *            ㄴ      Del    -->    Del
-     *
      *      Add  ----     Set    -->     Set
      *            ㄴ      Add    -->    error
      *            ㄴ      Del    -->     Del
-     *
-     *      Del  ----     Set    -->     error
-     *            ㄴ      Add    -->      Set
-     *            ㄴ      Del    -->     error
-     *
      *
      * @param int $before
      * @param int $after
@@ -100,7 +101,7 @@ final class Status
             }
             else if($after === self::INSERTED)
             {
-                throw new DataCookerException("invalid status before : $before , after : $after , with auto increment : $withAutoIncrement");
+                throw new DataCookerException("invalid status before : $before , after : $after ");
             }
             else if($after === self::DELETED)
             {
@@ -108,7 +109,7 @@ final class Status
             }
             else
             {
-                throw new DataCookerException("invalid status before : $before , after : $after , with auto increment : $withAutoIncrement");
+                throw new DataCookerException("invalid status before : $before , after : $after");
             }
         }
 
@@ -126,17 +127,9 @@ final class Status
      *
      *     current       next       changed
      *
-     * None, Set -----    Set    -->    Set
-     *            ㄴ      Add    -->   error
-     *            ㄴ      Del    -->    Del
-     *
      *      Add  ----     Set    -->     Add
      *            ㄴ      Add    -->    error
-     *            ㄴ      Del    -->     unset data
-     *
-     *      Del  ----     Set    -->     error
-     *            ㄴ      Add    -->      Set
-     *            ㄴ      Del    -->     error
+     *            ㄴ      Del    -->    unset data
      *
      */
     public static function getStatusWithoutAutoincrement(int $before, int $after): int
@@ -150,7 +143,7 @@ final class Status
             }
             else if($after === self::INSERTED)
             {
-                throw new DataCookerException("invalid status before : $before , after : $after , with auto increment : $withAutoIncrement");
+                throw new DataCookerException("invalid status before : $before , after : $after");
             }
             else if($after === self::DELETED)
             {
@@ -158,7 +151,7 @@ final class Status
             }
             else
             {
-                throw new DataCookerException("invalid status before : $before , after : $after , with auto increment : $withAutoIncrement");
+                throw new DataCookerException("invalid status before : $before , after : $after");
             }
         }
 
