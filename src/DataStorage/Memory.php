@@ -21,7 +21,7 @@ final class Memory
     /**
      * @var $trees Tree[]
      */
-    private $trees;
+    private static $trees;
 
     private $cachedFieldMap = array();
 
@@ -30,10 +30,10 @@ final class Memory
     public function __construct(IDataStorage $storage = null)
     {
         $this->storage = $storage;
-        $this->trees = array();
+        self::$trees = array();
     }
 
-    private function addToTree(Model $object)
+    private function addToTree($object)
     {
 
     }
@@ -56,7 +56,7 @@ final class Memory
             try
             {
                 $identifiers = array();
-                $autoIncrement = array();
+                $autoIncrement = "";
                 $attributes = array();
 
                 $class = get_class($object);
@@ -75,7 +75,7 @@ final class Memory
                     }
                     else if(stripos('@dataCookerAutoIncrement', $doc))
                     {
-                        $autoIncrement[] = $property->getName();
+                        $autoIncrement = $property->getName();
                     }
                     else if(stripos('@dataCookerAttribute', $doc))
                     {
@@ -106,16 +106,20 @@ final class Memory
             }
         }
 
-        if(in_array($autoIncrement, $identifiers, true) === true && empty($object->$autoIncrement) === true)
+        if($autoIncrement !== "" && empty($object->$autoIncrement) === true)
         {
             if($this->storage === null)
             {
-                //throw new DataCookerException("autoIncrement value is null");
+                throw new DataCookerException("autoIncrement value is null");
             }
             else
             {
                 //rollback 을 위해 적어 둬야 하나 ...
                 $object = $this->storage->add($object);
+                if(empty($object->$autoIncrement) === true)
+                {
+                    throw new DataCookerException("autoIncrement value is null");
+                }
             }
         }
 

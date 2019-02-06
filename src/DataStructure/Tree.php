@@ -3,50 +3,24 @@ declare(strict_types=1);
 
 namespace battlecook\DataStructure;
 
+use battlecook\Data\Status;
 use battlecook\DataCookerException;
 
 final class Tree
 {
-    private $map;
+    private $depth;
+    private $tree;
+    private $withAutoIncrement;
 
-    public function __construct()
+    public function __construct(bool $withAutoIncrement, int $depth)
     {
-        $this->map = array();
+        $this->tree = array();
+        $this->withAutoIncrement = $withAutoIncrement;
+        // for later need depth constraint
+        $this->depth = $depth;
     }
 
-    /**
-     * @param array $keys
-     * @param array $data
-     * @return bool
-     * @throws DataCookerException
-     */
-    public function insert(array $keys, array $data): bool
-    {
-        if(empty($keys) === true)
-        {
-            throw new DataCookerException("insert function have to have keys.");
-        }
-        $ret = $this->insertRecursive($this->map, $keys, $data);
-
-        return $ret;
-    }
-
-    public function search($keys): bool
-    {
-        return $this->searchRecursive($this->map, $keys);
-    }
-
-    public function delete($keys)
-    {
-
-    }
-
-    public function update($keys)
-    {
-
-    }
-
-    private function insertRecursive(&$tree, $keys, $data): bool
+    private function insertRecursive(&$tree, array $keys, $data): bool
     {
         $key = array_shift($keys);
         if (empty($keys) === true)
@@ -57,7 +31,7 @@ final class Tree
             }
             else
             {
-                $tree[$key] = $data;
+                $tree[$key] = new LeafNode($data);
                 return true;
             }
         }
@@ -67,17 +41,112 @@ final class Tree
         }
     }
 
-    private function searchRecursive(&$tree, array $keys): bool
+    /**
+     * @param array $keys
+     * @param array $data
+     * @return bool
+     * @throws DataCookerException
+     */
+    public function insert(array $keys, array $data): bool
     {
-        if(empty($keys) === true)
+        if(count($keys) !== $this->depth)
         {
-            return false;
+            throw new DataCookerException("invalid depth");
         }
+        $ret = $this->insertRecursive($this->tree, $keys, $data);
+
+        return $ret;
+    }
+
+    /**
+     * @param $tree
+     * @param array $keys
+     * @return array
+     * @throws DataCookerException
+     */
+    private function searchRecursive(&$tree, array $keys): array
+    {
+        if(empty($tree) === true)
+        {
+            return array();
+        }
+
         $searchKey = array_shift($keys);
-        if(isset($tree[$searchKey]) === false)
+        if($searchKey !== null && ($searchKey instanceof LeafNode) === false)
         {
-            $tree[$searchKey] = null;
+            return $this->searchRecursive($tree[$searchKey], $keys);
         }
-        $this->searchRecursive($tree[$searchKey], $keys);
+        //leaf
+        elseif(is_array($tree) === false)
+        {
+            /**
+             * @var $tree LeafNode
+             */
+            if($tree->getStatus() === Status::DELETED)
+            {
+                return array();
+            }
+
+            return array($tree->getData());
+        }
+        //middle node
+        else
+        {
+            $leafs = array();
+            array_walk_recursive($tree, function($data) use (&$leafs)
+            {
+                /**
+                 * @var $data LeafNode
+                 */
+                if($data->getStatus() !== Status::DELETED)
+                {
+                    $leafs[] = $data->getData();
+                }
+            });
+            return $leafs;
+        }
+    }
+
+    /**
+     * @param array $keys
+     * @return array
+     * @throws DataCookerException
+     */
+    public function search(array $keys)
+    {
+        if(count($keys) > $this->depth)
+        {
+            throw new DataCookerException("");
+        }
+        return $this->searchRecursive($this->tree, $keys);
+    }
+
+    /**
+     * @param array $keys
+     * @throws DataCookerException
+     */
+    public function delete(array $keys)
+    {
+        if(count($keys) !== $this->depth)
+        {
+            throw new DataCookerException("invalid depth");
+        }
+
+        //if status is unset, remove node
+
+
+    }
+
+    /**
+     * @param array $keys
+     * @throws DataCookerException
+     */
+    public function update(array $keys)
+    {
+        if(count($keys) !== $this->depth)
+        {
+            throw new DataCookerException("invalid depth");
+        }
+
     }
 }

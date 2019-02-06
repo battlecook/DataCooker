@@ -15,6 +15,4 @@ final class Field
         $this->autoincrement = $autoincrement;
         $this->attributes = $attributes;
     }
-
-
 }
