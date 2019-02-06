@@ -9,11 +9,6 @@ use battlecook\DataStructure\Tree;
 
 final class Memory
 {
-    const NONE = 0;
-    const INSERT = 1;
-    const DELETE = 2;
-    const UPDATE = 3;
-
     const IDENTIFIERS = 0;
     const AUTOINCREMENT = 1;
     const ATTRIBUTES = 2;
