@@ -3,56 +3,37 @@ declare(strict_types=1);
 
 namespace battlecook\DataStructure;
 
-final class LeafNode extends Node
+use battlecook\Data\Status;
+
+final class LeafNode
 {
-    const NONE = 0;
-    const ADDED = 1;
-    const UPDATED = 2;
-    const DELETED = 4;
-
     private $data;
-    private $keys;
-    private $currentStatus;
+    private $status;
 
-    public function __construct($pointer, array $data, array $keys)
+    public function __construct(array $data)
     {
-        parent::__construct($pointer);
-
         $this->data = $data;
-        $this->keys = $keys;
+        $this->status = Status::INSERTED;
     }
 
     public function getStatus(): int
     {
-        return $this->currentStatus;
+        return $this->status;
     }
 
-    public function update(array $data): bool
+    public function getData()
     {
-        if($this->currentStatus === self::DELETED)
-        {
-            return false;
-        }
+        return $this->data;
+    }
 
-        $isChanged = false;
-        foreach($this->keys as $key)
-        {
-            if($this->data[$key] === $data[$key])
-            {
-                continue;
-            }
-            $this->data[$key] = $data[$key];
-            if($isChanged === false)
-            {
-                $isChanged = true;
-            }
-        }
+    public function update(array $data, int $status)
+    {
+        $this->status = $status;
+        $this->data = $data;
+    }
 
-        if($isChanged === true && $this->currentStatus !== self::UPDATED)
-        {
-            $this->currentStatus = self::UPDATED;
-        }
-
-        return true;
+    public function delete(int $status)
+    {
+        $this->status = $status;
     }
 }
