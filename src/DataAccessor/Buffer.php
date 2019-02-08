@@ -1,34 +1,33 @@
 <?php
 declare(strict_types=1);
 
-namespace battlecook\DataStorage;
+namespace battlecook\DataAccessor;
 
-use battlecook\Data\Model;
 use battlecook\DataCookerException;
-use battlecook\DataStructure\Tree;
+use battlecook\DataStorage\PhpMemory;
 
-final class Memory
+final class Buffer implements IDataAccessor
 {
     const IDENTIFIERS = 0;
     const AUTOINCREMENT = 1;
     const ATTRIBUTES = 2;
 
     /**
-     * @var $trees Tree[]
+     * @var $phpData PhpMemory
      */
-    private static $trees;
+    private static $phpData;
 
     private $cachedFieldMap = array();
 
     private $storage;
 
-    public function __construct(IDataStorage $storage = null)
+    public function __construct(IDataAccessor $storage = null)
     {
         $this->storage = $storage;
-        self::$trees = array();
+        self::$phpData = array();
     }
 
-    private function addToTree($object)
+    private function addToBuffer($object)
     {
 
     }
@@ -118,32 +117,32 @@ final class Memory
             }
         }
 
-        $this->addToTree($object);
+        $this->addToBuffer($object);
 
         return clone $object;
     }
 
-    public function get(Model $object)
+    public function get($object)
     {
     }
 
-    public function set(Model $object): int
+    public function set($object): int
     {
-        // TODO: Implement update() method.
     }
 
-    public function remove(Model $object): int
+    public function remove($object): int
     {
-        // TODO: Implement delete() method.
     }
 
     public function commit()
     {
-        // TODO: Implement flush() method.
     }
 
     public function rollback()
     {
-        // TODO: Implement rollback() method.
+    }
+
+    public function initialize()
+    {
     }
 }
