@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace battlecook\DataStructure;
+namespace battlecook\DataStorage;
 
 use battlecook\Data\Status;
 
@@ -17,6 +17,11 @@ final class LeafNode
     }
 
     public function getStatus(): int
+    {
+        return $this->status;
+    }
+
+    public function setStatus(): int
     {
         return $this->status;
     }
