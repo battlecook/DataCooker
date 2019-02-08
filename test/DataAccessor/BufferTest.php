@@ -3,28 +3,28 @@ declare(strict_types=1);
 
 namespace test\DataStorage;
 
-use battlecook\DataStorage\Memory;
+use battlecook\DataAccessor\Buffer;
 use PHPUnit\Framework\TestCase;
 use test\Fixture\DataStorage\Item;
 
-require __DIR__  . '/../../vendor/autoload.php';
+require __DIR__ . '/../../vendor/autoload.php';
 
-class MemoryDataStorageTest extends TestCase
+class BufferTest extends TestCase
 {
     /**
      * @throws \battlecook\DataCookerException
      */
-    public function testAddNotFillAllField()
+    public function testAdd()
     {
         //given
         $object = new Item();
         $object->id1 = 1;
         $object->id2 = 1;
         $object->id3 = 1;
-        $storage = new Memory();
+        $storage = new Buffer();
 
         //when
-        $storage->add($object);
+        $storage->get($object);
 
         //then
         $this->assertEquals(1,1);
