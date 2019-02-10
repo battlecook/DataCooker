@@ -21,9 +21,9 @@ final class LeafNode
         return $this->status;
     }
 
-    public function setStatus(): int
+    public function setStatus($changedStatus)
     {
-        return $this->status;
+        $this->status = $changedStatus;
     }
 
     public function getData()

@@ -182,7 +182,7 @@ final class PhpMemory
         }
 
         /**
-         * @var $leafNode LeafNode
+         * @var $leafNodeArr LeafNode[]
          */
         $leafNodeArr = $this->searchRecursive($this->trees[$dataName], $keys);
         if(empty($leafNodeArr))
@@ -194,6 +194,7 @@ final class PhpMemory
         {
             $changedStatus = Status::getStatusWithAutoIncrement($leafNodeArr[0]->getStatus(), Status::DELETED);
         }
+
         if($changedStatus === Status::UNSET)
         {
             $this->unsetRecursive($this->trees[$dataName], $keys, $changedStatus);

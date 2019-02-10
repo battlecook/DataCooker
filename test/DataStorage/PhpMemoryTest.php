@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace test\DataStorage;
 
+use battlecook\Data\Status;
 use battlecook\DataStorage\Field;
 use battlecook\DataStorage\Meta;
 use battlecook\DataStorage\PhpMemory;
@@ -109,11 +110,6 @@ class PhpMemoryTest extends TestCase
         $this->assertEquals($data, $ret[0]->getData());
     }
 
-    public function testInsertWithAutoIncrement()
-    {
-        $this->assertEquals(1, 1);
-    }
-
     /**
      * @expectedException \battlecook\DataCookerException
      * @throws \battlecook\DataCookerException
@@ -176,5 +172,57 @@ class PhpMemoryTest extends TestCase
         //then
         $ret = $storage->search($dataName, $keys);
         $this->assertEquals(array(), $ret);
+    }
+
+    public function testDeleteNotUnsetData()
+    {
+        //given
+        $dataName = get_class(new Item());
+        $identifiers = array('id1', 'id2', 'id3');
+        $autoIncrement = 'id1';
+        $attributes = array("attr1", "attr2", "attr3");
+
+        $storage = new PhpMemory();
+        $storage->addMetaData(new Meta(new Field($identifiers, $autoIncrement, $attributes), $dataName));
+
+        $keys = array(1,'2',3);
+        $data = array(1, 2, 3);
+        $storage->insert($dataName, $keys, $data);
+
+        //when
+        $storage->delete($dataName, array(1,'2',3));
+
+        //then
+        $ret = $storage->search($dataName, $keys);
+        $this->assertEquals(Status::DELETED, $ret[0]->getStatus());
+    }
+
+    public function testDelete()
+    {
+        //given
+        $dataName = get_class(new Item());
+        $identifiers = array('id1', 'id2', 'id3');
+        $attributes = array("attr1", "attr2", "attr3");
+
+        $storage = new PhpMemory();
+        $storage->addMetaData(new Meta(new Field($identifiers,"", $attributes), $dataName));
+
+        $keys1 = array(1, 1, 1);
+        $data = array(1, 2, 3);
+        $storage->insert($dataName, $keys1, $data);
+
+        $keys2 = array(1, 1, 2);
+        $data = array(1, 2, 3);
+        $storage->insert($dataName, $keys2, $data);
+
+        //when
+        $storage->delete($dataName, $keys1);
+
+        //then
+        $ret = $storage->search($dataName, $keys1);
+        $this->assertEquals(array(), $ret);
+
+        $ret = $storage->search($dataName, array(1,1));
+        $this->assertEquals($data, $ret[0]->getData());
     }
 }
