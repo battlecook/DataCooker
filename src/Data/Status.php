@@ -30,7 +30,7 @@ final class Status
      * @return int
      * @throws DataCookerException
      */
-    public static function getStatus(int $before, int $after): int
+    private static function getStatus(int $before, int $after): int
     {
         $changedStatus = $before;
         if($before === self::UPDATED || $before === self::NONE)
@@ -41,7 +41,7 @@ final class Status
             }
             else if($after === self::INSERTED)
             {
-                throw new DataCookerException("invalid status before : $before , after : $after ");
+                throw new DataCookerException("invalid status before : $before , after : $after (INSERTED)");
             }
             else if($after === self::DELETED)
             {
@@ -92,6 +92,7 @@ final class Status
      */
     public static function getStatusWithAutoIncrement(int $before, int $after): int
     {
+        $changedStatus = self::getStatus($before, $after);
         if($before === self::INSERTED)
         {
             if($after === self::UPDATED)
@@ -100,7 +101,7 @@ final class Status
             }
             else if($after === self::INSERTED)
             {
-                throw new DataCookerException("invalid status before : $before , after : $after ");
+                throw new DataCookerException("invalid status before : $before (INSERTED), after : $after (INSERTED)");
             }
             else if($after === self::DELETED)
             {
@@ -108,12 +109,8 @@ final class Status
             }
             else
             {
-                throw new DataCookerException("invalid status before : $before , after : $after");
+                throw new DataCookerException("invalid after status : $after");
             }
-        }
-        else
-        {
-            throw new DataCookerException("before status is not INSERTED. before status : $before");
         }
 
         return $changedStatus;
@@ -137,6 +134,7 @@ final class Status
      */
     public static function getStatusWithoutAutoincrement(int $before, int $after): int
     {
+        $changedStatus = self::getStatus($before, $after);
         if($before === self::INSERTED)
         {
             if($after === self::UPDATED)
@@ -145,7 +143,7 @@ final class Status
             }
             else if($after === self::INSERTED)
             {
-                throw new DataCookerException("invalid status before : $before , after : $after");
+                $changedStatus = self::INSERTED;
             }
             else if($after === self::DELETED)
             {
@@ -153,12 +151,8 @@ final class Status
             }
             else
             {
-                throw new DataCookerException("invalid status before : $before , after : $after");
+                throw new DataCookerException("invalid after status : $after");
             }
-        }
-        else
-        {
-            throw new DataCookerException("before status is not INSERTED. before status : $before");
         }
 
         return $changedStatus;
