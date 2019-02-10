@@ -31,7 +31,7 @@ final class LeafNode
         return $this->data;
     }
 
-    public function update(array $data, int $status)
+    public function update(int $status, array $data)
     {
         $this->status = $status;
         $this->data = $data;

@@ -50,7 +50,7 @@ final class PhpMemory
         }
 
         /**
-         * @var $leafNode LeafNode
+         * @var $leafNodeArr LeafNode[]
          */
         $leafNodeArr = $this->searchRecursive($this->trees[$dataName], $keys);
         if(empty($leafNodeArr))
@@ -59,10 +59,13 @@ final class PhpMemory
         }
         else
         {
-            $changedStatus = Status::getStatusWithoutAutoincrement($leafNode->getStatus(), Status::INSERTED);
             if($meta->hasAutoIncrement())
             {
-                $changedStatus = Status::getStatusWithAutoIncrement($leafNode->getStatus(), Status::INSERTED);
+                $changedStatus = Status::getStatusWithAutoIncrement($leafNodeArr[0]->getStatus(), Status::INSERTED);
+            }
+            else
+            {
+                $changedStatus = Status::getStatusWithoutAutoincrement($leafNodeArr[0]->getStatus(), Status::INSERTED);
             }
             $this->insertRecursive($this->trees[$dataName], $keys, $data, $changedStatus);
         }
@@ -166,7 +169,11 @@ final class PhpMemory
         }
         else
         {
-            $changedStatus = Status::getStatus($leafNode->getStatus(), Status::DELETED);
+            $changedStatus = Status::getStatusWithoutAutoincrement($leafNodeArr[0]->getStatus(), Status::DELETED);
+            if($meta->hasAutoIncrement())
+            {
+                $changedStatus = Status::getStatusWithAutoIncrement($leafNodeArr[0]->getStatus(), Status::DELETED);
+            }
             if($changedStatus === Status::UNSET)
             {
                 //if status is unset, remove node
@@ -183,16 +190,19 @@ final class PhpMemory
      * @param array $keys
      * @param $data
      * @param $changedStatus
-     * @return bool
      */
-    private function updateRecursive(&$tree, array $keys, $data, $changedStatus): bool
+    private function updateRecursive(&$tree, array $keys, $data, $changedStatus)
     {
         $key = array_shift($keys);
         if (empty($keys) === true)
         {
             if($tree[$key] instanceof LeafNode)
             {
-                $tree[$key]->setStatus($changedStatus);
+                if($tree[$key]->getData() === $data)
+                {
+                    return;
+                }
+                $tree[$key]->update($changedStatus, $data);
             }
             else
             {
@@ -201,7 +211,7 @@ final class PhpMemory
         }
         else
         {
-            return $this->updateRecursive($tree[$key], $keys,  $data, $changedStatus);
+            $this->updateRecursive($tree[$key], $keys,  $data, $changedStatus);
         }
     }
 
@@ -229,7 +239,14 @@ final class PhpMemory
         }
         else
         {
-            $changedStatus = Status::getStatus($leafNodeArr[0]->getStatus(), Status::UPDATED);
+            //todo data type 및 value 체크
+
+
+            $changedStatus = Status::getStatusWithoutAutoincrement($leafNodeArr[0]->getStatus(), Status::UPDATED);
+            if($meta->hasAutoIncrement())
+            {
+                $changedStatus = Status::getStatusWithAutoIncrement($leafNodeArr[0]->getStatus(), Status::UPDATED);
+            }
             $this->updateRecursive($this->trees[$dataName], $keys, $data, $changedStatus);
         }
     }
