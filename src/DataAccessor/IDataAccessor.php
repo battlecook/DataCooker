@@ -9,5 +9,4 @@ interface IDataAccessor
     public function get($object);
     public function set($object): int;
     public function remove($object): int;
-
 }
