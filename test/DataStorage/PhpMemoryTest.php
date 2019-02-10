@@ -16,7 +16,7 @@ class PhpMemoryTest extends TestCase
     /**
      * @throws \battlecook\DataCookerException
      */
-    public function testSearch()
+    public function testSearchEmptyData()
     {
         //given
         $dataName = get_class(new Item());
@@ -34,6 +34,34 @@ class PhpMemoryTest extends TestCase
         $this->assertEquals(array(), $ret);
     }
 
+    public function testSearchInternalNode()
+    {
+        //given
+        $dataName = get_class(new Item());
+        $identifiers = array('id1', 'id2', 'id3');
+        $attributes = array("attr1", "attr2", "attr3");
+
+        $storage = new PhpMemory();
+        $storage->addMetaData(new Meta(new Field($identifiers,"", $attributes), $dataName));
+
+        $keys = array(1,1,1);
+        $data1 = array(1,1,1);
+        $storage->insert($dataName, $keys, $data1);
+
+        $keys = array(1,1,2);
+        $data2 = array(1,1,1);
+        $storage->insert($dataName, $keys, $data2);
+
+        //when
+        $keys = array(1,1);
+        $ret = $storage->search($dataName, $keys);
+
+        //then
+        $this->assertEquals(2, count($ret));
+        $this->assertEquals($data1, $ret[0]->getData());
+        $this->assertEquals($data2, $ret[1]->getData());
+    }
+
     public function testInsert()
     {
         //given
@@ -46,12 +74,12 @@ class PhpMemoryTest extends TestCase
 
         //when
         $keys = array(1,'2',3);
-        $data = array('1','2',3);
+        $data = array('1','2', 3);
         $storage->insert($dataName, $keys, $data);
 
         //then
         $ret = $storage->search($dataName, $keys);
-        $this->assertEquals($data, $ret[0]);
+        $this->assertEquals($data, $ret[0]->getData());
     }
 
     public function testInsertWithoutAutoIncrement()
@@ -64,17 +92,48 @@ class PhpMemoryTest extends TestCase
         $this->assertEquals(1, 1);
     }
 
+    /**
+     * @expectedException \battlecook\DataCookerException
+     * @throws \battlecook\DataCookerException
+     */
+    public function testUpdateEmptyData()
+    {
+        //given
+        $dataName = get_class(new Item());
+        $identifiers = array('id1', 'id2', 'id3');
+        $attributes = array("attr1", "attr2", "attr3");
+
+        $storage = new PhpMemory();
+        $storage->addMetaData(new Meta(new Field($identifiers,"", $attributes), $dataName));
+
+        $keys = array(1,'2',3);
+        $data = array(1, 2, 3);
+        $storage->insert($dataName, $keys, $data);
+
+        //when
+        $storage->update($dataName, array(1,'2',3), array('1','2', '3'));
+
+        //then
+    }
+
     public function testUpdate()
     {
         //given
         $dataName = get_class(new Item());
+        $identifiers = array('id1', 'id2', 'id3');
+        $attributes = array("attr1", "attr2", "attr3");
+
         $storage = new PhpMemory();
+        $storage->addMetaData(new Meta(new Field($identifiers,"", $attributes), $dataName));
+
+        $keys = array(1,'2',3);
+        $data = array(1, 2, 3);
+        $storage->insert($dataName, $keys, $data);
 
         //when
         $storage->update($dataName, array(1,'2',3), array('1','2'));
 
         //then
-        $this->assertEquals(1,1);
     }
 
     public function testDelete()
