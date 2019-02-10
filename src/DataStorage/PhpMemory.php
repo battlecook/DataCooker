@@ -71,7 +71,7 @@ final class PhpMemory
     /**
      * @param $tree
      * @param array $keys
-     * @return array
+     * @return LeafNode[]
      * @throws DataCookerException
      */
     private function searchRecursive(&$tree, array $keys): array
@@ -92,7 +92,7 @@ final class PhpMemory
             /**
              * @var $tree LeafNode
              */
-            return array($tree->getData());
+            return array(clone $tree);
         }
         //internals
         else
@@ -103,7 +103,7 @@ final class PhpMemory
                 /**
                  * @var $data LeafNode
                  */
-                $leafs[] = $data->getData();
+                $leafs[] = $data;
             });
             return $leafs;
         }
@@ -220,7 +220,7 @@ final class PhpMemory
         }
 
         /**
-         * @var $leafNode LeafNode
+         * @var $leafNodeArr LeafNode[]
          */
         $leafNodeArr = $this->searchRecursive($this->trees[$dataName], $keys);
         if(empty($leafNodeArr))
@@ -229,7 +229,7 @@ final class PhpMemory
         }
         else
         {
-            $changedStatus = Status::getStatus($leafNode->getStatus(), Status::DELETED);
+            $changedStatus = Status::getStatus($leafNodeArr[0]->getStatus(), Status::UPDATED);
             $this->updateRecursive($this->trees[$dataName], $keys, $data, $changedStatus);
         }
     }
