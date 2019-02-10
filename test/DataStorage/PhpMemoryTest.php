@@ -84,7 +84,29 @@ class PhpMemoryTest extends TestCase
 
     public function testInsertWithoutAutoIncrement()
     {
-        $this->assertEquals(1, 1);
+        //given
+        $dataName = get_class(new Item());
+        $identifiers = array('id1', 'id2', 'id3');
+        $attributes = array("attr1", "attr2", "attr3");
+
+        $storage = new PhpMemory();
+        $storage->addMetaData(new Meta(new Field($identifiers,"", $attributes), $dataName));
+
+        $keys = array(1, 2, 3);
+        $data = array(1, 2, 3);
+        $storage->insert($dataName, $keys, $data);
+
+        $data = array(1, 2, 4);
+        $storage->update($dataName, $keys, $data);
+
+        //when
+        $keys = array(1, 2, 3);
+        $data = array(1, 2, 3);
+        $storage->insert($dataName, $keys, $data);
+
+        //then
+        $ret = $storage->search($dataName, $keys);
+        $this->assertEquals($data, $ret[0]->getData());
     }
 
     public function testInsertWithAutoIncrement()
@@ -105,10 +127,6 @@ class PhpMemoryTest extends TestCase
 
         $storage = new PhpMemory();
         $storage->addMetaData(new Meta(new Field($identifiers,"", $attributes), $dataName));
-
-        $keys = array(1,'2',3);
-        $data = array(1, 2, 3);
-        $storage->insert($dataName, $keys, $data);
 
         //when
         $storage->update($dataName, array(1,'2',3), array('1','2', '3'));
@@ -131,21 +149,32 @@ class PhpMemoryTest extends TestCase
         $storage->insert($dataName, $keys, $data);
 
         //when
-        $storage->update($dataName, array(1,'2',3), array('1','2'));
+        $storage->update($dataName, array(1,'2',3), array('1','2', '3'));
 
         //then
+        $ret = $storage->search($dataName, $keys);
+        $this->assertEquals($data, $ret[0]->getData());
     }
 
-    public function testDelete()
+    public function testDeleteUnsetData()
     {
         //given
         $dataName = get_class(new Item());
+        $identifiers = array('id1', 'id2', 'id3');
+        $attributes = array("attr1", "attr2", "attr3");
+
         $storage = new PhpMemory();
+        $storage->addMetaData(new Meta(new Field($identifiers,"", $attributes), $dataName));
+
+        $keys = array(1,'2',3);
+        $data = array(1, 2, 3);
+        $storage->insert($dataName, $keys, $data);
 
         //when
         $storage->delete($dataName, array(1,'2',3));
 
         //then
-        $this->assertEquals(1,1);
+        $ret = $storage->search($dataName, $keys);
+        $this->assertEquals(array(), $ret);
     }
 }

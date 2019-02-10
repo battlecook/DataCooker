@@ -146,6 +146,28 @@ final class PhpMemory
         }
     }
 
+    private function unsetRecursive(&$tree, array $keys, $changedStatus)
+    {
+        $key = array_shift($keys);
+        if (empty($keys) === true)
+        {
+            if($tree[$key] instanceof LeafNode)
+            {
+                unset($tree[$key]);
+                return;
+            }
+        }
+        else
+        {
+            $this->unsetRecursive($tree[$key], $keys, $changedStatus);
+            if(empty($tree[$key]) === true)
+            {
+                unset($tree[$key]);
+                return;
+            }
+        }
+    }
+
     /**
      * @param string $dataName
      * @param array $keys
@@ -165,23 +187,20 @@ final class PhpMemory
         $leafNodeArr = $this->searchRecursive($this->trees[$dataName], $keys);
         if(empty($leafNodeArr))
         {
-            throw new DataCookerException("data is empty for delete");
+            return;
+        }
+        $changedStatus = Status::getStatusWithoutAutoincrement($leafNodeArr[0]->getStatus(), Status::DELETED);
+        if($meta->hasAutoIncrement())
+        {
+            $changedStatus = Status::getStatusWithAutoIncrement($leafNodeArr[0]->getStatus(), Status::DELETED);
+        }
+        if($changedStatus === Status::UNSET)
+        {
+            $this->unsetRecursive($this->trees[$dataName], $keys, $changedStatus);
         }
         else
         {
-            $changedStatus = Status::getStatusWithoutAutoincrement($leafNodeArr[0]->getStatus(), Status::DELETED);
-            if($meta->hasAutoIncrement())
-            {
-                $changedStatus = Status::getStatusWithAutoIncrement($leafNodeArr[0]->getStatus(), Status::DELETED);
-            }
-            if($changedStatus === Status::UNSET)
-            {
-                //if status is unset, remove node
-            }
-            else
-            {
-                $this->deleteRecursive($this->trees[$dataName], $keys, $changedStatus);
-            }
+            $this->deleteRecursive($this->trees[$dataName], $keys, $changedStatus);
         }
     }
 
@@ -198,10 +217,6 @@ final class PhpMemory
         {
             if($tree[$key] instanceof LeafNode)
             {
-                if($tree[$key]->getData() === $data)
-                {
-                    return;
-                }
                 $tree[$key]->update($changedStatus, $data);
             }
             else
@@ -235,12 +250,14 @@ final class PhpMemory
         $leafNodeArr = $this->searchRecursive($this->trees[$dataName], $keys);
         if(empty($leafNodeArr))
         {
-            throw new DataCookerException("data is empty for delete");
+            throw new DataCookerException("data is empty for update");
         }
         else
         {
-            //todo data type 및 value 체크
-
+            if($leafNodeArr[0]->getData() === $data || count($leafNodeArr[0]->getData()) !== count($data))
+            {
+                return;
+            }
 
             $changedStatus = Status::getStatusWithoutAutoincrement($leafNodeArr[0]->getStatus(), Status::UPDATED);
             if($meta->hasAutoIncrement())
