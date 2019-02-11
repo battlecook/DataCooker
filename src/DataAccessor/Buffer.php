@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace battlecook\DataAccessor;
 
 use battlecook\DataCookerException;
+use battlecook\DataStorage\Field;
+use battlecook\DataStorage\Meta;
 use battlecook\DataStorage\PhpMemory;
 
 final class Buffer implements IDataAccessor
@@ -11,6 +13,12 @@ final class Buffer implements IDataAccessor
     const IDENTIFIERS = 0;
     const AUTOINCREMENT = 1;
     const ATTRIBUTES = 2;
+
+    const VERSION_DELIMITER = "@dataCookerVersion";
+    const IDENTIFIER_DELIMITER = "@dataCookerIdentifier";
+    const AUTOINCREMENT_DELIMITER = "@dataCookerAutoIncrement";
+    const ATTRIBUTE_DELIMITER = "@dataCookerAttribute";
+
 
     /**
      * @var $phpData PhpMemory
@@ -24,12 +32,10 @@ final class Buffer implements IDataAccessor
     public function __construct(IDataAccessor $storage = null)
     {
         $this->storage = $storage;
-        self::$phpData = array();
-    }
-
-    private function addToBuffer($object)
-    {
-
+        if(empty(self::$phpData) === true)
+        {
+            self::$phpData = new PhpMemory();
+        }
     }
 
     /**
@@ -59,22 +65,52 @@ final class Buffer implements IDataAccessor
                 foreach($properties as $property)
                 {
                     $doc = $property->getDocComment();
-                    if(stripos('@dataCookerVersion', $doc))
+                    if(stripos($doc, self::VERSION_DELIMITER))
                     {
 
                     }
-                    else if(stripos('@dataCookerIdentifier', $doc))
+                    else if(stripos($doc, self::IDENTIFIER_DELIMITER))
                     {
+                        if(stripos($doc, self::AUTOINCREMENT_DELIMITER))
+                        {
+                            if($autoIncrement !== "")
+                            {
+                                throw new DataCookerException("auto increment have to has only one");
+                            }
+                            $autoIncrement = $property->getName();
+                            if(isset($object->$autoIncrement) === true && is_int($object->$autoIncrement) === false)
+                            {
+                                throw new DataCookerException("auto increment have to has integer type");
+                            }
+                        }
                         $identifiers[] = $property->getName();
                     }
-                    else if(stripos('@dataCookerAutoIncrement', $doc))
+                    else if(stripos($doc, self::ATTRIBUTE_DELIMITER))
                     {
-                        $autoIncrement = $property->getName();
-                    }
-                    else if(stripos('@dataCookerAttribute', $doc))
-                    {
+                        if(stripos($doc, self::AUTOINCREMENT_DELIMITER))
+                        {
+                            if($autoIncrement !== "")
+                            {
+                                throw new DataCookerException("auto increment have to has only one");
+                            }
+                            $autoIncrement = $property->getName();
+                            if(isset($object->$autoIncrement) === true && is_int($object->$autoIncrement) === false)
+                            {
+                                throw new DataCookerException("auto increment have to has integer type");
+                            }
+                        }
                         $attributes[] = $property->getName();
                     }
+                }
+
+                if(empty($identifiers) === true)
+                {
+                    throw new DataCookerException("identifiers is empty");
+                }
+
+                if(array_search($autoIncrement, $identifiers) === false && array_search($autoIncrement, $attributes) === false)
+                {
+                    throw new DataCookerException("autoincrement must be included in identifiers or attribute");
                 }
 
                 $this->cachedFieldMap[$cacheKey][self::IDENTIFIERS] = $identifiers;
@@ -86,6 +122,8 @@ final class Buffer implements IDataAccessor
             {
                 throw new DataCookerException("reflection error");
             }
+
+            self::$phpData->addMetaData(new Meta(new Field($identifiers, $autoIncrement, $attributes), $cacheKey));
         }
 
         $fields = array_merge($identifiers, $attributes);
@@ -117,7 +155,19 @@ final class Buffer implements IDataAccessor
             }
         }
 
-        $this->addToBuffer($object);
+        $keys = array();
+        foreach($this->cachedFieldMap[$cacheKey][self::IDENTIFIERS] as $identifier)
+        {
+            $keys[] = $object->$identifier;
+        }
+
+        $data = array();
+        foreach($this->cachedFieldMap[$cacheKey][self::ATTRIBUTES] as $attribute)
+        {
+            $data[] = $object->$attribute;
+        }
+
+        self::$phpData->insert($cacheKey, $keys, $data);
 
         return clone $object;
     }
