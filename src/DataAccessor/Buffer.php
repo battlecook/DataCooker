@@ -134,7 +134,7 @@ final class Buffer implements IDataAccessor
     {
     }
 
-    public function commit()
+    public function flush()
     {
     }
 
