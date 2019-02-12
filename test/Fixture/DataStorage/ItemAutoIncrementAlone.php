@@ -5,7 +5,7 @@ namespace test\Fixture\DataStorage;
 
 require __DIR__  . '/../../../vendor/autoload.php';
 
-final class Item
+final class ItemAutoIncrementAlone
 {
     /**
      * @dataCookerVersion
@@ -16,7 +16,7 @@ final class Item
      */
     public $id1;
     /**
-     * @dataCookerIdentifier
+     * @dataCookerAutoIncrement
      */
     public $id2;
     /**
@@ -24,7 +24,6 @@ final class Item
      */
     public $id3;
     /**
-     * @dataCookerAutoIncrement
      * @dataCookerAttribute
      */
     public $attr1;

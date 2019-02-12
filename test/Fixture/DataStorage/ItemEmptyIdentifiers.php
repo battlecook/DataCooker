@@ -5,23 +5,11 @@ namespace test\Fixture\DataStorage;
 
 require __DIR__  . '/../../../vendor/autoload.php';
 
-final class Item
+final class ItemEmptyIdentifiers
 {
-    /**
-     * @dataCookerVersion
-     */
     public $version;
-    /**
-     * @dataCookerIdentifier
-     */
     public $id1;
-    /**
-     * @dataCookerIdentifier
-     */
     public $id2;
-    /**
-     * @dataCookerIdentifier
-     */
     public $id3;
     /**
      * @dataCookerAutoIncrement
