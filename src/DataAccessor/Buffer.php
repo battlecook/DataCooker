@@ -25,6 +25,9 @@ final class Buffer implements IDataAccessor
      */
     private static $phpData;
 
+    /**
+     * @var $cachedFieldMap Field[]
+     */
     private $cachedFieldMap = array();
 
     private $storage;
@@ -42,97 +45,119 @@ final class Buffer implements IDataAccessor
      * @param $object
      * @throws DataCookerException
      */
-    public function add($object)
+    private function setField($object)
+    {
+        try
+        {
+            $identifiers = array();
+            $autoIncrement = "";
+            $attributes = array();
+
+            $cacheKey = get_class($object);
+            $rc = new \ReflectionClass($cacheKey);
+            $properties = $rc->getProperties();
+            foreach($properties as $property)
+            {
+                $doc = $property->getDocComment();
+                if($doc === false)
+                {
+                    continue;
+                }
+
+                if(stripos($doc, self::VERSION_DELIMITER))
+                {
+
+                }
+                else if(stripos($doc, self::IDENTIFIER_DELIMITER))
+                {
+                    if(stripos($doc, self::AUTOINCREMENT_DELIMITER))
+                    {
+                        if($autoIncrement !== "")
+                        {
+                            throw new DataCookerException("auto increment have to has only one");
+                        }
+                        $autoIncrement = $property->getName();
+                        if(isset($object->$autoIncrement) === true && is_int($object->$autoIncrement) === false)
+                        {
+                            throw new DataCookerException("auto increment have to has integer type");
+                        }
+                    }
+                    $identifiers[] = $property->getName();
+                }
+                else if(stripos($doc, self::ATTRIBUTE_DELIMITER))
+                {
+                    if(stripos($doc, self::AUTOINCREMENT_DELIMITER))
+                    {
+                        if($autoIncrement !== "")
+                        {
+                            throw new DataCookerException("auto increment have to has only one");
+                        }
+                        $autoIncrement = $property->getName();
+                        if(isset($object->$autoIncrement) === true && is_int($object->$autoIncrement) === false)
+                        {
+                            throw new DataCookerException("auto increment have to has integer type");
+                        }
+                    }
+                    $attributes[] = $property->getName();
+                }
+            }
+
+            if(empty($identifiers) === true)
+            {
+                throw new DataCookerException("identifiers is empty");
+            }
+
+            if(array_search($autoIncrement, $identifiers) === false && array_search($autoIncrement, $attributes) === false)
+            {
+                throw new DataCookerException("autoincrement must be included in identifiers or attribute");
+            }
+
+            $this->cachedFieldMap[$cacheKey] = new Field($identifiers, $autoIncrement, $attributes);
+        }
+        catch(\ReflectionException $e)
+        {
+            throw new DataCookerException("reflection error");
+        }
+    }
+
+    private function getKeys($cacheKey, $object)
+    {
+        $keys = array();
+        foreach($this->cachedFieldMap[$cacheKey]->getIdentifiers() as $identifier)
+        {
+            $keys[] = $object->$identifier;
+        }
+        return $keys;
+    }
+
+    private function getData($cacheKey, $object)
+    {
+        $data = array();
+        foreach($this->cachedFieldMap[$cacheKey]->getAttributes() as $attribute)
+        {
+            $data[] = $object->$attribute;
+        }
+        return $data;
+    }
+
+    /**
+     * @param $object
+     * @throws DataCookerException
+     */
+    private function setMeta($object)
     {
         $cacheKey = get_class($object);
-        if(isset($this->cachedFieldMap[$cacheKey]))
+        if(isset($this->cachedFieldMap[$cacheKey]) === false)
         {
-            $identifiers = $this->cachedFieldMap[$cacheKey][self::IDENTIFIERS];
-            $autoIncrement = $this->cachedFieldMap[$cacheKey][self::AUTOINCREMENT];
-            $attributes = $this->cachedFieldMap[$cacheKey][self::ATTRIBUTES];
-        }
-        else
-        {
-            try
-            {
-                $identifiers = array();
-                $autoIncrement = "";
-                $attributes = array();
+            $this->setField($object);
 
-                $class = get_class($object);
-                $rc = new \ReflectionClass($class);
-                $properties = $rc->getProperties();
-                foreach($properties as $property)
-                {
-                    $doc = $property->getDocComment();
-                    if($doc === false)
-                    {
-                        continue;
-                    }
-
-                    if(stripos($doc, self::VERSION_DELIMITER))
-                    {
-
-                    }
-                    else if(stripos($doc, self::IDENTIFIER_DELIMITER))
-                    {
-                        if(stripos($doc, self::AUTOINCREMENT_DELIMITER))
-                        {
-                            if($autoIncrement !== "")
-                            {
-                                throw new DataCookerException("auto increment have to has only one");
-                            }
-                            $autoIncrement = $property->getName();
-                            if(isset($object->$autoIncrement) === true && is_int($object->$autoIncrement) === false)
-                            {
-                                throw new DataCookerException("auto increment have to has integer type");
-                            }
-                        }
-                        $identifiers[] = $property->getName();
-                    }
-                    else if(stripos($doc, self::ATTRIBUTE_DELIMITER))
-                    {
-                        if(stripos($doc, self::AUTOINCREMENT_DELIMITER))
-                        {
-                            if($autoIncrement !== "")
-                            {
-                                throw new DataCookerException("auto increment have to has only one");
-                            }
-                            $autoIncrement = $property->getName();
-                            if(isset($object->$autoIncrement) === true && is_int($object->$autoIncrement) === false)
-                            {
-                                throw new DataCookerException("auto increment have to has integer type");
-                            }
-                        }
-                        $attributes[] = $property->getName();
-                    }
-                }
-
-                if(empty($identifiers) === true)
-                {
-                    throw new DataCookerException("identifiers is empty");
-                }
-
-                if(array_search($autoIncrement, $identifiers) === false && array_search($autoIncrement, $attributes) === false)
-                {
-                    throw new DataCookerException("autoincrement must be included in identifiers or attribute");
-                }
-
-                $this->cachedFieldMap[$cacheKey][self::IDENTIFIERS] = $identifiers;
-                $this->cachedFieldMap[$cacheKey][self::AUTOINCREMENT] = $autoIncrement;
-                $this->cachedFieldMap[$cacheKey][self::ATTRIBUTES] = $attributes;
-            }
-            catch(\ReflectionException $e)
-            {
-                throw new DataCookerException("reflection error");
-            }
-
+            $identifiers = $this->cachedFieldMap[$cacheKey]->getIdentifiers();
+            $autoIncrement = $this->cachedFieldMap[$cacheKey]->getAutoIncrement();
+            $attributes = $this->cachedFieldMap[$cacheKey]->getAttributes();
             self::$phpData->addMetaData(new Meta(new Field($identifiers, $autoIncrement, $attributes), $cacheKey));
         }
 
-        $fields = array_merge($identifiers, $attributes);
-        $fields = array_diff($fields, array($autoIncrement));
-
+        $fields = $this->cachedFieldMap[$cacheKey]->getFields();
         foreach($fields as $field)
         {
             //is_null 이 더 맞는거 같지만 exception 이 빠져버림
@@ -141,7 +166,18 @@ final class Buffer implements IDataAccessor
                 throw new DataCookerException("fields don't fill all");
             }
         }
+    }
 
+    /**
+     * @param $object
+     * @throws DataCookerException
+     */
+    public function add($object)
+    {
+        $this->setMeta($object);
+
+        $cacheKey = get_class($object);
+        $autoIncrement = $this->cachedFieldMap[$cacheKey]->getAutoIncrement();
         if($autoIncrement !== "" && empty($object->$autoIncrement) === true)
         {
             if($this->storage === null)
@@ -159,29 +195,46 @@ final class Buffer implements IDataAccessor
             }
         }
 
-        $keys = array();
-        foreach($this->cachedFieldMap[$cacheKey][self::IDENTIFIERS] as $identifier)
-        {
-            $keys[] = $object->$identifier;
-        }
-
-        $data = array();
-        foreach($this->cachedFieldMap[$cacheKey][self::ATTRIBUTES] as $attribute)
-        {
-            $data[] = $object->$attribute;
-        }
-
+        $keys = $this->getKeys($cacheKey, $object);
+        $data = $this->getData($cacheKey, $object);
         self::$phpData->insert($cacheKey, $keys, $data);
 
         return clone $object;
     }
 
-    public function get($object)
+    /**
+     * @param $object
+     * @return array
+     * @throws DataCookerException
+     */
+    public function get($object): array
     {
+        $this->setMeta($object);
+
+        $cacheKey = get_class($object);
+        $keys = $this->getKeys($cacheKey, $object);
+
+        $ret = self::$phpData->search($cacheKey, $keys);
+
+        return $ret;
     }
 
-    public function set($object): int
+    /**
+     * @param $object
+     * @return object
+     * @throws DataCookerException
+     */
+    public function set($object)
     {
+        $this->setMeta($object);
+
+        $cacheKey = get_class($object);
+        $keys = $this->getKeys($cacheKey, $object);
+        $data = $this->getData($cacheKey, $object);
+
+        self::$phpData->update($cacheKey, $keys, $data);
+
+        return clone $object;
     }
 
     public function remove($object): int
