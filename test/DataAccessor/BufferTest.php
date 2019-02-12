@@ -95,9 +95,36 @@ class BufferTest extends TestCase
         $storage = new Buffer();
 
         //when
-        $storage->add($object);
+        $ret = $storage->add($object);
 
         //then
-        $this->assertEquals(1,1);
+        $this->assertEquals($object, $ret);
+    }
+
+    public function testSet()
+    {
+        //given
+        $object = new Item();
+        $object->id1 = 1;
+        $object->id2 = 1;
+        $object->id3 = 1;
+        $object->attr1 = 1;
+        $object->attr2 = 1;
+        $object->attr3 = 1;
+        $storage = new Buffer();
+        $storage->add($object);
+
+        //when
+        $object2 = new Item();
+        $object2->id1 = 1;
+        $object2->id2 = 1;
+        $object2->id3 = 1;
+        $object2->attr1 = 2;
+        $object2->attr2 = 2;
+        $object2->attr3 = 2;
+        $ret = $storage->set($object2);
+
+        //then
+        $this->assertEquals($object2, $ret);
     }
 }

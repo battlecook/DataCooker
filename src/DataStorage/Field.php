@@ -33,4 +33,12 @@ final class Field
     {
         return $this->attributes;
     }
+
+    public function getFields(): array
+    {
+        $fields = array_merge($this->identifiers, $this->attributes);
+        $fields = array_diff($fields, array($this->autoincrement));
+
+        return $fields;
+    }
 }
