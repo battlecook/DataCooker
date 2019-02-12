@@ -65,6 +65,11 @@ final class Buffer implements IDataAccessor
                 foreach($properties as $property)
                 {
                     $doc = $property->getDocComment();
+                    if($doc === false)
+                    {
+                        continue;
+                    }
+
                     if(stripos($doc, self::VERSION_DELIMITER))
                     {
 
@@ -116,7 +121,6 @@ final class Buffer implements IDataAccessor
                 $this->cachedFieldMap[$cacheKey][self::IDENTIFIERS] = $identifiers;
                 $this->cachedFieldMap[$cacheKey][self::AUTOINCREMENT] = $autoIncrement;
                 $this->cachedFieldMap[$cacheKey][self::ATTRIBUTES] = $attributes;
-
             }
             catch(\ReflectionException $e)
             {
