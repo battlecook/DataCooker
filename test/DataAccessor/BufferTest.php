@@ -14,6 +14,12 @@ require __DIR__ . '/../../vendor/autoload.php';
 
 class BufferTest extends TestCase
 {
+    public function setUp()
+    {
+        $buffer = new Buffer();
+        $buffer->initialize();
+    }
+
     /**
      * @expectedException \battlecook\DataCookerException
      * @expectedExceptionMessage auto increment have to has only one
@@ -71,6 +77,12 @@ class BufferTest extends TestCase
     {
         //given
         $object = new ItemAutoIncrementAlone();
+        $object->id1 = 1;
+        $object->id2 = 1;
+        $object->id3 = 1;
+        $object->attr1 = 1;
+        $object->attr2 = 1;
+        $object->attr3 = 1;
         $storage = new Buffer();
 
         //when
@@ -126,5 +138,43 @@ class BufferTest extends TestCase
 
         //then
         $this->assertEquals($object2, $ret);
+    }
+
+    public function testRemove()
+    {
+        //given
+        $storage = new Buffer();
+
+        $object1 = new Item();
+        $object1->id1 = 1;
+        $object1->id2 = 1;
+        $object1->id3 = 1;
+        $object1->attr1 = 1;
+        $object1->attr2 = 1;
+        $object1->attr3 = 1;
+        $storage->add($object1);
+
+        $object2 = new Item();
+        $object2->id1 = 1;
+        $object2->id2 = 1;
+        $object2->id3 = 2;
+        $object2->attr1 = 1;
+        $object2->attr2 = 1;
+        $object2->attr3 = 1;
+        $storage->add($object2);
+
+        //when
+        $object = new Item();
+        $object->id1 = 1;
+        $object->id2 = 1;
+        $object->id3 = 1;
+        $storage->remove($object);
+
+        //then
+        $object = new Item();
+        $object->id1 = 1;
+        $object->id2 = 1;
+        $ret = $storage->get($object);
+        $this->assertEquals($object2, $ret[0]);
     }
 }

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace battlecook\DataAccessor;
 
+use battlecook\Data\Status;
 use battlecook\DataCookerException;
 use battlecook\DataStorage\Field;
 use battlecook\DataStorage\Meta;
@@ -10,15 +11,10 @@ use battlecook\DataStorage\PhpMemory;
 
 final class Buffer implements IDataAccessor
 {
-    const IDENTIFIERS = 0;
-    const AUTOINCREMENT = 1;
-    const ATTRIBUTES = 2;
-
     const VERSION_DELIMITER = "@dataCookerVersion";
     const IDENTIFIER_DELIMITER = "@dataCookerIdentifier";
     const AUTOINCREMENT_DELIMITER = "@dataCookerAutoIncrement";
     const ATTRIBUTE_DELIMITER = "@dataCookerAttribute";
-
 
     /**
      * @var $phpData PhpMemory
@@ -37,7 +33,7 @@ final class Buffer implements IDataAccessor
         $this->storage = $storage;
         if(empty(self::$phpData) === true)
         {
-            self::$phpData = new PhpMemory();
+            $this->initialize();
         }
     }
 
@@ -100,16 +96,18 @@ final class Buffer implements IDataAccessor
                     }
                     $attributes[] = $property->getName();
                 }
+                else if(stripos($doc, self::AUTOINCREMENT_DELIMITER))
+                {
+                    if(stripos($doc, self::IDENTIFIER_DELIMITER) === false && stripos($doc, self::ATTRIBUTE_DELIMITER) === false)
+                    {
+                        throw new DataCookerException("autoincrement must be included in identifiers or attribute");
+                    }
+                }
             }
 
             if(empty($identifiers) === true)
             {
                 throw new DataCookerException("identifiers is empty");
-            }
-
-            if(array_search($autoIncrement, $identifiers) === false && array_search($autoIncrement, $attributes) === false)
-            {
-                throw new DataCookerException("autoincrement must be included in identifiers or attribute");
             }
 
             $this->cachedFieldMap[$cacheKey] = new Field($identifiers, $autoIncrement, $attributes);
@@ -120,7 +118,7 @@ final class Buffer implements IDataAccessor
         }
     }
 
-    private function getKeys($cacheKey, $object)
+    private function getIdentifierValues($cacheKey, $object)
     {
         $keys = array();
         foreach($this->cachedFieldMap[$cacheKey]->getIdentifiers() as $identifier)
@@ -130,7 +128,7 @@ final class Buffer implements IDataAccessor
         return $keys;
     }
 
-    private function getData($cacheKey, $object)
+    private function getAttributeValues($cacheKey, $object)
     {
         $data = array();
         foreach($this->cachedFieldMap[$cacheKey]->getAttributes() as $attribute)
@@ -156,7 +154,15 @@ final class Buffer implements IDataAccessor
             $attributes = $this->cachedFieldMap[$cacheKey]->getAttributes();
             self::$phpData->addMetaData(new Meta(new Field($identifiers, $autoIncrement, $attributes), $cacheKey));
         }
+    }
 
+    /**
+     * @param $cacheKey
+     * @param $object
+     * @throws DataCookerException
+     */
+    private function checkField($cacheKey, $object)
+    {
         $fields = $this->cachedFieldMap[$cacheKey]->getFields();
         foreach($fields as $field)
         {
@@ -177,6 +183,8 @@ final class Buffer implements IDataAccessor
         $this->setMeta($object);
 
         $cacheKey = get_class($object);
+        $this->checkField($cacheKey, $object);
+
         $autoIncrement = $this->cachedFieldMap[$cacheKey]->getAutoIncrement();
         if($autoIncrement !== "" && empty($object->$autoIncrement) === true)
         {
@@ -195,8 +203,8 @@ final class Buffer implements IDataAccessor
             }
         }
 
-        $keys = $this->getKeys($cacheKey, $object);
-        $data = $this->getData($cacheKey, $object);
+        $keys = $this->getIdentifierValues($cacheKey, $object);
+        $data = $this->getAttributeValues($cacheKey, $object);
         self::$phpData->insert($cacheKey, $keys, $data);
 
         return clone $object;
@@ -212,9 +220,39 @@ final class Buffer implements IDataAccessor
         $this->setMeta($object);
 
         $cacheKey = get_class($object);
-        $keys = $this->getKeys($cacheKey, $object);
+        $keys = $this->getIdentifierValues($cacheKey, $object);
 
-        $ret = self::$phpData->search($cacheKey, $keys);
+        $nodeArr = self::$phpData->search($cacheKey, $keys);
+
+        $identifierKeys = $this->cachedFieldMap[$cacheKey]->getIdentifiers();
+        $attributeKeys = $this->cachedFieldMap[$cacheKey]->getAttributes();
+
+        $ret = array();
+        foreach($nodeArr as $node)
+        {
+            if($node->getStatus() !== Status::DELETED)
+            {
+                //order dependency
+                $identifierDataArr = $node->getKey();
+
+                $attributeDataArr = $node->getData();
+
+                $tmp = new $object();
+                for($i=0; $i<count($identifierKeys); $i++)
+                {
+                    $key = $identifierKeys[$i];
+                    $tmp->$key = $identifierDataArr[$i];
+                }
+
+                for($i=0; $i<count($attributeKeys); $i++)
+                {
+                    $key = $attributeKeys[$i];
+                    $tmp->$key = $attributeDataArr[$i];
+                }
+
+                $ret[] = $tmp;
+            }
+        }
 
         return $ret;
     }
@@ -229,16 +267,29 @@ final class Buffer implements IDataAccessor
         $this->setMeta($object);
 
         $cacheKey = get_class($object);
-        $keys = $this->getKeys($cacheKey, $object);
-        $data = $this->getData($cacheKey, $object);
+        $this->checkField($cacheKey, $object);
+
+        $cacheKey = get_class($object);
+        $keys = $this->getIdentifierValues($cacheKey, $object);
+        $data = $this->getAttributeValues($cacheKey, $object);
 
         self::$phpData->update($cacheKey, $keys, $data);
 
         return clone $object;
     }
 
-    public function remove($object): int
+    /**
+     * @param $object
+     * @throws DataCookerException
+     */
+    public function remove($object)
     {
+        $this->setMeta($object);
+
+        $cacheKey = get_class($object);
+        $keys = $this->getIdentifierValues($cacheKey, $object);
+
+        self::$phpData->delete($cacheKey, $keys);
     }
 
     public function flush()
@@ -251,5 +302,6 @@ final class Buffer implements IDataAccessor
 
     public function initialize()
     {
+        self::$phpData = new PhpMemory();
     }
 }

@@ -41,4 +41,13 @@ final class Field
 
         return $fields;
     }
+
+    public function hasAutoIncrement(): bool
+    {
+        if($this->autoincrement === "")
+        {
+            return false;
+        }
+        return true;
+    }
 }
