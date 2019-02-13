@@ -231,7 +231,6 @@ final class Buffer implements IDataAccessor
 
     /**
      * @param $object
-     * @return object
      * @throws DataCookerException
      */
     public function set($object)
@@ -246,8 +245,6 @@ final class Buffer implements IDataAccessor
         $data = $this->getAttributeValues($cacheKey, $object);
 
         self::$phpData->update($cacheKey, $keys, $data);
-
-        return clone $object;
     }
 
     /**
