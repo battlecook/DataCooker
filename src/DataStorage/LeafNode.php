@@ -5,13 +5,15 @@ namespace battlecook\DataStorage;
 
 use battlecook\Data\Status;
 
-final class LeafNode
+final class LeafNode extends Node
 {
     private $data;
     private $status;
 
-    public function __construct(array $data)
+    public function __construct(array $key, array $data)
     {
+        parent::__construct($key);
+
         $this->data = $data;
         $this->status = Status::INSERTED;
     }

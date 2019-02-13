@@ -20,11 +20,11 @@ final class PhpMemory
         $this->trees = array();
     }
 
-    private function insertRecursive(&$tree, array $keys, $data, $changedStatus)
+    private function insertRecursive(&$tree, array $keys, $key, $data, $changedStatus)
     {
         if(empty($keys) === true)
         {
-            $tree = new LeafNode($data);
+            $tree = new LeafNode($key, $data);
             return;
         }
         $searchKey = array_shift($keys);
@@ -32,7 +32,7 @@ final class PhpMemory
         {
             $tree[$searchKey] = null;
         }
-        $this->insertRecursive($tree[$searchKey], $keys, $data, $changedStatus);
+        $this->insertRecursive($tree[$searchKey], $keys, $key, $data, $changedStatus);
     }
 
     /**
@@ -55,7 +55,7 @@ final class PhpMemory
         $leafNodeArr = $this->searchRecursive($this->trees[$dataName], $keys);
         if(empty($leafNodeArr))
         {
-            $this->insertRecursive($this->trees[$dataName], $keys, $data, Status::INSERTED);
+            $this->insertRecursive($this->trees[$dataName], $keys, $keys, $data, Status::INSERTED);
         }
         else
         {
@@ -67,7 +67,7 @@ final class PhpMemory
             {
                 $changedStatus = Status::getStatusWithoutAutoincrement($leafNodeArr[0]->getStatus(), Status::INSERTED);
             }
-            $this->insertRecursive($this->trees[$dataName], $keys, $data, $changedStatus);
+            $this->insertRecursive($this->trees[$dataName], $keys, $keys, $data, $changedStatus);
         }
     }
 
@@ -115,7 +115,7 @@ final class PhpMemory
     /**
      * @param string $dataName
      * @param array $keys
-     * @return array
+     * @return LeafNode[]
      * @throws DataCookerException
      */
     public function search(string $dataName, array $keys)
@@ -208,10 +208,11 @@ final class PhpMemory
     /**
      * @param $tree
      * @param array $keys
+     * @param array $treeKey
      * @param $data
      * @param $changedStatus
      */
-    private function updateRecursive(&$tree, array $keys, $data, $changedStatus)
+    private function updateRecursive(&$tree, array $keys, array $treeKey, $data, $changedStatus)
     {
         $key = array_shift($keys);
         if (empty($keys) === true)
@@ -222,12 +223,12 @@ final class PhpMemory
             }
             else
             {
-                $tree[$key] = new LeafNode($data);
+                $tree[$key] = new LeafNode($treeKey, $data);
             }
         }
         else
         {
-            $this->updateRecursive($tree[$key], $keys,  $data, $changedStatus);
+            $this->updateRecursive($tree[$key], $keys, $treeKey, $data, $changedStatus);
         }
     }
 
@@ -265,7 +266,7 @@ final class PhpMemory
             {
                 $changedStatus = Status::getStatusWithAutoIncrement($leafNodeArr[0]->getStatus(), Status::UPDATED);
             }
-            $this->updateRecursive($this->trees[$dataName], $keys, $data, $changedStatus);
+            $this->updateRecursive($this->trees[$dataName], $keys, $keys, $data, $changedStatus);
         }
     }
 
