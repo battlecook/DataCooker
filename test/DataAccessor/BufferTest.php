@@ -134,10 +134,11 @@ class BufferTest extends TestCase
         $object2->attr1 = 2;
         $object2->attr2 = 2;
         $object2->attr3 = 2;
-        $ret = $storage->set($object2);
+        $storage->set($object2);
 
         //then
-        $this->assertEquals($object2, $ret);
+        $ret = $storage->get(new Item());
+        $this->assertEquals($object2, $ret[0]);
     }
 
     public function testRemove()
