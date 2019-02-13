@@ -44,8 +44,7 @@ final class Field
 
     public function hasAutoIncrement(): bool
     {
-        if($this->autoincrement === "")
-        {
+        if ($this->autoincrement === "") {
             return false;
         }
         return true;
