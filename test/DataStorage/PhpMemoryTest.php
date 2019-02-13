@@ -25,10 +25,10 @@ class PhpMemoryTest extends TestCase
         $attributes = array("attr1", "attr2", "attr3");
 
         $storage = new PhpMemory();
-        $storage->addMetaData(new Meta(new Field($identifiers,"", $attributes), $dataName));
+        $storage->addMetaData(new Meta(new Field($identifiers, "", $attributes), $dataName));
 
         //when
-        $keys = array(1,'2',3);
+        $keys = array(1, '2', 3);
         $ret = $storage->search($dataName, $keys);
 
         //then
@@ -43,18 +43,18 @@ class PhpMemoryTest extends TestCase
         $attributes = array("attr1", "attr2", "attr3");
 
         $storage = new PhpMemory();
-        $storage->addMetaData(new Meta(new Field($identifiers,"", $attributes), $dataName));
+        $storage->addMetaData(new Meta(new Field($identifiers, "", $attributes), $dataName));
 
-        $keys = array(1,1,1);
-        $data1 = array(1,1,1);
+        $keys = array(1, 1, 1);
+        $data1 = array(1, 1, 1);
         $storage->insert($dataName, $keys, $data1);
 
-        $keys = array(1,1,2);
-        $data2 = array(1,1,1);
+        $keys = array(1, 1, 2);
+        $data2 = array(1, 1, 1);
         $storage->insert($dataName, $keys, $data2);
 
         //when
-        $keys = array(1,1);
+        $keys = array(1, 1);
         $ret = $storage->search($dataName, $keys);
 
         //then
@@ -71,11 +71,11 @@ class PhpMemoryTest extends TestCase
         $attributes = array("attr1", "attr2", "attr3");
 
         $storage = new PhpMemory();
-        $storage->addMetaData(new Meta(new Field($identifiers,"", $attributes), $dataName));
+        $storage->addMetaData(new Meta(new Field($identifiers, "", $attributes), $dataName));
 
         //when
-        $keys = array(1,'2',3);
-        $data = array('1','2', 3);
+        $keys = array(1, '2', 3);
+        $data = array('1', '2', 3);
         $storage->insert($dataName, $keys, $data);
 
         //then
@@ -91,7 +91,7 @@ class PhpMemoryTest extends TestCase
         $attributes = array("attr1", "attr2", "attr3");
 
         $storage = new PhpMemory();
-        $storage->addMetaData(new Meta(new Field($identifiers,"", $attributes), $dataName));
+        $storage->addMetaData(new Meta(new Field($identifiers, "", $attributes), $dataName));
 
         $keys = array(1, 2, 3);
         $data = array(1, 2, 3);
@@ -122,10 +122,10 @@ class PhpMemoryTest extends TestCase
         $attributes = array("attr1", "attr2", "attr3");
 
         $storage = new PhpMemory();
-        $storage->addMetaData(new Meta(new Field($identifiers,"", $attributes), $dataName));
+        $storage->addMetaData(new Meta(new Field($identifiers, "", $attributes), $dataName));
 
         //when
-        $storage->update($dataName, array(1,'2',3), array('1','2', '3'));
+        $storage->update($dataName, array(1, '2', 3), array('1', '2', '3'));
 
         //then
     }
@@ -138,14 +138,14 @@ class PhpMemoryTest extends TestCase
         $attributes = array("attr1", "attr2", "attr3");
 
         $storage = new PhpMemory();
-        $storage->addMetaData(new Meta(new Field($identifiers,"", $attributes), $dataName));
+        $storage->addMetaData(new Meta(new Field($identifiers, "", $attributes), $dataName));
 
-        $keys = array(1,'2',3);
+        $keys = array(1, '2', 3);
         $data = array(1, 2, 3);
         $storage->insert($dataName, $keys, $data);
 
         //when
-        $storage->update($dataName, array(1,'2',3), array('1','2', '3'));
+        $storage->update($dataName, array(1, '2', 3), array('1', '2', '3'));
 
         //then
         $ret = $storage->search($dataName, $keys);
@@ -160,14 +160,14 @@ class PhpMemoryTest extends TestCase
         $attributes = array("attr1", "attr2", "attr3");
 
         $storage = new PhpMemory();
-        $storage->addMetaData(new Meta(new Field($identifiers,"", $attributes), $dataName));
+        $storage->addMetaData(new Meta(new Field($identifiers, "", $attributes), $dataName));
 
-        $keys = array(1,'2',3);
+        $keys = array(1, '2', 3);
         $data = array(1, 2, 3);
         $storage->insert($dataName, $keys, $data);
 
         //when
-        $storage->delete($dataName, array(1,'2',3));
+        $storage->delete($dataName, array(1, '2', 3));
 
         //then
         $ret = $storage->search($dataName, $keys);
@@ -185,12 +185,12 @@ class PhpMemoryTest extends TestCase
         $storage = new PhpMemory();
         $storage->addMetaData(new Meta(new Field($identifiers, $autoIncrement, $attributes), $dataName));
 
-        $keys = array(1,'2',3);
+        $keys = array(1, '2', 3);
         $data = array(1, 2, 3);
         $storage->insert($dataName, $keys, $data);
 
         //when
-        $storage->delete($dataName, array(1,'2',3));
+        $storage->delete($dataName, array(1, '2', 3));
 
         //then
         $ret = $storage->search($dataName, $keys);
@@ -205,7 +205,7 @@ class PhpMemoryTest extends TestCase
         $attributes = array("attr1", "attr2", "attr3");
 
         $storage = new PhpMemory();
-        $storage->addMetaData(new Meta(new Field($identifiers,"", $attributes), $dataName));
+        $storage->addMetaData(new Meta(new Field($identifiers, "", $attributes), $dataName));
 
         $keys1 = array(1, 1, 1);
         $data = array(1, 2, 3);
@@ -222,7 +222,7 @@ class PhpMemoryTest extends TestCase
         $ret = $storage->search($dataName, $keys1);
         $this->assertEquals(array(), $ret);
 
-        $ret = $storage->search($dataName, array(1,1));
+        $ret = $storage->search($dataName, array(1, 1));
         $this->assertEquals($data, $ret[0]->getData());
     }
 }
