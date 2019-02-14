@@ -11,11 +11,6 @@ use battlecook\DataStorage\PhpMemory;
 
 final class Buffer extends AbstractMeta implements IDataAccessor
 {
-    const VERSION_DELIMITER = "@dataCookerVersion";
-    const IDENTIFIER_DELIMITER = "@dataCookerIdentifier";
-    const AUTOINCREMENT_DELIMITER = "@dataCookerAutoIncrement";
-    const ATTRIBUTE_DELIMITER = "@dataCookerAttribute";
-
     /**
      * @var $phpData PhpMemory
      */
