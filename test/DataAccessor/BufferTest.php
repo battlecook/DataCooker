@@ -27,8 +27,9 @@ class BufferTest extends TestCase
     public function testNoCachedFieldMultiAutoIncrement()
     {
         //given
-        $object = new ItemMultiAutoIncrement();
         $storage = new Buffer();
+
+        $object = new ItemMultiAutoIncrement();
 
         //when
         $storage->add($object);
@@ -43,9 +44,10 @@ class BufferTest extends TestCase
     public function testAutoIncrementNotInteger()
     {
         //given
+        $storage = new Buffer();
+
         $object = new Item();
         $object->attr1 = '1';
-        $storage = new Buffer();
 
         //when
         $storage->add($object);
@@ -60,8 +62,9 @@ class BufferTest extends TestCase
     public function testEmptyIdentifiers()
     {
         //given
-        $object = new ItemEmptyIdentifiers();
         $storage = new Buffer();
+
+        $object = new ItemEmptyIdentifiers();
 
         //when
         $storage->add($object);
@@ -76,6 +79,8 @@ class BufferTest extends TestCase
     public function testAutoIncrementAlone()
     {
         //given
+        $storage = new Buffer();
+
         $object = new ItemAutoIncrementAlone();
         $object->id1 = 1;
         $object->id2 = 1;
@@ -83,7 +88,6 @@ class BufferTest extends TestCase
         $object->attr1 = 1;
         $object->attr2 = 1;
         $object->attr3 = 1;
-        $storage = new Buffer();
 
         //when
         $storage->add($object);
@@ -97,6 +101,8 @@ class BufferTest extends TestCase
     public function testAdd()
     {
         //given
+        $storage = new Buffer();
+
         $object = new Item();
         $object->id1 = 1;
         $object->id2 = 1;
@@ -104,7 +110,6 @@ class BufferTest extends TestCase
         $object->attr1 = 1;
         $object->attr2 = 1;
         $object->attr3 = 1;
-        $storage = new Buffer();
 
         //when
         $ret = $storage->add($object);
@@ -116,6 +121,8 @@ class BufferTest extends TestCase
     public function testSet()
     {
         //given
+        $storage = new Buffer();
+
         $object = new Item();
         $object->id1 = 1;
         $object->id2 = 1;
@@ -123,7 +130,6 @@ class BufferTest extends TestCase
         $object->attr1 = 1;
         $object->attr2 = 1;
         $object->attr3 = 1;
-        $storage = new Buffer();
         $storage->add($object);
 
         //when
