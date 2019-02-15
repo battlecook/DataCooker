@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace battlecook\Config;
 
-final class File
+final class Spreadsheet
 {
     private $path;
 
@@ -12,7 +12,7 @@ final class File
         $this->path = $path;
     }
 
-    public function getPath()
+    public function getPath(): string
     {
         return $this->path;
     }
