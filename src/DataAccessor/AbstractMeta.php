@@ -135,4 +135,9 @@ class AbstractMeta
             }
         }
     }
+
+    protected function getFieldsWithAutoIncrement(string $cacheKey)
+    {
+        return array_merge($this->cachedFieldMap[$cacheKey]->getIdentifiers(), $this->cachedFieldMap[$cacheKey]->getAttributes());
+    }
 }
