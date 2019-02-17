@@ -127,27 +127,11 @@ final class Spreadsheet extends AbstractMeta implements IDataAccessor
         $ret = array();
         $sheet = $this->spreadsheet->getSheetByName($sheetName);
         $rowCount = 2;
-        while (true) {
-            if ($sheet->getCellByColumnAndRow(1, $rowCount)->getValue() === null) {
-                break;
-            }
-
-            $count = 0;
-            foreach($this->cachedFieldMap[$cacheKey]->getIdentifiers() as $identifier) {
-                $index = $columns[$identifier];
-                $cell = $sheet->getCellByColumnAndRow($index, $rowCount);
-                if ($cell->getValue() === null) {
+        if($this->isGetAll($cacheKey, $object) === true) {
+            while (true) {
+                if ($sheet->getCellByColumnAndRow(1, $rowCount)->getValue() === null) {
                     break;
                 }
-
-                if($object->$identifier == $cell->getValue()) {
-                    $count++;
-                }
-                else {
-                    break;
-                }
-            }
-            if(count($this->cachedFieldMap[$cacheKey]->getIdentifiers()) === $count) {
 
                 $tmp = new $object();
                 foreach($this->cachedFieldMap[$cacheKey]->getFields() as $field) {
@@ -157,9 +141,44 @@ final class Spreadsheet extends AbstractMeta implements IDataAccessor
                 }
 
                 $ret[] = $tmp;
-            }
 
-            $rowCount++;
+                $rowCount++;
+            }
+        } else {
+            while (true) {
+                if ($sheet->getCellByColumnAndRow(1, $rowCount)->getValue() === null) {
+                    break;
+                }
+
+                $count = 0;
+                foreach($this->cachedFieldMap[$cacheKey]->getIdentifiers() as $identifier) {
+                    $index = $columns[$identifier];
+                    $cell = $sheet->getCellByColumnAndRow($index, $rowCount);
+                    if ($cell->getValue() === null) {
+                        break;
+                    }
+
+                    if($object->$identifier == $cell->getValue()) {
+                        $count++;
+                    }
+                    else {
+                        break;
+                    }
+                }
+                if(count($this->cachedFieldMap[$cacheKey]->getIdentifiers()) === $count) {
+
+                    $tmp = new $object();
+                    foreach($this->cachedFieldMap[$cacheKey]->getFields() as $field) {
+                        $index = $columns[$field];
+                        $cell = $sheet->getCellByColumnAndRow($index, $rowCount);
+                        $tmp->$field = $cell->getValue();
+                    }
+
+                    $ret[] = $tmp;
+                }
+
+                $rowCount++;
+            }
         }
 
         return $ret;
