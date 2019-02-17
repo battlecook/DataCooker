@@ -98,6 +98,7 @@ class SpreadsheetTest extends TestCase
         $object->id1 = 1;
         $object->id2 = 1;
         $object->id3 = 1;
+
         $object->attr1 = 1;
         $object->attr2 = 1;
         $object->attr3 = 1;
@@ -106,7 +107,21 @@ class SpreadsheetTest extends TestCase
         $ret = $storage->get($object);
 
         //then
-        $this->assertEquals($object, $ret);
+        $this->assertEquals($object, $ret[0]);
+    }
+
+    public function testGetAll()
+    {
+        //given
+        $storage = new Spreadsheet(null, new \battlecook\Config\Spreadsheet("../Fixture/DataAccessor/Sample.xlsx"));
+
+        $object = new Quest();
+
+        //when
+        $ret = $storage->get($object);
+
+        //then
+        $this->assertEquals(8, count($ret));
     }
 
     public function testAdd()
