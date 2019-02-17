@@ -13,7 +13,6 @@ final class Spreadsheet extends AbstractMeta implements IDataAccessor
 
     private $spreadsheet;
 
-
     /**
      * $metaMap[$sheetName] = array( column1, column2, ... )
      */
@@ -50,7 +49,7 @@ final class Spreadsheet extends AbstractMeta implements IDataAccessor
                 if ($column->getValue() === null) {
                     break;
                 }
-                $columns[] = $column->getValue();
+                $columns[$column->getValue()] = $start + $count;
                 $count++;
             }
 
@@ -59,20 +58,6 @@ final class Spreadsheet extends AbstractMeta implements IDataAccessor
             }
 
             self::$columnsMap[$sheetName] = $columns;
-
-            /*
-            $start = 2;
-            $count = 0;
-            while (true) {
-                $row = $sheet->getCellByColumnAndRow(1, $start + $count);
-                if ($row->getValue() === null) {
-                    break;
-                }
-                $rows[] = $row->getValue();
-                $count++;
-            }
-            */
-
         }
     }
 
@@ -126,7 +111,6 @@ final class Spreadsheet extends AbstractMeta implements IDataAccessor
         $cacheKey = get_class($object);
         $this->setMeta($object);
 
-
         $explodedObject = explode('\\', $cacheKey);
         $sheetName = end($explodedObject);
         if (isset(self::$columnsMap[$sheetName]) === false) {
@@ -135,28 +119,50 @@ final class Spreadsheet extends AbstractMeta implements IDataAccessor
 
         $fields = $this->getFieldsWithAutoIncrement($cacheKey);
         $columns = self::$columnsMap[$sheetName];
-        $diff = array_diff($fields, $columns);
+        $diff = array_diff($fields, array_keys($columns));
         if (count($diff) > 0) {
             throw new DataCookerException("difference fields and columns");
         }
 
-
+        $ret = array();
         $sheet = $this->spreadsheet->getSheetByName($sheetName);
-
-
-        for ($i = 1; $i < count($columns); $i++) {
-            //for ($j = 0; $j < c)
-            {
-
+        $rowCount = 2;
+        while (true) {
+            if ($sheet->getCellByColumnAndRow(1, $rowCount)->getValue() === null) {
+                break;
             }
+
+            $count = 0;
+            foreach($this->cachedFieldMap[$cacheKey]->getIdentifiers() as $identifier) {
+                $index = $columns[$identifier];
+                $cell = $sheet->getCellByColumnAndRow($index, $rowCount);
+                if ($cell->getValue() === null) {
+                    break;
+                }
+
+                if($object->$identifier == $cell->getValue()) {
+                    $count++;
+                }
+                else {
+                    break;
+                }
+            }
+            if(count($this->cachedFieldMap[$cacheKey]->getIdentifiers()) === $count) {
+
+                $tmp = new $object();
+                foreach($this->cachedFieldMap[$cacheKey]->getFields() as $field) {
+                    $index = $columns[$field];
+                    $cell = $sheet->getCellByColumnAndRow($index, $rowCount);
+                    $tmp->$field = $cell->getValue();
+                }
+
+                $ret[] = $tmp;
+            }
+
+            $rowCount++;
         }
 
-        //$sheet->getCellByColumnAndRow()
-
-        //$identifierValues = $this->getIdentifierValues($cacheKey, $object);
-
-
-        return array();
+        return $ret;
     }
 
     public function set($object)
