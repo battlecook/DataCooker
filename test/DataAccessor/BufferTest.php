@@ -95,6 +95,37 @@ class BufferTest extends TestCase
         //then
     }
 
+    public function testGetAll()
+    {
+        //given
+        $storage = new Buffer();
+
+        $object1 = new Item();
+        $object1->id1 = 1;
+        $object1->id2 = 1;
+        $object1->id3 = 1;
+        $object1->attr1 = 1;
+        $object1->attr2 = 1;
+        $object1->attr3 = 1;
+        $storage->add($object1);
+
+        $object2 = new Item();
+        $object2->id1 = 1;
+        $object2->id2 = 1;
+        $object2->id3 = 2;
+        $object2->attr1 = 1;
+        $object2->attr2 = 1;
+        $object2->attr3 = 1;
+        $storage->add($object2);
+
+        //when
+        $object = new Item();
+        $ret = $storage->get($object);
+
+        //then
+        $this->assertEquals(2, count($ret));
+    }
+
     /**
      * @throws \battlecook\DataCookerException
      */
