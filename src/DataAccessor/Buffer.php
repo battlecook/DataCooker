@@ -15,6 +15,7 @@ final class Buffer extends AbstractMeta implements IDataAccessor
      * @var $phpData PhpMemory
      */
     private static $phpData;
+    private static $cache;
 
     private $storage;
 
@@ -22,7 +23,7 @@ final class Buffer extends AbstractMeta implements IDataAccessor
     {
         $this->storage = $storage;
         if (empty(self::$phpData) === true) {
-            $this->initialize();
+            self::initialize();
         }
     }
 
@@ -83,6 +84,16 @@ final class Buffer extends AbstractMeta implements IDataAccessor
         $this->setUpMeta($cacheKey, $object);
 
         $keys = $this->getIdentifierValues($cacheKey, $object);
+        if(isset($this->cache[$cacheKey][$keys[0]]) === false) {
+            if($this->storage !== null) {
+                $rootObject = new $object();
+                $rootIdentifier = $this->cachedFieldMap[$cacheKey]->getIdentifiers()[0];
+                $rootObject->$rootIdentifier = $object->$rootIdentifier;
+                $ret = $this->storage->get($rootObject);
+
+                //if ret is tree structure, save it as is, not convert and save it
+            }
+        }
         $nodeArr = self::$phpData->search($cacheKey, $keys);
 
         $identifierKeys = $this->cachedFieldMap[$cacheKey]->getIdentifiers();
@@ -152,7 +163,7 @@ final class Buffer extends AbstractMeta implements IDataAccessor
     {
     }
 
-    public function initialize()
+    public static function initialize()
     {
         self::$phpData = new PhpMemory();
     }
