@@ -143,8 +143,9 @@ final class Buffer extends AbstractMeta implements IDataAccessor
         self::$phpData->delete($cacheKey, $keys);
     }
 
-    public function flush()
+    public function commit($data)
     {
+        //if other storage is key value storage ( redis, memcache etc), send to data for tree structure not object structure
     }
 
     public function rollback()
