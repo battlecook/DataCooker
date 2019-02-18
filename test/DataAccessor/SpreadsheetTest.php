@@ -121,7 +121,7 @@ class SpreadsheetTest extends TestCase
         $ret = $storage->get($object);
 
         //then
-        $this->assertEquals(8, count($ret));
+        $this->assertEquals(9, count($ret));
     }
 
     public function testAdd()
