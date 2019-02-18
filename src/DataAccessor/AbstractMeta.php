@@ -86,6 +86,16 @@ class AbstractMeta
         }
     }
 
+    protected function isGetAll($cacheKey, $object): bool
+    {
+        foreach ($this->cachedFieldMap[$cacheKey]->getIdentifiers() as $identifier) {
+            if($object->$identifier === null) {
+                return true;
+            }
+            return false;
+        }
+    }
+
     protected function getIdentifierValues($cacheKey, $object)
     {
         $keys = array();
