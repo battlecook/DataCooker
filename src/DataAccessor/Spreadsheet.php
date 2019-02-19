@@ -168,10 +168,10 @@ final class Spreadsheet extends AbstractMeta implements IDataAccessor
                 if(count($this->cachedFieldMap[$cacheKey]->getIdentifiers()) === $count) {
 
                     $tmp = new $object();
-                    foreach($this->cachedFieldMap[$cacheKey]->getFields() as $field) {
-                        $index = $columns[$field];
+                    foreach($columns as $column => $index) {
+
                         $cell = $sheet->getCellByColumnAndRow($index, $rowCount);
-                        $tmp->$field = $cell->getValue();
+                        $tmp->$column = $cell->getValue();
                     }
 
                     $ret[] = $tmp;
@@ -195,7 +195,7 @@ final class Spreadsheet extends AbstractMeta implements IDataAccessor
     {
     }
 
-    public function initialize()
+    public static function initialize()
     {
         self::$columnsMap = array();
     }

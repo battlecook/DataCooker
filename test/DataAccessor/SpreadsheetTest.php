@@ -12,6 +12,11 @@ require __DIR__ . '/../../vendor/autoload.php';
 
 class SpreadsheetTest extends TestCase
 {
+    public function setUp()
+    {
+        Spreadsheet::initialize();
+    }
+
     /**
      * @expectedException \battlecook\DataCookerException
      * @expectedExceptionMessage this sheet is empty
