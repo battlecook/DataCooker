@@ -84,7 +84,7 @@ final class Buffer extends AbstractMeta implements IDataAccessor
         $this->setUpMeta($cacheKey, $object);
 
         $keys = $this->getIdentifierValues($cacheKey, $object);
-        if(isset($this->cache[$cacheKey][$keys[0]]) === false) {
+        if(isset(self::$cache[$cacheKey][$keys[0]]) === false) {
             if($this->storage !== null) {
                 $rootObject = new $object();
                 $rootIdentifier = $this->cachedFieldMap[$cacheKey]->getIdentifiers()[0];
@@ -92,6 +92,9 @@ final class Buffer extends AbstractMeta implements IDataAccessor
                 $ret = $this->storage->get($rootObject);
 
                 //if ret is tree structure, save it as is, not convert and save it
+
+
+                self::$cache[$cacheKey][$keys[0]] = true;
             }
         }
         $nodeArr = self::$phpData->search($cacheKey, $keys);

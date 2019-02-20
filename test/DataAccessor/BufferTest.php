@@ -16,8 +16,7 @@ class BufferTest extends TestCase
 {
     public function setUp()
     {
-        $buffer = new Buffer();
-        $buffer->initialize();
+        Buffer::initialize();
     }
 
     /**
