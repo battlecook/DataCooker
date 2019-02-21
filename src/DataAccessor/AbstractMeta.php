@@ -88,12 +88,12 @@ class AbstractMeta
 
     protected function isGetAll($cacheKey, $object): bool
     {
-        foreach ($this->cachedFieldMap[$cacheKey]->getIdentifiers() as $identifier) {
-            if($object->$identifier === null) {
-                return true;
-            }
-            return false;
+        $id1 = $this->cachedFieldMap[$cacheKey]->getIdentifiers()[0];
+        if($object->$id1 === null) {
+            return true;
         }
+
+        return false;
     }
 
     protected function getIdentifierValues($cacheKey, $object)

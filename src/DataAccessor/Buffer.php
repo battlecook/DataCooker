@@ -32,13 +32,34 @@ final class Buffer extends AbstractMeta implements IDataAccessor
      * @param $object
      * @throws DataCookerException
      */
-    private function setUpMeta($cacheKey, $object)
+    private function setUp($cacheKey, $object)
     {
         if ($this->setMeta($object) === true) {
             $identifiers = $this->cachedFieldMap[$cacheKey]->getIdentifiers();
             $autoIncrement = $this->cachedFieldMap[$cacheKey]->getAutoIncrement();
             $attributes = $this->cachedFieldMap[$cacheKey]->getAttributes();
             self::$phpData->addMetaData(new Meta(new Field($identifiers, $autoIncrement, $attributes), $cacheKey));
+        }
+
+        if(isset(self::$cache[$cacheKey]) === false) {
+            if($this->isGetAll($cacheKey, $object) === true) {
+                $ret = $this->storage->get(new $object());
+
+            } else {
+                $keys = $this->getIdentifierValues($cacheKey, $object);
+                if($this->storage !== null) {
+                    $rootObject = new $object();
+                    $rootIdentifier = $this->cachedFieldMap[$cacheKey]->getIdentifiers()[0];
+                    $rootObject->$rootIdentifier = $object->$rootIdentifier;
+                    $ret = $this->storage->get($rootObject);
+
+                    //if ret is tree structure, save it as is, not convert and save it
+
+
+                }
+            }
+
+            self::$cache[$cacheKey] = true;
         }
     }
 
@@ -50,7 +71,7 @@ final class Buffer extends AbstractMeta implements IDataAccessor
     public function add($object)
     {
         $cacheKey = get_class($object);
-        $this->setUpMeta($cacheKey, $object);
+        $this->setUp($cacheKey, $object);
         $this->checkField($cacheKey, $object);
 
         $autoIncrement = $this->cachedFieldMap[$cacheKey]->getAutoIncrement();
@@ -81,22 +102,9 @@ final class Buffer extends AbstractMeta implements IDataAccessor
     public function get($object): array
     {
         $cacheKey = get_class($object);
-        $this->setUpMeta($cacheKey, $object);
+        $this->setUp($cacheKey, $object);
 
         $keys = $this->getIdentifierValues($cacheKey, $object);
-        if(isset(self::$cache[$cacheKey][$keys[0]]) === false) {
-            if($this->storage !== null) {
-                $rootObject = new $object();
-                $rootIdentifier = $this->cachedFieldMap[$cacheKey]->getIdentifiers()[0];
-                $rootObject->$rootIdentifier = $object->$rootIdentifier;
-                $ret = $this->storage->get($rootObject);
-
-                //if ret is tree structure, save it as is, not convert and save it
-
-
-                self::$cache[$cacheKey][$keys[0]] = true;
-            }
-        }
         $nodeArr = self::$phpData->search($cacheKey, $keys);
 
         $identifierKeys = $this->cachedFieldMap[$cacheKey]->getIdentifiers();
@@ -134,7 +142,7 @@ final class Buffer extends AbstractMeta implements IDataAccessor
     public function set($object)
     {
         $cacheKey = get_class($object);
-        $this->setUpMeta($cacheKey, $object);
+        $this->setUp($cacheKey, $object);
         $this->checkField($cacheKey, $object);
 
         $keys = $this->getIdentifierValues($cacheKey, $object);
@@ -150,7 +158,7 @@ final class Buffer extends AbstractMeta implements IDataAccessor
     public function remove($object)
     {
         $cacheKey = get_class($object);
-        $this->setUpMeta($cacheKey, $object);
+        $this->setUp($cacheKey, $object);
 
         $keys = $this->getIdentifierValues($cacheKey, $object);
 
