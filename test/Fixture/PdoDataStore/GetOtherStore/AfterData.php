@@ -12,5 +12,3 @@ class AfterData
         );
     }
 }
-
-?>

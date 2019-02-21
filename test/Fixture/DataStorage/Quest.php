@@ -16,11 +16,11 @@ final class Quest extends Model
 
     public function getIdentifiers(): array
     {
-        // TODO: Implement getIdentifiers() method.
+        return array();
     }
 
     public function getAttributes(): array
     {
-        // TODO: Implement getAttributes() method.
+        return array();
     }
 }
