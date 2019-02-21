@@ -18,5 +18,3 @@ class BeforeData
         );
     }
 }
-
-?>
