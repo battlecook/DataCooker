@@ -1,5 +1,4 @@
 
-
 matrix:
   allow_failures:
   - php: 5.6
@@ -23,7 +22,11 @@ before-install:
 install: composer install
 
 before_script:
-- "sudo apt-get install php7-memcached"
+- php --version
+- echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv
+- echo "extension=apc.so" >> ~/.phpenv/versions/$(phpenv
+- "sudo apt-get install php72-memcached"
 
 script:
 - phpunit BufferTest.php
+
