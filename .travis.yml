@@ -1,4 +1,4 @@
-sudo: false
+sudo: true
 language: php
 
 git:
@@ -12,7 +12,7 @@ services:
 - memcached
 
 before_script:
-- sudo apt-get install php7.1-memcached
+- sudo apt-get install php7.2-memcached
 - phpenv config-add travis.php.ini
 - composer install
 
