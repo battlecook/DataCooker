@@ -1,8 +1,10 @@
 language: php
+services:
+- memcached
+before_script:
+- "sudo apt-get install php7-memcached"
 
-php:
-  - 7.1
-  - 7.2
-  - 7.3
+script:
+- phpunit BufferTest.php
 
 install: composer install
