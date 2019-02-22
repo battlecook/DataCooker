@@ -167,11 +167,12 @@ final class Buffer extends AbstractMeta implements IDataAccessor
 
     public function commit($data)
     {
-        //if other storage is key value storage ( redis, memcache etc), send to data for tree structure not object structure
+        //if other storage is key value storage (redis, memcache etc), send to data for tree structure, not object structure
     }
 
     public function rollback()
     {
+        self::initialize();
     }
 
     public static function initialize()

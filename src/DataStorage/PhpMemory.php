@@ -20,6 +20,12 @@ final class PhpMemory
         $this->trees = array();
     }
 
+    //for test case
+    public function getTree()
+    {
+        return $this->trees;
+    }
+
     private function insertRecursive(&$tree, array $keys, $key, $data, $changedStatus)
     {
         if (empty($keys) === true) {
