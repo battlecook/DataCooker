@@ -16,7 +16,6 @@ services:
 
 before-install:
 - composer self-update
-- "sudo apt-get install php72-memcached"
 - echo "extension=memcached.so" >> ~/.phpenv/versions/$(phpenv
 - echo "extension=apc.so" >> ~/.phpenv/versions/$(phpenv
 
