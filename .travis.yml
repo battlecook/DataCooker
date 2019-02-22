@@ -16,8 +16,6 @@ services:
 
 before-install:
 - composer self-update
-- echo "extension=memcached.so" >> ~/.phpenv/versions/$(phpenv
-- echo "extension=apc.so" >> ~/.phpenv/versions/$(phpenv
 
 install:
 - composer install
