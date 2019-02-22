@@ -16,6 +16,7 @@ services:
 
 before-install:
 - composer self-update
+- "phpenv config-add travis.php.ini"
 
 install:
 - composer install
