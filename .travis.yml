@@ -1,32 +1,30 @@
-
-matrix:
-  allow_failures:
-  - php: 5.6
-  - php: hhvm
-
+sudo: false
 language: php
+
+git:
+  depth: 2
 
 php:
 - 7.1
 - 7.2
 
-sudo: false
 
 services:
 - memcached
 - mysql
+- redis-server
 
 before-install:
 - composer self-update
+- "sudo apt-get install php72-memcached"
+- echo "extension=memcached.so" >> ~/.phpenv/versions/$(phpenv
+- echo "extension=apc.so" >> ~/.phpenv/versions/$(phpenv
 
-install: composer install
+install:
+- composer install
 
 before_script:
 - php --version
-- echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv
-- echo "extension=apc.so" >> ~/.phpenv/versions/$(phpenv
-- "sudo apt-get install php72-memcached"
 
 script:
 - phpunit BufferTest.php
-
