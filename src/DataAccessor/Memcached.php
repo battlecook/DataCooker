@@ -40,6 +40,7 @@ final class Memcached extends AbstractMeta implements IDataAccessor
 
     public function get($object): array
     {
+        return array();
     }
 
     public function set($object)
