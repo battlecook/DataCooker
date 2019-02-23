@@ -7,19 +7,6 @@ git:
 php:
 - 7.1
 
-services:
-- memcached
-
-before_install:
-- php -m
-- sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6B05F25D762E3157
-- sudo apt update
-
-before_script:
-- sudo apt-get install -y php-memcached
-- phpenv config-add travis.php.ini
-- composer install
-
 script:
 - phpunit BufferTest.php
 
