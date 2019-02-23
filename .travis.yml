@@ -13,6 +13,7 @@ services:
 
 before_install:
 - PHP_INI=~/.phpenv/versions/$(phpenv version-name)/etc/php.ini;
+- sudo apt-get update;
 - sudo apt-get install -y php-memcached;
 
 before_script:
