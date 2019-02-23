@@ -7,8 +7,18 @@ git:
 php:
 - 7.1
 
+services:
+- memcached
+- redis-server
+
+before_install:
+- echo 'y' | pecl install memcached
+
+before_script:
+- phpenv config-add travis.php.ini
+- composer install
+
 script:
-- pwd
 - phpunit test/DataAccessor/BufferTest.php
 
 notifications:
