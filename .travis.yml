@@ -11,10 +11,16 @@ php:
 services:
 - memcached
 
+before_install:
+- sudo apt-get update
+
 before_script:
-- pecl install -y memcached
+- sudo apt-get install -y php-memcached
 - phpenv config-add travis.php.ini
 - composer install
 
 script:
 - phpunit BufferTest.php
+
+notifications:
+  email: false
