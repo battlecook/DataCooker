@@ -8,6 +8,7 @@ php:
 - 7.1
 
 script:
+- pwd
 - phpunit BufferTest.php
 
 notifications:
