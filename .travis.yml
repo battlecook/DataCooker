@@ -12,7 +12,7 @@ services:
 - memcached
 
 before_install:
-- sudo apt-get update
+- sudo apt update
 
 before_script:
 - sudo apt-get install -y php-memcached
