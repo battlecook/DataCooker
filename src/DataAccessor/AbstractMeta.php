@@ -96,6 +96,11 @@ class AbstractMeta
         return false;
     }
 
+    protected function getIdentifierKeys($cacheKey): array
+    {
+        return $this->cachedFieldMap[$cacheKey]->getIdentifiers();
+    }
+
     protected function getIdentifierValues($cacheKey, $object)
     {
         $keys = array();
@@ -103,6 +108,11 @@ class AbstractMeta
             $keys[] = $object->$identifier;
         }
         return $keys;
+    }
+
+    protected function getAttributeKeys($cacheKey): array
+    {
+        return $this->cachedFieldMap[$cacheKey]->getAttributes();
     }
 
     protected function getAttributeValues($cacheKey, $object)
