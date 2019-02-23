@@ -9,7 +9,7 @@ php:
 
 script:
 - pwd
-- phpunit BufferTest.php
+- phpunit test/DataAccessor/BufferTest.php
 
 notifications:
   email: false
