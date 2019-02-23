@@ -10,11 +10,10 @@ php:
 
 services:
 - memcached
-- redis-server
 
 before_install:
 - PHP_INI=~/.phpenv/versions/$(phpenv version-name)/etc/php.ini;
-- apt-get install -y php-memcached;
+- sudo apt-get install -y php-memcached;
 
 before_script:
 - phpenv config-add travis.php.ini
