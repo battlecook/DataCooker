@@ -12,7 +12,8 @@ services:
 - memcached
 
 before_script:
-- apt-get install php-memcached
+- sudo apt-get update
+- sudo apt-get install php-memcached
 - phpenv config-add travis.php.ini
 - composer install
 
