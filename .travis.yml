@@ -12,7 +12,7 @@ services:
 - redis-server
 
 before_install:
-- echo 'y' | pecl install memcached
+- echo no | pecl install memcached
 
 before_script:
 - phpenv config-add travis.php.ini
