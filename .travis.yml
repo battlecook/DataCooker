@@ -1,4 +1,3 @@
-sudo: required
 language: php
 
 git:
@@ -12,7 +11,8 @@ services:
 - redis-server
 
 before_install:
-- echo no | pecl install memcached
+- PHP_INI=~/.phpenv/versions/$(phpenv version-name)/etc/php.ini;
+- apt-get install -y php-memcached;
 
 before_script:
 - phpenv config-add travis.php.ini
