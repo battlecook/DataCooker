@@ -124,6 +124,11 @@ class AbstractMeta
         return $data;
     }
 
+    protected function getFieldKeys($cacheKey): array
+    {
+        return $this->cachedFieldMap[$cacheKey]->getFields();
+    }
+
     /**
      * @param $object
      * @return bool

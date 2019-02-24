@@ -107,8 +107,8 @@ final class Buffer extends AbstractMeta implements IDataAccessor
         $keys = $this->getIdentifierValues($cacheKey, $object);
         $nodeArr = self::$phpData->search($cacheKey, $keys);
 
-        $identifierKeys = $this->cachedFieldMap[$cacheKey]->getIdentifiers();
-        $attributeKeys = $this->cachedFieldMap[$cacheKey]->getAttributes();
+        $identifierKeys = $this->getIdentifierKeys($cacheKey);
+        $attributeKeys = $this->getAttributeKeys($cacheKey);
 
         $ret = array();
         foreach ($nodeArr as $node) {
