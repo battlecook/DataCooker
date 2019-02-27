@@ -22,7 +22,6 @@ final class RelationDatabase extends AbstractMeta implements IDataAccessor
         $dsn = "mysql:$dbName=demo;host=$ip;port=$port;charset=utf8";
 
         try {
-
             $this->pdo = new \PDO($dsn, $config->getDatabaseName(), $config->getPassword(), array());
         } catch(\PDOException $e) {
             $log = array();
@@ -99,6 +98,22 @@ final class RelationDatabase extends AbstractMeta implements IDataAccessor
 
     public function set($object)
     {
+        $this->setMeta($object);
+        $cacheKey = $tableName = get_class($object);
+
+        $attributes = $this->getAttributeKeys($cacheKey);
+        $sql = "UPDATE $tableName SET ";
+        foreach($attributes as $attribute) {
+            $sql .= "`" . $attribute  . "`";
+            $sql .= ' = ';
+            $sql .= ":$attribute";
+            $sql .= ' , ';
+        }
+        $sql = substr($sql, 0, -2);
+
+        $identifierKeys = $this->getIdentifierKeys($cacheKey);
+
+        //if have autoincrement else   for rdb performance
     }
 
     public function remove($object)
