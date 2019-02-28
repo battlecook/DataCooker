@@ -19,10 +19,10 @@ final class RelationDatabase extends AbstractMeta implements IDataAccessor
         $dbName = $config->getDatabaseName();
         $ip = $config->getIp();
         $port = $config->getPort();
-        $dsn = "mysql:$dbName=demo;host=$ip;port=$port;charset=utf8";
 
+        $dsn = "mysql:host={$ip};port={$port};dbname={$dbName}";
         try {
-            $this->pdo = new \PDO($dsn, $config->getDatabaseName(), $config->getPassword(), array());
+            $this->pdo = new \PDO($dsn, $config->getUser(), $config->getPassword(), array());
         } catch(\PDOException $e) {
             $log = array();
             $log['exception'] = "sql data store exception";
