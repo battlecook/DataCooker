@@ -7,8 +7,7 @@
     "ext-memcached": "*"
   },
   "require-dev": {
-    "phpunit/phpunit": "^7.5",
-    "phpunit/dbunit": "dev-master"
+    "phpunit/phpunit": "^7.5"
   },
   "license": "MIT",
   "autoload": {
