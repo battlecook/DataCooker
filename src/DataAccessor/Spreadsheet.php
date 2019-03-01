@@ -79,7 +79,7 @@ final class Spreadsheet extends AbstractMeta implements IDataAccessor
             throw new DataCookerException("not exist sheet");
         }
 
-        $fields = $this->getFieldsWithAutoIncrement($cacheKey);
+        $fields = $this->getFieldKeysWithAutoIncrement($cacheKey);
         $columns = self::$columnsMap[$sheetName];
         $diff = array_diff($fields, $columns);
         if (count($diff) > 0) {
@@ -117,7 +117,7 @@ final class Spreadsheet extends AbstractMeta implements IDataAccessor
             throw new DataCookerException("not exist sheet");
         }
 
-        $fields = $this->getFieldsWithAutoIncrement($cacheKey);
+        $fields = $this->getFieldKeysWithAutoIncrement($cacheKey);
         $columns = self::$columnsMap[$sheetName];
         $diff = array_diff($fields, array_keys($columns));
         if (count($diff) > 0) {

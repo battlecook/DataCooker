@@ -144,7 +144,6 @@ class AbstractMeta
         return false;
     }
 
-
     /**
      * @param $cacheKey
      * @param $object
@@ -161,7 +160,7 @@ class AbstractMeta
         }
     }
 
-    protected function getFieldsWithAutoIncrement(string $cacheKey)
+    protected function getFieldKeysWithAutoIncrement(string $cacheKey)
     {
         return array_merge($this->cachedFieldMap[$cacheKey]->getIdentifiers(), $this->cachedFieldMap[$cacheKey]->getAttributes());
     }
