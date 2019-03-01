@@ -27,6 +27,32 @@ final class Buffer extends AbstractMeta implements IDataAccessor
         }
     }
 
+    private function cacheData($cacheKey, $object)
+    {
+        if(isset(self::$cache[$cacheKey]) === false) {
+
+            if($this->storage !== null) {
+
+                $paramObject = new $object();
+                if($this->isGetAll($cacheKey, $object) === false) {
+                    $rootIdentifier = $this->getIdentifierKeys($cacheKey)[0];
+                    $paramObject->$rootIdentifier = $object->$rootIdentifier;
+                }
+
+                //todo if array is big, performance is raw. so need insertMulti which better than insert many time
+                $objectArray = $this->storage->get($paramObject);
+                foreach($objectArray as $object) {
+
+                    $keys = $this->getIdentifierValues($cacheKey, $object);
+                    $data = $this->getAttributeValues($cacheKey, $object);
+                    self::$phpData->insert($cacheKey, $keys, $data);
+                }
+            }
+
+            self::$cache[$cacheKey] = true;
+        }
+    }
+
     /**
      * @param $cacheKey
      * @param $object
@@ -41,26 +67,7 @@ final class Buffer extends AbstractMeta implements IDataAccessor
             self::$phpData->addMetaData(new Meta(new Field($identifiers, $autoIncrement, $attributes), $cacheKey));
         }
 
-        if(isset(self::$cache[$cacheKey]) === false) {
-            if($this->isGetAll($cacheKey, $object) === true) {
-                $ret = $this->storage->get(new $object());
-
-            } else {
-                $keys = $this->getIdentifierValues($cacheKey, $object);
-                if($this->storage !== null) {
-                    $rootObject = new $object();
-                    $rootIdentifier = $this->cachedFieldMap[$cacheKey]->getIdentifiers()[0];
-                    $rootObject->$rootIdentifier = $object->$rootIdentifier;
-                    $ret = $this->storage->get($rootObject);
-
-                    //if ret is tree structure, save it as is, not convert and save it
-
-
-                }
-            }
-
-            self::$cache[$cacheKey] = true;
-        }
+        $this->cacheData($cacheKey, $object);
     }
 
     /**
