@@ -6,9 +6,7 @@ namespace test\DataStorage;
 use battlecook\Config\Auth;
 use battlecook\Config\Database;
 use battlecook\DataAccessor\RelationDatabase;
-use PHPUnit\DbUnit\Database\Connection;
-use PHPUnit\DbUnit\DataSet\IDataSet;
-use PHPUnit\DbUnit\TestCase;
+use PHPUnit\Framework\TestCase;
 use test\Fixture\DataStorage\Item;
 
 require __DIR__ . '/../../vendor/autoload.php';
@@ -20,6 +18,37 @@ class RelationDatabaseTest extends TestCase
     private $dbName = "DataCooker";
     private $user = "user";
     private $password = "password";
+
+    private function getPdo()
+    {
+        $dsn = "mysql:host={$this->ip};port={$this->port};dbname={$this->dbName}";
+
+        return new \PDO($dsn, $this->user, $this->password, array());
+    }
+
+    public function setUp()
+    {
+        $pdo = $this->getPdo();
+        $dropSql = "drop table Item;";
+        $st = $pdo->prepare($dropSql);
+        $st->execute();
+
+        $createSql = "create table Item
+(
+	id1 int not null,
+	id2 int not null,
+	id3 int not null,
+	attr1 int auto_increment,
+	attr2 int not null,
+	attr3 int not null,
+	constraint Item_pk
+		primary key (attr1)
+);
+
+";
+        $st = $pdo->prepare($createSql);
+        $st->execute();
+    }
 
     private function getConfig()
     {
@@ -44,6 +73,20 @@ class RelationDatabaseTest extends TestCase
 
         //then
         $this->assertEquals($object, $ret);
+    }
+
+    public function testGet()
+    {
+        //given
+        $storage = new RelationDatabase(null, $this->getConfig());
+
+        $object = new Item();
+
+        //when
+        $ret = $storage->get($object);
+
+        //then
+        $this->assertEquals(array(), $ret);
     }
 
     public function testSet()
@@ -111,28 +154,5 @@ class RelationDatabaseTest extends TestCase
         $object->id2 = 1;
         $ret = $storage->get($object);
         $this->assertEquals($object2, $ret[0]);
-    }
-
-    /**
-     * Returns the test database connection.
-     *
-     * @return Connection
-     */
-    protected function getConnection()
-    {
-        $dsn = "mysql:host={$this->ip};port={$this->port};dbname={$this->dbName}";
-        $schema = "Item";
-
-        return $this->createDefaultDBConnection(new \PDO($dsn, $this->user, $this->password, array()), $schema);
-    }
-
-    /**
-     * Returns the test dataset.
-     *
-     * @return IDataSet
-     */
-    protected function getDataSet()
-    {
-        // TODO: Implement getDataSet() method.
     }
 }
