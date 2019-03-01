@@ -35,14 +35,14 @@ class RelationDatabaseTest extends TestCase
 
         $createSql = "create table Item
 (
-	id1 int not null,
+	id1 int auto_increment,
 	id2 int not null,
 	id3 int not null,
-	attr1 int auto_increment,
+	attr1 int not null,
 	attr2 int not null,
 	attr3 int not null,
 	constraint Item_pk
-		primary key (attr1)
+		primary key (id1)
 );
 
 ";
@@ -133,7 +133,7 @@ class RelationDatabaseTest extends TestCase
         $storage->add($object1);
 
         $object2 = new Item();
-        $object2->id1 = 1;
+        $object2->id1 = 2;
         $object2->id2 = 1;
         $object2->id3 = 2;
         $object2->attr1 = 1;
@@ -150,7 +150,6 @@ class RelationDatabaseTest extends TestCase
 
         //then
         $object = new Item();
-        $object->id1 = 1;
         $object->id2 = 1;
         $ret = $storage->get($object);
         $this->assertEquals($object2, $ret[0]);
