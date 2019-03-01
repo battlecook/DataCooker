@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="UTF-8" ?>
 <phpunit
         colors="true"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/6.0/phpunit.xsd"
+        xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/7.0/phpunit.xsd"
+        bootstrap="bootstrap/init.php"
         extensionsDirectory="tools/phpunit.d">
 
     <testsuites>
@@ -17,4 +17,3 @@
         </whitelist>
     </filter>
 </phpunit>
-
