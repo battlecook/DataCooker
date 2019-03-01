@@ -23,14 +23,7 @@ final class RelationDatabase extends AbstractMeta implements IDataAccessor
         $dsn = "mysql:host={$ip};port={$port};dbname={$dbName}";
         try {
             $this->pdo = new \PDO($dsn, $config->getUser(), $config->getPassword(), array());
-        } catch(\PDOException $e) {
-            $log = array();
-            $log['exception'] = "sql data store exception";
-            $log['error_info'] = $e->errorInfo;
-            $log['error_message'] = $e->getMessage();
-            $log['error_code'] = $e->getCode();
-            $log['error_trace'] = $e->getTrace();
-
+        } catch (\PDOException $e) {
             throw new DataCookerException($e);
         }
         $this->pdo->setAttribute(\PDO::MYSQL_ATTR_INIT_COMMAND, "SET NAMES utf8mb4");
@@ -38,62 +31,135 @@ final class RelationDatabase extends AbstractMeta implements IDataAccessor
         $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
     }
 
+    private function getTableName($className)
+    {
+        $explodedObject = explode('\\', $className);
+        return end($explodedObject);
+    }
+
+    /**
+     * @param $object
+     * @return mixed
+     * @throws DataCookerException
+     */
     public function add($object)
     {
+        $cacheKey = get_class($object);
         $this->setMeta($object);
+        $this->checkField($cacheKey, $object);
 
-        $cacheKey = $tableName = get_class($object);
-        $fields = $this->cachedFieldMap[$cacheKey]->getFields();
+        $tableName = $this->getTableName($cacheKey);
+        $fields = $this->getFieldKeys($cacheKey);
 
         $sql = "insert into {$tableName}";
         $delimiter = ' (';
-        foreach($fields as $field)
-        {
+        foreach ($fields as $field) {
             $sql .= $delimiter . $field;
             $delimiter = ', ';
         }
         $delimiter = ') values (';
-        foreach($fields as $field)
-        {
+        foreach ($fields as $field) {
             $sql .= $delimiter . ':' . $field;
             $delimiter = ', ';
         }
         $sql .= ");";
 
-        try
-        {
+        try {
             $pdoStatement = $this->pdo->prepare($sql);
-            foreach($fields as $field)
-            {
+            foreach ($fields as $field) {
                 $pdoStatement->bindValue(':' . $field, $object->$field);
             }
 
             $pdoStatement->execute();
-            if($pdoStatement->rowCount() == 0)
-            {
+            if ($pdoStatement->rowCount() === 0) {
                 throw new DataCookerException("no affected row");
+            } else {
+                if ($pdoStatement->rowCount() > 1) {
+                    throw new DataCookerException("many affected row");
+                }
             }
 
             $autoIncrement = $this->cachedFieldMap[$cacheKey]->getAutoIncrement();
-            $object->$autoIncrement = $this->pdo->lastInsertId();
-        } catch(\PDOException $e) {
-            $log = array();
-            $log['exception'] = "sql data store exception";
-            $log['error_info'] = $e->errorInfo;
-            $log['error_message'] = $e->getMessage();
-            $log['error_code'] = $e->getCode();
-            $log['error_trace'] = $e->getTrace();
-            $log['query'] = $sql;
 
+            $ret = clone $object;
+            $ret->$autoIncrement = (int)$this->pdo->lastInsertId();
+        } catch (\PDOException $e) {
             throw new DataCookerException($e);
         }
 
-        return clone $object;
+        if ($this->storage !== null) {
+            $ret = $this->storage->add($object);
+        }
+
+        return $ret;
     }
 
+    /**
+     * @param $object
+     * @return array
+     * @throws DataCookerException
+     */
     public function get($object): array
     {
-        return array();
+        $this->setMeta($object);
+
+        $cacheKey = get_class($object);
+        $explodedObject = explode('\\', $cacheKey);
+        $tableName = end($explodedObject);
+
+        $fieldsWithAutoIncrement = $this->getFieldKeysWithAutoIncrement($cacheKey);
+
+        $sql = 'select sql_no_cache ';
+        $delimiter = '';
+        foreach ($fieldsWithAutoIncrement as $identifierKey) {
+            $sql .= $delimiter . $identifierKey;
+            $delimiter = ', ';
+        }
+        $sql .= ' from ' . $tableName;
+
+        //todo tuning point ( if it have autoincrement, change where statement with autoincrement )
+        $identifierKeys = $this->getIdentifierKeys($cacheKey);
+        $delimiter = ' where ';
+        $whereStatement = '';
+        foreach ($identifierKeys as $identifierKey) {
+            if ($object->$identifierKey === null) {
+                break;
+            }
+            $whereStatement .= $delimiter . $identifierKey . ' = :' . $identifierKey;
+            $delimiter = ' and ';
+        }
+        $whereStatement .= ';';
+
+        $sql .= $whereStatement;
+
+        try {
+            $pdoStatement = $this->pdo->prepare($sql);
+
+            foreach ($identifierKeys as $identifierKey) {
+                $identifierValue = $object->$identifierKey;
+                if ($identifierValue === null) {
+                    break;
+                }
+                $pdoStatement->bindValue(':' . $identifierKey, $identifierValue);
+            }
+
+            $pdoStatement->execute();
+        } catch (\PDOException $e) {
+            throw new DataCookerException($e);
+        }
+
+        $rowCount = $pdoStatement->rowCount();
+
+        $ret = array();
+        if ($rowCount === 0) {
+            return $ret;
+        } else {
+            while ($loadedObject = $pdoStatement->fetchObject($cacheKey)) {
+                $ret[] = $loadedObject;
+            }
+        }
+
+        return $ret;
     }
 
     public function set($object)
@@ -103,8 +169,8 @@ final class RelationDatabase extends AbstractMeta implements IDataAccessor
 
         $attributes = $this->getAttributeKeys($cacheKey);
         $sql = "UPDATE $tableName SET ";
-        foreach($attributes as $attribute) {
-            $sql .= "`" . $attribute  . "`";
+        foreach ($attributes as $attribute) {
+            $sql .= "`" . $attribute . "`";
             $sql .= ' = ';
             $sql .= ":$attribute";
             $sql .= ' , ';
@@ -118,5 +184,47 @@ final class RelationDatabase extends AbstractMeta implements IDataAccessor
 
     public function remove($object)
     {
+        $cacheKey = get_class($object);
+        $this->setMeta($object);
+
+        $tableName = $this->getTableName($cacheKey);
+
+        $sql = "delete from {$tableName}";
+        $identifierKeys = $this->getIdentifierKeys($cacheKey);
+        $delimiter = ' where ';
+        $whereStatement = '';
+        foreach ($identifierKeys as $identifierKey) {
+            if ($object->$identifierKey === null) {
+                break;
+            }
+            $whereStatement .= $delimiter . $identifierKey . ' = :' . $identifierKey;
+            $delimiter = ' and ';
+        }
+        $whereStatement .= ';';
+
+        $sql .= $whereStatement;
+
+        try {
+            $pdoStatement = $this->pdo->prepare($sql);
+
+            foreach ($identifierKeys as $identifierKey) {
+                $identifierValue = $object->$identifierKey;
+                if ($identifierValue === null) {
+                    break;
+                }
+                $pdoStatement->bindValue(':' . $identifierKey, $identifierValue);
+            }
+
+            $pdoStatement->execute();
+        } catch (\PDOException $e) {
+            throw new DataCookerException($e);
+        }
+
+        if($pdoStatement->rowCount() == 0)
+        {
+            return false;
+        }
+
+        return true;
     }
 }
