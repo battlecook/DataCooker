@@ -12,6 +12,7 @@ final class Item
      */
     public $version;
     /**
+     * @dataCookerAutoIncrement
      * @dataCookerIdentifier
      */
     public $id1;
@@ -24,7 +25,6 @@ final class Item
      */
     public $id3;
     /**
-     * @dataCookerAutoIncrement
      * @dataCookerAttribute
      */
     public $attr1;
