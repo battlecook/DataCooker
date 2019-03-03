@@ -179,7 +179,12 @@ final class RelationDatabase extends AbstractMeta implements IDataAccessor
 
         $identifierKeys = $this->getIdentifierKeys($cacheKey);
 
-        //if have autoincrement else   for rdb performance
+        //todo tuning point ( if it have autoincrement, change where statement with autoincrement )
+
+
+        if ($this->storage !== null) {
+            $ret = $this->storage->set($object);
+        }
     }
 
     public function remove($object)
@@ -220,11 +225,16 @@ final class RelationDatabase extends AbstractMeta implements IDataAccessor
             throw new DataCookerException($e);
         }
 
+        $ret = true;
         if($pdoStatement->rowCount() == 0)
         {
-            return false;
+            $ret = false;
         }
 
-        return true;
+        if ($this->storage !== null) {
+            $ret = $this->storage->remove($object);
+        }
+
+        return $ret;
     }
 }
