@@ -29,6 +29,9 @@ final class Memcached extends AbstractMeta implements IDataAccessor
         $this->setMeta($object);
 
         $cacheKey = get_class($object);
+        $this->checkField($cacheKey, $object);
+
+        $cacheKey = get_class($object);
         $keys = $this->getIdentifierValues($cacheKey, $object);
 
 
@@ -40,15 +43,18 @@ final class Memcached extends AbstractMeta implements IDataAccessor
 
     public function get($object): array
     {
+        $this->setMeta($object);
         return array();
     }
 
     public function set($object)
     {
+        $this->setMeta($object);
     }
 
     public function remove($object)
     {
+        $this->setMeta($object);
     }
 
     public function commit($data)
