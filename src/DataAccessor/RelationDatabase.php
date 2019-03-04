@@ -165,25 +165,79 @@ final class RelationDatabase extends AbstractMeta implements IDataAccessor
     public function set($object)
     {
         $this->setMeta($object);
-        $cacheKey = $tableName = get_class($object);
+        $cacheKey = get_class($object);
+        $explodedObject = explode('\\', $cacheKey);
+        $tableName = end($explodedObject);
 
-        $attributes = $this->getAttributeKeys($cacheKey);
+        $attributeKeys = $this->getAttributeKeys($cacheKey);
         $sql = "UPDATE $tableName SET ";
-        foreach ($attributes as $attribute) {
-            $sql .= "`" . $attribute . "`";
+        foreach ($attributeKeys as $attributeKey) {
+            $attributeValue = $object->$attributeKey;
+            if ($attributeValue === null) {
+                continue;
+            }
+
+            $sql .= "`" . $attributeKey . "`";
             $sql .= ' = ';
-            $sql .= ":$attribute";
+            $sql .= ":$attributeKey";
             $sql .= ' , ';
         }
         $sql = substr($sql, 0, -2);
 
-        $identifierKeys = $this->getIdentifierKeys($cacheKey);
-
         //todo tuning point ( if it have autoincrement, change where statement with autoincrement )
+        $identifierKeys = $this->getIdentifierKeys($cacheKey);
+        $delimiter = ' where ';
+        $whereStatement = '';
+        foreach ($identifierKeys as $identifierKey) {
+            if ($object->$identifierKey === null) {
+                break;
+            }
+            $whereStatement .= $delimiter . $identifierKey . ' = :' . $identifierKey;
+            $delimiter = ' and ';
+        }
+        $whereStatement .= ';';
 
+        $sql .= $whereStatement;
+
+        $attributeKeys = $this->getAttributeKeys($cacheKey);
+
+        try {
+            $pdoStatement = $this->pdo->prepare($sql);
+
+            //todo add dirty check
+            foreach ($attributeKeys as $attributeKey) {
+                $attributeValue = $object->$attributeKey;
+                if ($attributeValue === null) {
+                    continue;
+                }
+                $pdoStatement->bindValue(':' . $attributeKey, $attributeValue);
+            }
+
+            foreach ($identifierKeys as $identifierKey) {
+                $identifierValue = $object->$identifierKey;
+                if ($identifierValue === null) {
+                    break;
+                }
+                $pdoStatement->bindValue(':' . $identifierKey, $identifierValue);
+            }
+
+            $pdoStatement->execute();
+        } catch (\PDOException $e) {
+            throw new DataCookerException($e);
+        }
+
+        $rowCount = $pdoStatement->rowCount();
+
+        /*
+        $ret = array();
+        if ($rowCount === 0) {
+            return $ret;
+        } else {
+        }
+        */
 
         if ($this->storage !== null) {
-            $ret = $this->storage->set($object);
+            $this->storage->set($object);
         }
     }
 
