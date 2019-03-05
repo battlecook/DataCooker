@@ -44,12 +44,20 @@ final class RelationDatabase extends AbstractMeta implements IDataAccessor
      */
     public function add($object)
     {
-        $cacheKey = get_class($object);
         $this->setMeta($object);
+
+        $cacheKey = get_class($object);
         $this->checkField($cacheKey, $object);
 
         $tableName = $this->getTableName($cacheKey);
-        $fields = $this->getFieldKeys($cacheKey);
+
+        $autoIncrement = $this->cachedFieldMap[$cacheKey]->getAutoIncrement();
+
+        if($object->$autoIncrement === null) {
+            $fields = $this->getFieldKeys($cacheKey);
+        } else {
+            $fields = $this->getFieldKeysWithAutoIncrement($cacheKey);
+        }
 
         $sql = "insert into {$tableName}";
         $delimiter = ' (';
@@ -78,8 +86,6 @@ final class RelationDatabase extends AbstractMeta implements IDataAccessor
                     throw new DataCookerException("many affected row");
                 }
             }
-
-            $autoIncrement = $this->cachedFieldMap[$cacheKey]->getAutoIncrement();
 
             $ret = clone $object;
             $ret->$autoIncrement = (int)$this->pdo->lastInsertId();
@@ -243,9 +249,9 @@ final class RelationDatabase extends AbstractMeta implements IDataAccessor
 
     public function remove($object)
     {
-        $cacheKey = get_class($object);
         $this->setMeta($object);
 
+        $cacheKey = get_class($object);
         $tableName = $this->getTableName($cacheKey);
 
         $sql = "delete from {$tableName}";
