@@ -55,7 +55,7 @@ class RelationDatabaseTest extends TestCase
         return new Database($this->ip, $this->port, $this->dbName, new Auth($this->user, $this->password));
     }
 
-    public function testAdd()
+    public function testAddWithAutoIncrement()
     {
         //given
         $storage = new RelationDatabase(null, $this->getConfig());
@@ -73,6 +73,57 @@ class RelationDatabaseTest extends TestCase
 
         //then
         $this->assertEquals($object, $ret);
+    }
+
+    /**
+     * @expectedException \battlecook\DataCookerException
+     * @throws \battlecook\DataCookerException
+     */
+    public function testAddDuplicated()
+    {
+        //given
+        $storage = new RelationDatabase(null, $this->getConfig());
+
+        $object = new Item();
+        $object->id1 = 1;
+        $object->id2 = 1;
+        $object->id3 = 1;
+        $object->attr1 = 1;
+        $object->attr2 = 1;
+        $object->attr3 = 1;
+
+        //when
+        $storage->add($object);
+        $storage->add($object);
+
+        //then
+    }
+
+    public function testAddWithoutAutoIncrement()
+    {
+        //given
+        $storage = new RelationDatabase(null, $this->getConfig());
+
+        $object = new Item();
+        $object->id2 = 1;
+        $object->id3 = 1;
+        $object->attr1 = 1;
+        $object->attr2 = 1;
+        $object->attr3 = 1;
+
+        //when
+        $ret = $storage->add($object);
+
+        //then
+        $expected = new Item();
+        $expected->id1 = 1;
+        $expected->id2 = 1;
+        $expected->id3 = 1;
+        $expected->attr1 = 1;
+        $expected->attr2 = 1;
+        $expected->attr3 = 1;
+
+        $this->assertEquals($expected, $ret);
     }
 
     public function testGet()
