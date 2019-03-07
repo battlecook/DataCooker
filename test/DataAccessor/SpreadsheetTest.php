@@ -24,7 +24,8 @@ class SpreadsheetTest extends TestCase
     public function testEmptySheet()
     {
         //given
-        $storage = new Spreadsheet(null, new \battlecook\Config\Spreadsheet("../Fixture/DataAccessor/SampleEmptySheet.xlsx"));
+        $storage = new Spreadsheet(null,
+            new \battlecook\Config\Spreadsheet("../Fixture/DataAccessor/SampleEmptySheet.xlsx"));
 
         $object = new Item();
 

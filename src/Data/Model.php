@@ -15,20 +15,18 @@ abstract class Model implements IData
      */
     public function __construct()
     {
-        if(empty($this->getIdentifiers()) === true)
-        {
+        if (empty($this->getIdentifiers()) === true) {
             throw new DataCookerException("identifiers cant't be an empty array");
         }
 
-        if($this->getAutoIncrement() === '')
-        {
+        if ($this->getAutoIncrement() === '') {
             throw new DataCookerException("autoIncrement must not be an empty string ('')");
         }
 
-        if(is_null($this->getAutoIncrement()) !== null)
-        {
-            if(in_array($this->getAutoIncrement(), $this->getIdentifiers()) === false && in_array($this->getAutoIncrement(), $this->getAttributes()) === false)
-            {
+        if (is_null($this->getAutoIncrement()) !== null) {
+            if (in_array($this->getAutoIncrement(),
+                    $this->getIdentifiers()) === false && in_array($this->getAutoIncrement(),
+                    $this->getAttributes()) === false) {
                 throw new DataCookerException("autoIncrement have to include identifiers or attributes");
             }
         }

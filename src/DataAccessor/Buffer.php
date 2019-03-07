@@ -29,19 +29,19 @@ final class Buffer extends AbstractMeta implements IDataAccessor
 
     private function cacheData($cacheKey, $object)
     {
-        if(isset(self::$cache[$cacheKey]) === false) {
+        if (isset(self::$cache[$cacheKey]) === false) {
 
-            if($this->storage !== null) {
+            if ($this->storage !== null) {
 
                 $paramObject = new $object();
-                if($this->isGetAll($cacheKey, $object) === false) {
+                if ($this->isGetAll($cacheKey, $object) === false) {
                     $rootIdentifier = $this->getIdentifierKeys($cacheKey)[0];
                     $paramObject->$rootIdentifier = $object->$rootIdentifier;
                 }
 
                 //todo if array is big, performance is raw. so need insertMulti which better than insert many time
                 $objectArray = $this->storage->get($paramObject);
-                foreach($objectArray as $object) {
+                foreach ($objectArray as $object) {
 
                     $keys = $this->getIdentifierValues($cacheKey, $object);
                     $data = $this->getAttributeValues($cacheKey, $object);

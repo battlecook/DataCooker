@@ -6,6 +6,8 @@ namespace battlecook\Data;
 interface IData
 {
     public function getIdentifiers(): array;
+
     public function getAutoIncrement(): ?string;
+
     public function getAttributes(): array;
 }
