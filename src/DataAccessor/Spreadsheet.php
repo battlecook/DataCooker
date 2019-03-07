@@ -127,14 +127,14 @@ final class Spreadsheet extends AbstractMeta implements IDataAccessor
         $ret = array();
         $sheet = $this->spreadsheet->getSheetByName($sheetName);
         $rowCount = 2;
-        if($this->isGetAll($cacheKey, $object) === true) {
+        if ($this->isGetAll($cacheKey, $object) === true) {
             while (true) {
                 if ($sheet->getCellByColumnAndRow(1, $rowCount)->getValue() === null) {
                     break;
                 }
 
                 $tmp = new $object();
-                foreach($this->cachedFieldMap[$cacheKey]->getFields() as $field) {
+                foreach ($this->cachedFieldMap[$cacheKey]->getFields() as $field) {
                     $index = $columns[$field];
                     $cell = $sheet->getCellByColumnAndRow($index, $rowCount);
                     $tmp->$field = $cell->getValue();
@@ -151,24 +151,23 @@ final class Spreadsheet extends AbstractMeta implements IDataAccessor
                 }
 
                 $count = 0;
-                foreach($this->cachedFieldMap[$cacheKey]->getIdentifiers() as $identifier) {
+                foreach ($this->cachedFieldMap[$cacheKey]->getIdentifiers() as $identifier) {
                     $index = $columns[$identifier];
                     $cell = $sheet->getCellByColumnAndRow($index, $rowCount);
                     if ($cell->getValue() === null) {
                         break;
                     }
 
-                    if($object->$identifier == $cell->getValue()) {
+                    if ($object->$identifier == $cell->getValue()) {
                         $count++;
-                    }
-                    else {
+                    } else {
                         break;
                     }
                 }
-                if(count($this->cachedFieldMap[$cacheKey]->getIdentifiers()) === $count) {
+                if (count($this->cachedFieldMap[$cacheKey]->getIdentifiers()) === $count) {
 
                     $tmp = new $object();
-                    foreach($columns as $column => $index) {
+                    foreach ($columns as $column => $index) {
 
                         $cell = $sheet->getCellByColumnAndRow($index, $rowCount);
                         $tmp->$column = $cell->getValue();

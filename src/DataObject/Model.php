@@ -1,4 +1,5 @@
 <?php
+
 namespace battlecook\DataObject;
 
 use ReflectionClass;
@@ -18,25 +19,20 @@ abstract class Model implements DataObject
         $shortName = end($explodedClassName);
         $this->shortName = $shortName;
 
-        if(!isset(self::$data[$shortName]))
-        {
+        if (!isset(self::$data[$shortName])) {
             $identifiers = array();
             $attributes = array();
             $autoIncrements = array();
 
             $reflection = new ReflectionClass($this);
-            foreach($reflection->getProperties() as $property)
-            {
-                if(stripos($property->getDocComment(), 'dataStoreIdentifier'))
-                {
+            foreach ($reflection->getProperties() as $property) {
+                if (stripos($property->getDocComment(), 'dataStoreIdentifier')) {
                     $identifiers[] = $property->getName();
                 }
-                if(stripos($property->getDocComment(), 'dataStoreAttribute'))
-                {
+                if (stripos($property->getDocComment(), 'dataStoreAttribute')) {
                     $attributes[] = $property->getName();
                 }
-                if(stripos($property->getDocComment(), 'dataStoreAutoIncrement'))
-                {
+                if (stripos($property->getDocComment(), 'dataStoreAutoIncrement')) {
                     $autoIncrements[] = $property->getName();
                 }
             }

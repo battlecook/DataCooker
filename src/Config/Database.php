@@ -16,8 +16,7 @@ final class Database
         $this->ip = $ip;
         $this->port = $port;
         $this->dbName = $dbName;
-        if($auth !== null)
-        {
+        if ($auth !== null) {
             $this->user = $auth->getUser();
             $this->password = $auth->getPassword();
         }

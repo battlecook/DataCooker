@@ -89,7 +89,7 @@ class AbstractMeta
     protected function isGetAll($cacheKey, $object): bool
     {
         $id1 = $this->cachedFieldMap[$cacheKey]->getIdentifiers()[0];
-        if($object->$id1 === null) {
+        if ($object->$id1 === null) {
             return true;
         }
 
@@ -162,6 +162,7 @@ class AbstractMeta
 
     protected function getFieldKeysWithAutoIncrement(string $cacheKey)
     {
-        return array_merge($this->cachedFieldMap[$cacheKey]->getIdentifiers(), $this->cachedFieldMap[$cacheKey]->getAttributes());
+        return array_merge($this->cachedFieldMap[$cacheKey]->getIdentifiers(),
+            $this->cachedFieldMap[$cacheKey]->getAttributes());
     }
 }

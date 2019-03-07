@@ -53,7 +53,7 @@ final class RelationDatabase extends AbstractMeta implements IDataAccessor
 
         $autoIncrement = $this->cachedFieldMap[$cacheKey]->getAutoIncrement();
 
-        if($object->$autoIncrement === null) {
+        if ($object->$autoIncrement === null) {
             $fields = $this->getFieldKeys($cacheKey);
         } else {
             $fields = $this->getFieldKeysWithAutoIncrement($cacheKey);
@@ -286,8 +286,7 @@ final class RelationDatabase extends AbstractMeta implements IDataAccessor
         }
 
         $ret = true;
-        if($pdoStatement->rowCount() == 0)
-        {
+        if ($pdoStatement->rowCount() == 0) {
             $ret = false;
         }
 
