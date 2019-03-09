@@ -79,7 +79,7 @@ final class Buffer extends AbstractMeta implements IDataAccessor
     {
         $cacheKey = get_class($object);
         $this->setUp($cacheKey, $object);
-        $this->checkField($cacheKey, $object);
+        $this->checkHaveAllFieldData($cacheKey, $object);
 
         $autoIncrement = $this->cachedFieldMap[$cacheKey]->getAutoIncrement();
         if ($autoIncrement !== "" && empty($object->$autoIncrement) === true) {
@@ -150,7 +150,7 @@ final class Buffer extends AbstractMeta implements IDataAccessor
     {
         $cacheKey = get_class($object);
         $this->setUp($cacheKey, $object);
-        $this->checkField($cacheKey, $object);
+        $this->checkNoHaveAnyFieldData($cacheKey, $object);
 
         $keys = $this->getIdentifierValues($cacheKey, $object);
         $data = $this->getAttributeValues($cacheKey, $object);
