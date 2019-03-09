@@ -29,7 +29,7 @@ final class Memcached extends AbstractMeta implements IDataAccessor
         $this->setMeta($object);
 
         $cacheKey = get_class($object);
-        $this->checkField($cacheKey, $object);
+        $this->checkHaveAllFieldData($cacheKey, $object);
 
         $cacheKey = get_class($object);
         $keys = $this->getIdentifierValues($cacheKey, $object);

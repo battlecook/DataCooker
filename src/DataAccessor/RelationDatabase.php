@@ -47,7 +47,7 @@ final class RelationDatabase extends AbstractMeta implements IDataAccessor
         $this->setMeta($object);
 
         $cacheKey = get_class($object);
-        $this->checkField($cacheKey, $object);
+        $this->checkHaveAllFieldData($cacheKey, $object);
 
         $tableName = $this->getTableName($cacheKey);
 
