@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace battlecook\DataStore;
 
-interface IDataAccessor
+interface IDataStore
 {
     public function add($object);
 

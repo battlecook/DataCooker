@@ -9,7 +9,7 @@ use battlecook\DataStorage\Field;
 use battlecook\DataStorage\Meta;
 use battlecook\DataStorage\PhpMemory;
 
-final class Buffer extends AbstractMeta implements IDataAccessor
+final class Buffer extends AbstractMeta implements IDataStore
 {
     /**
      * @var $phpData PhpMemory
@@ -19,7 +19,7 @@ final class Buffer extends AbstractMeta implements IDataAccessor
 
     private $storage;
 
-    public function __construct(IDataAccessor $storage = null)
+    public function __construct(IDataStore $storage = null)
     {
         $this->storage = $storage;
         if (empty(self::$phpData) === true) {

@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace test\DataStorage;
 
-use battlecook\DataAccessor\Spreadsheet;
+use battlecook\DataStore\Spreadsheet;
 use PHPUnit\Framework\TestCase;
-use test\Fixture\DataAccessor\Quest;
+use test\Fixture\DataStore\Quest;
 use test\Fixture\DataStorage\Item;
 
 require __DIR__ . '/../../vendor/autoload.php';
@@ -44,7 +44,7 @@ class SpreadsheetTest extends TestCase
         //given
 
         //when
-        new Spreadsheet(null, new \battlecook\Config\Spreadsheet("../Fixture/DataAccessor/Sample"));
+        new Spreadsheet(null, new \battlecook\Config\Spreadsheet("../Fixture/DataStore/Sample"));
 
         //then
     }
@@ -56,7 +56,7 @@ class SpreadsheetTest extends TestCase
     public function testNotExistSheet()
     {
         //given
-        $storage = new Spreadsheet(null, new \battlecook\Config\Spreadsheet("../Fixture/DataAccessor/Sample.xlsx"));
+        $storage = new Spreadsheet(null, new \battlecook\Config\Spreadsheet("../Fixture/DataStore/Sample.xlsx"));
 
         $object = new Item();
         $object->id1 = 1;
@@ -79,7 +79,7 @@ class SpreadsheetTest extends TestCase
     public function testDifferenceFieldsAndColumns()
     {
         //given
-        $storage = new Spreadsheet(null, new \battlecook\Config\Spreadsheet("../Fixture/DataAccessor/Sample.xlsx"));
+        $storage = new Spreadsheet(null, new \battlecook\Config\Spreadsheet("../Fixture/DataStore/Sample.xlsx"));
 
         $object = new Quest();
         $object->id1 = 1;
@@ -95,10 +95,13 @@ class SpreadsheetTest extends TestCase
         //then
     }
 
+    /**
+     * @throws \battlecook\DataCookerException
+     */
     public function testGet()
     {
         //given
-        $storage = new Spreadsheet(null, new \battlecook\Config\Spreadsheet("../Fixture/DataAccessor/Sample.xlsx"));
+        $storage = new Spreadsheet(null, new \battlecook\Config\Spreadsheet("../Fixture/DataStore/Sample.xlsx"));
 
         $object = new Quest();
         $object->id1 = 1;
@@ -116,10 +119,13 @@ class SpreadsheetTest extends TestCase
         $this->assertEquals($object, $ret[0]);
     }
 
+    /**
+     * @throws \battlecook\DataCookerException
+     */
     public function testGetAll()
     {
         //given
-        $storage = new Spreadsheet(null, new \battlecook\Config\Spreadsheet("../Fixture/DataAccessor/Sample.xlsx"));
+        $storage = new Spreadsheet(null, new \battlecook\Config\Spreadsheet("../Fixture/DataStore/Sample.xlsx"));
 
         $object = new Quest();
 
@@ -133,7 +139,7 @@ class SpreadsheetTest extends TestCase
     public function testAdd()
     {
         //given
-        $storage = new Spreadsheet(null, new \battlecook\Config\Spreadsheet("../Fixture/DataAccessor/Sample.xlsx"));
+        $storage = new Spreadsheet(null, new \battlecook\Config\Spreadsheet("../Fixture/DataStore/Sample.xlsx"));
 
         $object = new Quest();
         $object->id1 = 1;

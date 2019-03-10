@@ -5,7 +5,7 @@ namespace test\DataStorage;
 
 use battlecook\Config\Auth;
 use battlecook\Config\Database;
-use battlecook\DataAccessor\RelationDatabase;
+use battlecook\DataStore\RelationDatabase;
 use PHPUnit\Framework\TestCase;
 use test\Fixture\DataStorage\Item;
 
@@ -55,6 +55,9 @@ class RelationDatabaseTest extends TestCase
         return new Database($this->ip, $this->port, $this->dbName, new Auth($this->user, $this->password));
     }
 
+    /**
+     * @throws \battlecook\DataCookerException
+     */
     public function testAddWithAutoIncrement()
     {
         //given
@@ -99,6 +102,9 @@ class RelationDatabaseTest extends TestCase
         //then
     }
 
+    /**
+     * @throws \battlecook\DataCookerException
+     */
     public function testAddWithoutAutoIncrement()
     {
         //given
@@ -126,6 +132,9 @@ class RelationDatabaseTest extends TestCase
         $this->assertEquals($expected, $ret);
     }
 
+    /**
+     * @throws \battlecook\DataCookerException
+     */
     public function testGet()
     {
         //given
@@ -140,6 +149,9 @@ class RelationDatabaseTest extends TestCase
         $this->assertEquals(array(), $ret);
     }
 
+    /**
+     * @throws \battlecook\DataCookerException
+     */
     public function testSet()
     {
         //given
@@ -169,6 +181,9 @@ class RelationDatabaseTest extends TestCase
         $this->assertEquals($object2, $ret[0]);
     }
 
+    /**
+     * @throws \battlecook\DataCookerException
+     */
     public function testRemove()
     {
         //given
