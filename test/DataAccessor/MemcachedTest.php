@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace test\DataStorage;
 
-use battlecook\DataAccessor\Memcached;
-use battlecook\DataAccessor\Spreadsheet;
+use battlecook\DataStore\Memcached;
+use battlecook\DataStore\Spreadsheet;
 use battlecook\DataStorage\LeafNode;
 use PHPUnit\Framework\TestCase;
 use test\Fixture\DataStorage\Item;

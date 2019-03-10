@@ -7,7 +7,7 @@ use battlecook\DataCookerException;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
-final class Spreadsheet extends AbstractMeta implements IDataAccessor
+final class Spreadsheet extends AbstractMeta implements IDataStore
 {
     private $storage;
 
@@ -20,11 +20,11 @@ final class Spreadsheet extends AbstractMeta implements IDataAccessor
 
     /**
      * Spreadsheet constructor.
-     * @param IDataAccessor|null $storage
+     * @param IDataStore|null $storage
      * @param \battlecook\Config\Spreadsheet $config
      * @throws DataCookerException
      */
-    public function __construct(?IDataAccessor $storage, \battlecook\Config\Spreadsheet $config)
+    public function __construct(?IDataStore $storage, \battlecook\Config\Spreadsheet $config)
     {
         $this->storage = $storage;
 

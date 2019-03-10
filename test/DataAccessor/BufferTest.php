@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace test\DataStorage;
 
-use battlecook\DataAccessor\Buffer;
+use battlecook\DataStore\Buffer;
 use PHPUnit\Framework\TestCase;
 use test\Fixture\DataStorage\Item;
 use test\Fixture\DataStorage\ItemAutoIncrementAlone;

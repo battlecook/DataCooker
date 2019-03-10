@@ -6,13 +6,13 @@ namespace battlecook\DataStore;
 use battlecook\Config\Database;
 use battlecook\DataCookerException;
 
-final class RelationDatabase extends AbstractMeta implements IDataAccessor
+final class RelationDatabase extends AbstractMeta implements IDataStore
 {
     private $pdo = array();
 
     private $storage;
 
-    public function __construct(?IDataAccessor $storage, Database $config)
+    public function __construct(?IDataStore $storage, Database $config)
     {
         $this->storage = $storage;
 

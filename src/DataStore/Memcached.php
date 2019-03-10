@@ -4,17 +4,17 @@ declare(strict_types=1);
 namespace battlecook\DataStore;
 
 
-final class Memcached extends AbstractMeta implements IDataAccessor
+final class Memcached extends AbstractMeta implements IDataStore
 {
     private $storage;
     private $memcached;
 
     /**
      * Memcached constructor.
-     * @param IDataAccessor|null $storage
+     * @param IDataStore|null $storage
      * @param \battlecook\Config\Memcache[] $configArr
      */
-    public function __construct(?IDataAccessor $storage, array $configArr)
+    public function __construct(?IDataStore $storage, array $configArr)
     {
         $this->storage = $storage;
 
