@@ -71,7 +71,7 @@ final class Spreadsheet extends AbstractMeta implements IDataStore
     {
         $cacheKey = get_class($object);
         $this->setMeta($object);
-        $this->checkField($cacheKey, $object);
+        $this->checkHaveAllFieldData($cacheKey, $object);
 
         $explodedObject = explode('\\', $cacheKey);
         $sheetName = end($explodedObject);
@@ -187,7 +187,7 @@ final class Spreadsheet extends AbstractMeta implements IDataStore
     {
         $cacheKey = get_class($object);
         $this->setUpMeta($cacheKey, $object);
-        $this->checkField($cacheKey, $object);
+        $this->checkHaveAllFieldData($cacheKey, $object);
     }
 
     public function remove($object)
