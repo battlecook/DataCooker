@@ -149,7 +149,7 @@ class AbstractMeta
      * @param $object
      * @throws DataCookerException
      */
-    protected function checkField($cacheKey, $object)
+    protected function checkHaveAllFieldData($cacheKey, $object)
     {
         $fields = $this->cachedFieldMap[$cacheKey]->getFields();
         foreach ($fields as $field) {
@@ -157,6 +157,30 @@ class AbstractMeta
             if (empty($object->$field) === true) {
                 throw new DataCookerException("fields don't fill all");
             }
+        }
+    }
+
+    protected function haveOneDataAtLeast($cacheKey, $object): bool
+    {
+        $fields = $this->cachedFieldMap[$cacheKey]->getFields();
+        foreach ($fields as $field) {
+            //is_null 이 더 맞는거 같지만 exception 이 빠져버림
+            if (empty($object->$field) !== true) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param $cacheKey
+     * @param $object
+     * @throws DataCookerException
+     */
+    protected function checkNoHaveAnyFieldData($cacheKey, $object)
+    {
+        if($this->haveOneDataAtLeast($cacheKey, $object) === false) {
+            throw new DataCookerException();
         }
     }
 
