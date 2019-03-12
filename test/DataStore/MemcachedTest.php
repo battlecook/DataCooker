@@ -21,7 +21,7 @@ class MemcachedTest extends TestCase
     public function testCommit()
     {
         //given
-        $storage = new Memcached(null, array(new \battlecook\Config\Memcache()));
+        $store = new Memcached(null, array(new \battlecook\Config\Memcache()));
         $data = array(get_class(new Item()) =>
             array(1 =>
                 array(1 =>
@@ -33,7 +33,7 @@ class MemcachedTest extends TestCase
         );
 
         //when
-        $storage->commit($data);
+        $store->commit($data);
 
         //then
     }
@@ -41,7 +41,7 @@ class MemcachedTest extends TestCase
     public function testGet()
     {
         //given
-        $storage = new Memcached(null, array(new \battlecook\Config\Memcache()));
+        $store = new Memcached(null, array(new \battlecook\Config\Memcache()));
         $data = array(get_class(new Item()) =>
             array(1 =>
                 array(1 =>
@@ -52,7 +52,7 @@ class MemcachedTest extends TestCase
             )
         );
 
-        $storage->commit($data);
+        $store->commit($data);
 
         $object = new Item();
         $object->id1 = 1;
@@ -60,7 +60,7 @@ class MemcachedTest extends TestCase
         $object->id3 = 1;
 
         //when
-        $ret = $storage->get($object);
+        $ret = $store->get($object);
 
         //then
         $this->assertEquals($object, $ret[0]);
@@ -69,7 +69,7 @@ class MemcachedTest extends TestCase
     public function testAdd()
     {
         //given
-        $storage = new Memcached(null, array(new \battlecook\Config\Memcache()));
+        $store = new Memcached(null, array(new \battlecook\Config\Memcache()));
 
         $object = new Item();
         $object->id1 = 1;
@@ -79,10 +79,10 @@ class MemcachedTest extends TestCase
         $object->attr2 = 1;
         $object->attr3 = 1;
 
-        $storage->commit();
+        $store->commit();
 
         //when
-        $ret = $storage->add($object);
+        $ret = $store->add($object);
 
         //then
         $this->assertEquals($object, $ret);
@@ -91,7 +91,7 @@ class MemcachedTest extends TestCase
     public function testSet()
     {
         //given
-        $storage = new Memcached(null, array(new \battlecook\Config\Memcache()));
+        $store = new Memcached(null, array(new \battlecook\Config\Memcache()));
 
         $object = new Item();
         $object->id1 = 1;
@@ -100,7 +100,7 @@ class MemcachedTest extends TestCase
         $object->attr1 = 1;
         $object->attr2 = 1;
         $object->attr3 = 1;
-        $storage->add($object);
+        $store->add($object);
 
         //when
         $object2 = new Item();
@@ -110,17 +110,17 @@ class MemcachedTest extends TestCase
         $object2->attr1 = 2;
         $object2->attr2 = 2;
         $object2->attr3 = 2;
-        $storage->set($object2);
+        $store->set($object2);
 
         //then
-        $ret = $storage->get(new Item());
+        $ret = $store->get(new Item());
         $this->assertEquals($object2, $ret[0]);
     }
 
     public function testRemove()
     {
         //given
-        $storage = new Memcached(null, array(new \battlecook\Config\Memcache()));
+        $store = new Memcached(null, array(new \battlecook\Config\Memcache()));
 
         $object1 = new Item();
         $object1->id1 = 1;
@@ -129,7 +129,7 @@ class MemcachedTest extends TestCase
         $object1->attr1 = 1;
         $object1->attr2 = 1;
         $object1->attr3 = 1;
-        $storage->add($object1);
+        $store->add($object1);
 
         $object2 = new Item();
         $object2->id1 = 1;
@@ -138,20 +138,20 @@ class MemcachedTest extends TestCase
         $object2->attr1 = 1;
         $object2->attr2 = 1;
         $object2->attr3 = 1;
-        $storage->add($object2);
+        $store->add($object2);
 
         //when
         $object = new Item();
         $object->id1 = 1;
         $object->id2 = 1;
         $object->id3 = 1;
-        $storage->remove($object);
+        $store->remove($object);
 
         //then
         $object = new Item();
         $object->id1 = 1;
         $object->id2 = 1;
-        $ret = $storage->get($object);
+        $ret = $store->get($object);
         $this->assertEquals($object2, $ret[0]);
     }
 }
