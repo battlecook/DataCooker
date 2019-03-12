@@ -26,12 +26,12 @@ class BufferTest extends TestCase
     public function testNoCachedFieldMultiAutoIncrement()
     {
         //given
-        $storage = new Buffer();
+        $store = new Buffer();
 
         $object = new ItemMultiAutoIncrement();
 
         //when
-        $storage->add($object);
+        $store->add($object);
 
         //then
     }
@@ -43,13 +43,13 @@ class BufferTest extends TestCase
     public function testAutoIncrementNotInteger()
     {
         //given
-        $storage = new Buffer();
+        $store = new Buffer();
 
         $object = new Item();
         $object->attr1 = '1';
 
         //when
-        $storage->add($object);
+        $store->add($object);
 
         //then
     }
@@ -61,12 +61,12 @@ class BufferTest extends TestCase
     public function testEmptyIdentifiers()
     {
         //given
-        $storage = new Buffer();
+        $store = new Buffer();
 
         $object = new ItemEmptyIdentifiers();
 
         //when
-        $storage->add($object);
+        $store->add($object);
 
         //then
     }
@@ -78,7 +78,7 @@ class BufferTest extends TestCase
     public function testAutoIncrementAlone()
     {
         //given
-        $storage = new Buffer();
+        $store = new Buffer();
 
         $object = new ItemAutoIncrementAlone();
         $object->id1 = 1;
@@ -89,7 +89,7 @@ class BufferTest extends TestCase
         $object->attr3 = 1;
 
         //when
-        $storage->add($object);
+        $store->add($object);
 
         //then
     }
@@ -97,7 +97,7 @@ class BufferTest extends TestCase
     public function testGetAll()
     {
         //given
-        $storage = new Buffer();
+        $store = new Buffer();
 
         $object1 = new Item();
         $object1->id1 = 1;
@@ -106,7 +106,7 @@ class BufferTest extends TestCase
         $object1->attr1 = 1;
         $object1->attr2 = 1;
         $object1->attr3 = 1;
-        $storage->add($object1);
+        $store->add($object1);
 
         $object2 = new Item();
         $object2->id1 = 1;
@@ -115,11 +115,11 @@ class BufferTest extends TestCase
         $object2->attr1 = 1;
         $object2->attr2 = 1;
         $object2->attr3 = 1;
-        $storage->add($object2);
+        $store->add($object2);
 
         //when
         $object = new Item();
-        $ret = $storage->get($object);
+        $ret = $store->get($object);
 
         //then
         $this->assertEquals(2, count($ret));
@@ -131,7 +131,7 @@ class BufferTest extends TestCase
     public function testAdd()
     {
         //given
-        $storage = new Buffer();
+        $store = new Buffer();
 
         $object = new Item();
         $object->id1 = 1;
@@ -142,7 +142,7 @@ class BufferTest extends TestCase
         $object->attr3 = 1;
 
         //when
-        $ret = $storage->add($object);
+        $ret = $store->add($object);
 
         //then
         $this->assertEquals($object, $ret);
@@ -151,7 +151,7 @@ class BufferTest extends TestCase
     public function testSet()
     {
         //given
-        $storage = new Buffer();
+        $store = new Buffer();
 
         $object = new Item();
         $object->id1 = 1;
@@ -160,7 +160,7 @@ class BufferTest extends TestCase
         $object->attr1 = 1;
         $object->attr2 = 1;
         $object->attr3 = 1;
-        $storage->add($object);
+        $store->add($object);
 
         //when
         $object2 = new Item();
@@ -170,17 +170,17 @@ class BufferTest extends TestCase
         $object2->attr1 = 2;
         $object2->attr2 = 2;
         $object2->attr3 = 2;
-        $storage->set($object2);
+        $store->set($object2);
 
         //then
-        $ret = $storage->get(new Item());
+        $ret = $store->get(new Item());
         $this->assertEquals($object2, $ret[0]);
     }
 
     public function testRemove()
     {
         //given
-        $storage = new Buffer();
+        $store = new Buffer();
 
         $object1 = new Item();
         $object1->id1 = 1;
@@ -189,7 +189,7 @@ class BufferTest extends TestCase
         $object1->attr1 = 1;
         $object1->attr2 = 1;
         $object1->attr3 = 1;
-        $storage->add($object1);
+        $store->add($object1);
 
         $object2 = new Item();
         $object2->id1 = 1;
@@ -198,20 +198,20 @@ class BufferTest extends TestCase
         $object2->attr1 = 1;
         $object2->attr2 = 1;
         $object2->attr3 = 1;
-        $storage->add($object2);
+        $store->add($object2);
 
         //when
         $object = new Item();
         $object->id1 = 1;
         $object->id2 = 1;
         $object->id3 = 1;
-        $storage->remove($object);
+        $store->remove($object);
 
         //then
         $object = new Item();
         $object->id1 = 1;
         $object->id2 = 1;
-        $ret = $storage->get($object);
+        $ret = $store->get($object);
         $this->assertEquals($object2, $ret[0]);
     }
 }

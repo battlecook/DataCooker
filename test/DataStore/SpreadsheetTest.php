@@ -56,7 +56,7 @@ class SpreadsheetTest extends TestCase
     public function testNotExistSheet()
     {
         //given
-        $storage = new Spreadsheet(null, new \battlecook\Config\Spreadsheet("../Fixture/DataStore/Sample.xlsx"));
+        $store = new Spreadsheet(null, new \battlecook\Config\Spreadsheet("../Fixture/DataStore/Sample.xlsx"));
 
         $object = new Item();
         $object->id1 = 1;
@@ -67,7 +67,7 @@ class SpreadsheetTest extends TestCase
         $object->attr3 = 1;
 
         //when
-        $storage->add($object);
+        $store->add($object);
 
         //then
     }
@@ -79,7 +79,7 @@ class SpreadsheetTest extends TestCase
     public function testDifferenceFieldsAndColumns()
     {
         //given
-        $storage = new Spreadsheet(null, new \battlecook\Config\Spreadsheet("../Fixture/DataStore/Sample.xlsx"));
+        $store = new Spreadsheet(null, new \battlecook\Config\Spreadsheet("../Fixture/DataStore/Sample.xlsx"));
 
         $object = new Quest();
         $object->id1 = 1;
@@ -90,7 +90,7 @@ class SpreadsheetTest extends TestCase
         $object->attr3 = 1;
 
         //when
-        $storage->add($object);
+        $store->add($object);
 
         //then
     }
@@ -101,7 +101,7 @@ class SpreadsheetTest extends TestCase
     public function testGet()
     {
         //given
-        $storage = new Spreadsheet(null, new \battlecook\Config\Spreadsheet("../Fixture/DataStore/Sample.xlsx"));
+        $store = new Spreadsheet(null, new \battlecook\Config\Spreadsheet("../Fixture/DataStore/Sample.xlsx"));
 
         $object = new Quest();
         $object->id1 = 1;
@@ -113,7 +113,7 @@ class SpreadsheetTest extends TestCase
         $object->attr3 = 1;
 
         //when
-        $ret = $storage->get($object);
+        $ret = $store->get($object);
 
         //then
         $this->assertEquals($object, $ret[0]);
@@ -125,12 +125,12 @@ class SpreadsheetTest extends TestCase
     public function testGetAll()
     {
         //given
-        $storage = new Spreadsheet(null, new \battlecook\Config\Spreadsheet("../Fixture/DataStore/Sample.xlsx"));
+        $store = new Spreadsheet(null, new \battlecook\Config\Spreadsheet("../Fixture/DataStore/Sample.xlsx"));
 
         $object = new Quest();
 
         //when
-        $ret = $storage->get($object);
+        $ret = $store->get($object);
 
         //then
         $this->assertEquals(9, count($ret));
@@ -139,7 +139,7 @@ class SpreadsheetTest extends TestCase
     public function testAdd()
     {
         //given
-        $storage = new Spreadsheet(null, new \battlecook\Config\Spreadsheet("../Fixture/DataStore/Sample.xlsx"));
+        $store = new Spreadsheet(null, new \battlecook\Config\Spreadsheet("../Fixture/DataStore/Sample.xlsx"));
 
         $object = new Quest();
         $object->id1 = 1;
@@ -150,7 +150,7 @@ class SpreadsheetTest extends TestCase
         $object->attr3 = 1;
 
         //when
-        $ret = $storage->add($object);
+        $ret = $store->add($object);
 
         //then
         $this->assertEquals($object, $ret);
@@ -159,7 +159,7 @@ class SpreadsheetTest extends TestCase
     public function testSet()
     {
         //given
-        $storage = new Spreadsheet(null, new \battlecook\Config\Spreadsheet(""));
+        $store = new Spreadsheet(null, new \battlecook\Config\Spreadsheet(""));
 
         $object = new Item();
         $object->id1 = 1;
@@ -168,7 +168,7 @@ class SpreadsheetTest extends TestCase
         $object->attr1 = 1;
         $object->attr2 = 1;
         $object->attr3 = 1;
-        $storage->add($object);
+        $store->add($object);
 
         //when
         $object2 = new Item();
@@ -178,17 +178,17 @@ class SpreadsheetTest extends TestCase
         $object2->attr1 = 2;
         $object2->attr2 = 2;
         $object2->attr3 = 2;
-        $storage->set($object2);
+        $store->set($object2);
 
         //then
-        $ret = $storage->get(new Item());
+        $ret = $store->get(new Item());
         $this->assertEquals($object2, $ret[0]);
     }
 
     public function testRemove()
     {
         //given
-        $storage = new Spreadsheet(null, new \battlecook\Config\Spreadsheet(""));
+        $store = new Spreadsheet(null, new \battlecook\Config\Spreadsheet(""));
 
         $object1 = new Item();
         $object1->id1 = 1;
@@ -197,7 +197,7 @@ class SpreadsheetTest extends TestCase
         $object1->attr1 = 1;
         $object1->attr2 = 1;
         $object1->attr3 = 1;
-        $storage->add($object1);
+        $store->add($object1);
 
         $object2 = new Item();
         $object2->id1 = 1;
@@ -206,20 +206,20 @@ class SpreadsheetTest extends TestCase
         $object2->attr1 = 1;
         $object2->attr2 = 1;
         $object2->attr3 = 1;
-        $storage->add($object2);
+        $store->add($object2);
 
         //when
         $object = new Item();
         $object->id1 = 1;
         $object->id2 = 1;
         $object->id3 = 1;
-        $storage->remove($object);
+        $store->remove($object);
 
         //then
         $object = new Item();
         $object->id1 = 1;
         $object->id2 = 1;
-        $ret = $storage->get($object);
+        $ret = $store->get($object);
         $this->assertEquals($object2, $ret[0]);
     }
 }
