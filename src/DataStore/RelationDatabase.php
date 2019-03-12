@@ -24,7 +24,7 @@ final class RelationDatabase extends AbstractMeta implements IDataStore
         try {
             $this->pdo = new \PDO($dsn, $config->getUser(), $config->getPassword(), array());
         } catch (\PDOException $e) {
-            throw new DataCookerException($e);
+            throw new DataCookerException();
         }
         $this->pdo->setAttribute(\PDO::MYSQL_ATTR_INIT_COMMAND, "SET NAMES utf8mb4");
         $this->pdo->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
@@ -90,7 +90,7 @@ final class RelationDatabase extends AbstractMeta implements IDataStore
             $ret = clone $object;
             $ret->$autoIncrement = (int)$this->pdo->lastInsertId();
         } catch (\PDOException $e) {
-            throw new DataCookerException($e);
+            throw new DataCookerException();
         }
 
         if ($this->storage !== null) {
@@ -229,7 +229,7 @@ final class RelationDatabase extends AbstractMeta implements IDataStore
 
             $pdoStatement->execute();
         } catch (\PDOException $e) {
-            throw new DataCookerException($e);
+            throw new DataCookerException();
         }
 
         $rowCount = $pdoStatement->rowCount();
@@ -282,7 +282,7 @@ final class RelationDatabase extends AbstractMeta implements IDataStore
 
             $pdoStatement->execute();
         } catch (\PDOException $e) {
-            throw new DataCookerException($e);
+            throw new DataCookerException();
         }
 
         $ret = true;

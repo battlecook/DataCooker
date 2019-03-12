@@ -3,21 +3,16 @@ declare(strict_types=1);
 
 namespace test\DataStorage;
 
-use battlecook\Config\Auth;
-use battlecook\Config\Database;
 use battlecook\DataStore\RelationDatabase;
 use PHPUnit\Framework\TestCase;
 use test\Fixture\DataStorage\Item;
+use test\Helper\DatabaseConfigTrait;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
 class RelationDatabaseTest extends TestCase
 {
-    private $ip = "localhost";
-    private $port = 3306;
-    private $dbName = "DataCooker";
-    private $user = "user";
-    private $password = "password";
+    use DatabaseConfigTrait;
 
     private function getPdo()
     {
@@ -48,11 +43,6 @@ class RelationDatabaseTest extends TestCase
 ";
         $st = $pdo->prepare($createSql);
         $st->execute();
-    }
-
-    private function getConfig()
-    {
-        return new Database($this->ip, $this->port, $this->dbName, new Auth($this->user, $this->password));
     }
 
     /**
