@@ -22,14 +22,18 @@ class MemcachedTest extends TestCase
     {
         //given
         $store = new Memcached(null, array(new \battlecook\Config\Memcache()));
-        $data = array(get_class(new Item()) =>
-            array(1 =>
-                array(1 =>
-                    array(1 => new LeafNode(array(1,1,1), array(1,1,1)),
-                        2 => new LeafNode(array(1,1,2), array(1,1,1))
-                    ),
+        $data = array(
+            get_class(new Item()) =>
+                array(
+                    1 =>
+                        array(
+                            1 =>
+                                array(
+                                    1 => new LeafNode(array(1, 1, 1), array(1, 1, 1)),
+                                    2 => new LeafNode(array(1, 1, 2), array(1, 1, 1))
+                                ),
+                        )
                 )
-            )
         );
 
         //when
@@ -42,14 +46,18 @@ class MemcachedTest extends TestCase
     {
         //given
         $store = new Memcached(null, array(new \battlecook\Config\Memcache()));
-        $data = array(get_class(new Item()) =>
-            array(1 =>
-                array(1 =>
-                    array(1 => new LeafNode(array(1,1,1), array(1,1,1)),
-                           2 => new LeafNode(array(1,1,2), array(1,1,1))
-                    ),
+        $data = array(
+            get_class(new Item()) =>
+                array(
+                    1 =>
+                        array(
+                            1 =>
+                                array(
+                                    1 => new LeafNode(array(1, 1, 1), array(1, 1, 1)),
+                                    2 => new LeafNode(array(1, 1, 2), array(1, 1, 1))
+                                ),
+                        )
                 )
-            )
         );
 
         $store->commit($data);

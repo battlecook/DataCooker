@@ -46,7 +46,7 @@ class BufferTest extends TestCase
         $store = new Buffer();
 
         $object = new Item();
-        $object->attr1 = '1';
+        $object->id1 = '1';
 
         //when
         $store->add($object);
