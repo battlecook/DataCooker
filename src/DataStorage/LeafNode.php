@@ -10,12 +10,12 @@ final class LeafNode extends Node
     private $data;
     private $status;
 
-    public function __construct(array $key, array $data)
+    public function __construct(array $key, array $data, $status = Status::INSERTED)
     {
         parent::__construct($key);
 
         $this->data = $data;
-        $this->status = Status::INSERTED;
+        $this->status = $status;
     }
 
     public function getStatus(): int

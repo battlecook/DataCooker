@@ -11,6 +11,7 @@ final class Database
     private $user;
     private $password;
 
+    //todo consider transaction option
     public function __construct(string $ip = "localhost", int $port = 3306, string $dbName = "", ?Auth $auth = null)
     {
         $this->ip = $ip;
