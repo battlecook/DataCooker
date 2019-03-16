@@ -68,7 +68,8 @@ final class Buffer extends AbstractMeta implements IDataStore
      */
     private function setUp($cacheKey, $object)
     {
-        if ($this->setMeta($object) === true) {
+        $this->setMeta($object);
+        if (self::$phpData->hasData($cacheKey) === false) {
             self::$phpData->addMetaData(new Meta(new Field($this->getIdentifierKeys($cacheKey),
                 $this->getAutoIncrementKey($cacheKey), $this->getAttributeKeys($cacheKey)), $cacheKey));
         }
@@ -203,6 +204,7 @@ final class Buffer extends AbstractMeta implements IDataStore
                         }
                     });
                 }
+
                 $this->store->commit($leafNodes);
             }
         }
