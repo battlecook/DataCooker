@@ -131,17 +131,14 @@ class AbstractMeta
 
     /**
      * @param $object
-     * @return bool
      * @throws DataCookerException
      */
-    protected function setMeta($object): bool
+    protected function setMeta($object)
     {
         $cacheKey = get_class($object);
         if (isset(self::$cachedFieldMap[$cacheKey]) === false) {
             $this->setField($object);
-            return true;
         }
-        return false;
     }
 
     /**
