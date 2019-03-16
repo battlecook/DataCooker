@@ -5,10 +5,12 @@ namespace test\DataStorage;
 
 use battlecook\Data\Status;
 use battlecook\DataStorage\Field;
+use battlecook\DataStorage\LeafNode;
 use battlecook\DataStorage\Meta;
 use battlecook\DataStorage\PhpMemory;
 use PHPUnit\Framework\TestCase;
 use test\Fixture\DataStorage\Item;
+use test\Fixture\DataStore\Quest;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
@@ -225,4 +227,63 @@ class PhpMemoryTest extends TestCase
         $ret = $storage->search($dataName, array(1, 1));
         $this->assertEquals($data, $ret[0]->getData());
     }
+
+    public function testGetData()
+    {
+        //given
+        $storage = new PhpMemory();
+
+        $dataName1 = get_class(new Item());
+        $identifiers = array('id1', 'id2', 'id3');
+        $attributes = array("attr1", "attr2", "attr3");
+
+        $storage->addMetaData(new Meta(new Field($identifiers, "", $attributes), $dataName1));
+
+        $keys1 = array(1, 1, 1);
+        $data = array(1, 2, 3);
+        $storage->insert($dataName1, $keys1, $data);
+
+        $keys2 = array(1, 1, 2);
+        $data = array(1, 2, 3);
+        $storage->insert($dataName1, $keys2, $data);
+
+        $dataName2 = get_class(new Quest());
+        $identifiers = array('id1', 'id2', 'id3');
+        $attributes = array("attr1", "attr2", "attr3");
+
+        $storage->addMetaData(new Meta(new Field($identifiers, "", $attributes), $dataName2));
+
+        $keys1 = array(1, 1, 1);
+        $data = array(1, 2, 3);
+        $storage->insert($dataName2, $keys1, $data);
+
+        $keys2 = array(1, 1, 2);
+        $data = array(1, 2, 3);
+        $storage->insert($dataName2, $keys2, $data);
+
+        //when
+        $ret = $storage->getTrees();
+
+        //then
+        $expected = array(
+            $dataName1 => array(
+                1 => array(
+                    1 => array(
+                        1 => new LeafNode($keys1, $data),
+                        2 => new LeafNode($keys2, $data),
+                    )
+                )
+            ),
+            $dataName2 => array(
+                1 => array(
+                    1 => array(
+                        1 => new LeafNode($keys1, $data),
+                        2 => new LeafNode($keys2, $data),
+                    )
+                )
+            ),
+        );
+        $this->assertEquals($expected, $ret);
+    }
+
 }

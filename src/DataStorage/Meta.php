@@ -18,7 +18,7 @@ final class Meta
 
     public function getField()
     {
-        return $this->getField();
+        return $this->field;
     }
 
     public function hasAutoIncrement(): bool

@@ -7,6 +7,7 @@ use battlecook\Config\Database;
 use battlecook\Data\Status;
 use battlecook\DataCookerException;
 use battlecook\DataStorage\LeafNode;
+use battlecook\DataStore\KeyValue\AbstractKeyValue;
 
 final class RelationDatabase extends AbstractMeta implements IDataStore
 {
@@ -249,6 +250,11 @@ final class RelationDatabase extends AbstractMeta implements IDataStore
         }
     }
 
+    /**
+     * @param $object
+     * @return bool
+     * @throws DataCookerException
+     */
     public function remove($object)
     {
         $this->setMeta($object);
@@ -300,7 +306,7 @@ final class RelationDatabase extends AbstractMeta implements IDataStore
     }
 
     //todo this function would be tuning. ( multi insert, multi update and so on )
-    private function commitToDB($tableName, &$tree)
+    private function commitToDB($object, &$tree)
     {
         //leaf
         if (is_array($tree) === false && $tree instanceof LeafNode) {
@@ -322,17 +328,17 @@ final class RelationDatabase extends AbstractMeta implements IDataStore
         }
         $keys = array_keys($tree);
         foreach ($keys as $key) {
-            $ret = $this->commitToDB($tableName, $tree[$key]);
+            $ret = $this->commitToDB($object, $tree[$key]);
 
             //leaf node process
             if ($ret === Status::DELETED) {
-                unset($tree[$key]);
+                $this->remove($object);
             }
             if ($ret === Status::INSERTED) {
-                $tree[$key] = $tree[$key]->getData();
+                $this->add($object);
             }
             if ($ret === Status::UPDATED) {
-                $tree[$key] = $tree[$key]->getData();
+                $this->set($object);
             }
             //end of leaf node process
 
@@ -345,13 +351,31 @@ final class RelationDatabase extends AbstractMeta implements IDataStore
         }
     }
 
+    /**
+     * @param null $data
+     * @throws DataCookerException
+     */
     public function commit($data = null)
     {
-        $created = $data;
+        if ($data !== null) {
+            foreach ($data as $status => $object) {
+                if ($status === Status::DELETED) {
+                    $this->remove($object);
+                } elseif ($status === Status::UPDATED) {
+                    $this->set($object);
+                } elseif ($status === Status::INSERTED) {
+                    $this->add($object);
+                } else {
+                    throw new DataCookerException();
+                }
+            }
 
-        foreach($created as $key => $tree) {
-            $tableName = $this->getTableName($key);
-            $this->commitToDB($tableName, $created);
+            if($this->store !== null) {
+                if ($this->store instanceof AbstractKeyValue) {
+                } else {
+                    $this->store->commit($data);
+                }
+            }
         }
     }
 }
