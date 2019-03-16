@@ -69,10 +69,8 @@ final class Buffer extends AbstractMeta implements IDataStore
     private function setUp($cacheKey, $object)
     {
         if ($this->setMeta($object) === true) {
-            $identifiers = $this->cachedFieldMap[$cacheKey]->getIdentifiers();
-            $autoIncrement = $this->cachedFieldMap[$cacheKey]->getAutoIncrement();
-            $attributes = $this->cachedFieldMap[$cacheKey]->getAttributes();
-            self::$phpData->addMetaData(new Meta(new Field($identifiers, $autoIncrement, $attributes), $cacheKey));
+            self::$phpData->addMetaData(new Meta(new Field($this->getIdentifierKeys($cacheKey),
+                $this->getAutoIncrementKey($cacheKey), $this->getAttributeKeys($cacheKey)), $cacheKey));
         }
 
         $this->cacheData($cacheKey, $object);
@@ -89,7 +87,7 @@ final class Buffer extends AbstractMeta implements IDataStore
         $this->setUp($cacheKey, $object);
         $this->checkHaveAllFieldData($cacheKey, $object);
 
-        $autoIncrement = $this->cachedFieldMap[$cacheKey]->getAutoIncrement();
+        $autoIncrement = $this->getAutoIncrementKey($cacheKey);
         if ($autoIncrement !== "" && empty($object->$autoIncrement) === true) {
             if ($this->store === null) {
                 throw new DataCookerException("autoIncrement value is null");
@@ -182,25 +180,25 @@ final class Buffer extends AbstractMeta implements IDataStore
 
     public function commit($data = null)
     {
-        if($data === null) {
+        if ($data === null) {
             $trees = self::$phpData->getTrees();
             if ($this->store instanceof AbstractKeyValue) {
                 $this->store->commit($trees);
             } else {
 
                 $leafNodes = array();
-                foreach($trees as $className => $tree) {
+                foreach ($trees as $className => $tree) {
                     $meta = self::$phpData->getMetaData($className);
                     array_walk_recursive($trees, function ($data) use ($className, $meta, &$leafNodes) {
                         $object = new $className();
-                        array_map(function ($key, $value) use ($object){
+                        array_map(function ($key, $value) use ($object) {
                             $object->$key = $value;
                         }, $meta->getField()->getIdentifiers(), $data->getKey());
-                        array_map(function ($key, $value) use ($object){
+                        array_map(function ($key, $value) use ($object) {
                             $object->$key = $value;
                         }, $meta->getField()->getAttributes(), $data->getData());
 
-                        if($data->getStatus() !== Status::NONE) {
+                        if ($data->getStatus() !== Status::NONE) {
                             $leafNodes[$data->getStatus()] = $object;
                         }
                     });
@@ -210,7 +208,6 @@ final class Buffer extends AbstractMeta implements IDataStore
         }
 
         self::initialize();
-        $this->cachedFieldMap = array();
     }
 
     public function rollback()
@@ -220,6 +217,8 @@ final class Buffer extends AbstractMeta implements IDataStore
 
     public static function initialize()
     {
+        parent::initialize();
+
         self::$phpData = new PhpMemory();
         self::$cache = null;
     }

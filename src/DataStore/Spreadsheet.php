@@ -134,7 +134,7 @@ final class Spreadsheet extends AbstractMeta implements IDataStore
                 }
 
                 $tmp = new $object();
-                foreach ($this->cachedFieldMap[$cacheKey]->getFields() as $field) {
+                foreach ($this->getFieldKeys($cacheKey) as $field) {
                     $index = $columns[$field];
                     $cell = $sheet->getCellByColumnAndRow($index, $rowCount);
                     $tmp->$field = $cell->getValue();
@@ -151,7 +151,7 @@ final class Spreadsheet extends AbstractMeta implements IDataStore
                 }
 
                 $count = 0;
-                foreach ($this->cachedFieldMap[$cacheKey]->getIdentifiers() as $identifier) {
+                foreach ($this->getIdentifierKeys($cacheKey) as $identifier) {
                     $index = $columns[$identifier];
                     $cell = $sheet->getCellByColumnAndRow($index, $rowCount);
                     if ($cell->getValue() === null) {
@@ -164,7 +164,7 @@ final class Spreadsheet extends AbstractMeta implements IDataStore
                         break;
                     }
                 }
-                if (count($this->cachedFieldMap[$cacheKey]->getIdentifiers()) === $count) {
+                if (count($this->getIdentifierKeys($cacheKey)) === $count) {
 
                     $tmp = new $object();
                     foreach ($columns as $column => $index) {

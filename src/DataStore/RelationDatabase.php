@@ -54,8 +54,7 @@ final class RelationDatabase extends AbstractMeta implements IDataStore
 
         $tableName = $this->getTableName($cacheKey);
 
-        $autoIncrement = $this->cachedFieldMap[$cacheKey]->getAutoIncrement();
-
+        $autoIncrement = $this->getAutoIncrementKey($cacheKey);
         if ($object->$autoIncrement === null) {
             $fields = $this->getFieldKeys($cacheKey);
         } else {

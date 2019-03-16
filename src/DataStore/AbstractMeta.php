@@ -16,7 +16,7 @@ class AbstractMeta
     /**
      * @var $cachedFieldMap Field[]
      */
-    protected $cachedFieldMap = array();
+    private static $cachedFieldMap = array();
 
     /**
      * @param $object
@@ -80,7 +80,7 @@ class AbstractMeta
                 throw new DataCookerException("identifiers is empty");
             }
 
-            $this->cachedFieldMap[$cacheKey] = new Field($identifiers, $autoIncrement, $attributes);
+            self::$cachedFieldMap[$cacheKey] = new Field($identifiers, $autoIncrement, $attributes);
         } catch (\ReflectionException $e) {
             throw new DataCookerException("reflection error");
         }
@@ -88,7 +88,7 @@ class AbstractMeta
 
     protected function isGetAll($cacheKey, $object): bool
     {
-        $id1 = $this->cachedFieldMap[$cacheKey]->getIdentifiers()[0];
+        $id1 = self::$cachedFieldMap[$cacheKey]->getIdentifiers()[0];
         if ($object->$id1 === null) {
             return true;
         }
@@ -98,13 +98,13 @@ class AbstractMeta
 
     protected function getIdentifierKeys($cacheKey): array
     {
-        return $this->cachedFieldMap[$cacheKey]->getIdentifiers();
+        return self::$cachedFieldMap[$cacheKey]->getIdentifiers();
     }
 
     protected function getIdentifierValues($cacheKey, $object)
     {
         $keys = array();
-        foreach ($this->cachedFieldMap[$cacheKey]->getIdentifiers() as $identifier) {
+        foreach (self::$cachedFieldMap[$cacheKey]->getIdentifiers() as $identifier) {
             $keys[] = $object->$identifier;
         }
         return $keys;
@@ -112,13 +112,13 @@ class AbstractMeta
 
     protected function getAttributeKeys($cacheKey): array
     {
-        return $this->cachedFieldMap[$cacheKey]->getAttributes();
+        return self::$cachedFieldMap[$cacheKey]->getAttributes();
     }
 
     protected function getAttributeValues($cacheKey, $object)
     {
         $data = array();
-        foreach ($this->cachedFieldMap[$cacheKey]->getAttributes() as $attribute) {
+        foreach (self::$cachedFieldMap[$cacheKey]->getAttributes() as $attribute) {
             $data[] = $object->$attribute;
         }
         return $data;
@@ -126,7 +126,7 @@ class AbstractMeta
 
     protected function getFieldKeys($cacheKey): array
     {
-        return $this->cachedFieldMap[$cacheKey]->getFields();
+        return self::$cachedFieldMap[$cacheKey]->getFields();
     }
 
     /**
@@ -137,7 +137,7 @@ class AbstractMeta
     protected function setMeta($object): bool
     {
         $cacheKey = get_class($object);
-        if (isset($this->cachedFieldMap[$cacheKey]) === false) {
+        if (isset(self::$cachedFieldMap[$cacheKey]) === false) {
             $this->setField($object);
             return true;
         }
@@ -151,7 +151,7 @@ class AbstractMeta
      */
     protected function checkHaveAllFieldData($cacheKey, $object)
     {
-        $fields = $this->cachedFieldMap[$cacheKey]->getFields();
+        $fields = self::$cachedFieldMap[$cacheKey]->getFields();
         foreach ($fields as $field) {
             //is_null 이 더 맞는거 같지만 exception 이 빠져버림
             if (empty($object->$field) === true) {
@@ -162,7 +162,7 @@ class AbstractMeta
 
     protected function haveOneDataAtLeast($cacheKey, $object): bool
     {
-        $fields = $this->cachedFieldMap[$cacheKey]->getFields();
+        $fields = self::$cachedFieldMap[$cacheKey]->getFields();
         foreach ($fields as $field) {
             //is_null 이 더 맞는거 같지만 exception 이 빠져버림
             if (empty($object->$field) !== true) {
@@ -184,9 +184,19 @@ class AbstractMeta
         }
     }
 
+    protected function getAutoIncrementKey(string $cacheKey)
+    {
+        return self::$cachedFieldMap[$cacheKey]->getAutoIncrement();
+    }
+
     protected function getFieldKeysWithAutoIncrement(string $cacheKey)
     {
-        return array_merge($this->cachedFieldMap[$cacheKey]->getIdentifiers(),
-            $this->cachedFieldMap[$cacheKey]->getAttributes());
+        return array_merge(self::$cachedFieldMap[$cacheKey]->getIdentifiers(),
+            self::$cachedFieldMap[$cacheKey]->getAttributes());
+    }
+
+    protected static function initialize()
+    {
+        self::$cachedFieldMap = array();
     }
 }
