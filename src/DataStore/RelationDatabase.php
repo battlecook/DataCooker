@@ -96,7 +96,7 @@ final class RelationDatabase extends AbstractMeta implements IDataStore
         }
 
         if ($this->store !== null) {
-            $ret = $this->store->add($object);
+            $ret = $this->store->add($ret);
         }
 
         return $ret;
