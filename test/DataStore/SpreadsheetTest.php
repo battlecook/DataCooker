@@ -136,6 +136,7 @@ class SpreadsheetTest extends TestCase
         $this->assertEquals(9, count($ret));
     }
 
+    /*
     public function testAdd()
     {
         //given
@@ -222,4 +223,5 @@ class SpreadsheetTest extends TestCase
         $ret = $store->get($object);
         $this->assertEquals($object2, $ret[0]);
     }
+    */
 }
