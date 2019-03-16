@@ -17,21 +17,26 @@ final class Buffer extends AbstractMeta implements IDataStore
     private static $phpData;
     private static $cache;
 
-    private $storage;
+    private $store;
 
     public function __construct(IDataStore $storage = null)
     {
-        $this->storage = $storage;
+        $this->store = $storage;
         if (empty(self::$phpData) === true) {
             self::initialize();
         }
     }
 
-    private function cacheData($cacheKey, $object)
+    /**
+     * @param string $cacheKey
+     * @param $object
+     * @throws DataCookerException
+     */
+    private function cacheData(string $cacheKey, $object)
     {
         if (isset(self::$cache[$cacheKey]) === false) {
 
-            if ($this->storage !== null) {
+            if ($this->store !== null) {
 
                 $paramObject = new $object();
                 if ($this->isGetAll($cacheKey, $object) === false) {
@@ -40,9 +45,8 @@ final class Buffer extends AbstractMeta implements IDataStore
                 }
 
                 //todo if array is big, performance is raw. so need insertMulti which better than insert many time
-                $objectArray = $this->storage->get($paramObject);
+                $objectArray = $this->store->get($paramObject);
                 foreach ($objectArray as $object) {
-
                     $keys = $this->getIdentifierValues($cacheKey, $object);
                     $data = $this->getAttributeValues($cacheKey, $object);
                     self::$phpData->insert($cacheKey, $keys, $data);
@@ -83,11 +87,11 @@ final class Buffer extends AbstractMeta implements IDataStore
 
         $autoIncrement = $this->cachedFieldMap[$cacheKey]->getAutoIncrement();
         if ($autoIncrement !== "" && empty($object->$autoIncrement) === true) {
-            if ($this->storage === null) {
+            if ($this->store === null) {
                 throw new DataCookerException("autoIncrement value is null");
             } else {
                 //rollback 을 위해 적어 둬야 하나 ...
-                $object = $this->storage->add($object);
+                $object = $this->store->add($object);
                 if (empty($object->$autoIncrement) === true) {
                     throw new DataCookerException("autoIncrement value is null");
                 }
@@ -172,9 +176,13 @@ final class Buffer extends AbstractMeta implements IDataStore
         self::$phpData->delete($cacheKey, $keys);
     }
 
-    public function commit($data)
+    public function commit($data = null)
     {
-        //if other storage is key value storage (redis, memcache etc), send to data for tree structure, not object structure
+        $data = self::$phpData->getData();
+
+        $this->store->commit($data);
+
+        self::initialize();
     }
 
     public function rollback()
