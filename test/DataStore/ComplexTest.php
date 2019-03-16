@@ -99,6 +99,7 @@ class ComplexTest extends TestCase
     public function testSet()
     {
         //given
+        Buffer::initialize();
         $store = new Buffer(new RelationDatabase(null, $this->getConfig()));
 
         $object = new Item();
