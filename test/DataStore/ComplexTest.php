@@ -102,7 +102,7 @@ class ComplexTest extends TestCase
         $store = new Buffer(new RelationDatabase(null, $this->getConfig()));
 
         $object = new Item();
-        $object->id1 = 1;
+        //$object->id1 = 1;
         $object->id2 = 1;
         $object->id3 = 1;
         $object->attr1 = 1;

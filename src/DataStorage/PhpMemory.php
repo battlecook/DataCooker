@@ -242,7 +242,12 @@ final class PhpMemory
         $this->metas[$meta->getDataName()] = $meta;
     }
 
-    public function getData(): array
+    public function getMetaData($dataName)
+    {
+        return $this->metas[$dataName];
+    }
+
+    public function getTrees(): array
     {
         $created = $this->trees;
 

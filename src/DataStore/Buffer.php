@@ -8,9 +8,13 @@ use battlecook\DataCookerException;
 use battlecook\DataStorage\Field;
 use battlecook\DataStorage\Meta;
 use battlecook\DataStorage\PhpMemory;
+use battlecook\DataStore\KeyValue\AbstractKeyValue;
+use battlecook\DataUtility\TreeTrait;
 
 final class Buffer extends AbstractMeta implements IDataStore
 {
+    use TreeTrait;
+
     /**
      * @var $phpData PhpMemory
      */
@@ -178,11 +182,35 @@ final class Buffer extends AbstractMeta implements IDataStore
 
     public function commit($data = null)
     {
-        $data = self::$phpData->getData();
+        if($data === null) {
+            $trees = self::$phpData->getTrees();
+            if ($this->store instanceof AbstractKeyValue) {
+                $this->store->commit($trees);
+            } else {
 
-        $this->store->commit($data);
+                $leafNodes = array();
+                foreach($trees as $className => $tree) {
+                    $meta = self::$phpData->getMetaData($className);
+                    array_walk_recursive($trees, function ($data) use ($className, $meta, &$leafNodes) {
+                        $object = new $className();
+                        array_map(function ($key, $value) use ($object){
+                            $object->$key = $value;
+                        }, $meta->getField()->getIdentifiers(), $data->getKey());
+                        array_map(function ($key, $value) use ($object){
+                            $object->$key = $value;
+                        }, $meta->getField()->getAttributes(), $data->getData());
+
+                        if($data->getStatus() !== Status::NONE) {
+                            $leafNodes[$data->getStatus()] = $object;
+                        }
+                    });
+                }
+                $this->store->commit($leafNodes);
+            }
+        }
 
         self::initialize();
+        $this->cachedFieldMap = array();
     }
 
     public function rollback()
@@ -193,5 +221,6 @@ final class Buffer extends AbstractMeta implements IDataStore
     public static function initialize()
     {
         self::$phpData = new PhpMemory();
+        self::$cache = null;
     }
 }
