@@ -9,7 +9,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 final class Spreadsheet extends AbstractMeta implements IDataStore
 {
-    private $storage;
+    private $store;
 
     private $spreadsheet;
 
@@ -26,7 +26,7 @@ final class Spreadsheet extends AbstractMeta implements IDataStore
      */
     public function __construct(?IDataStore $storage, \battlecook\Config\Spreadsheet $config)
     {
-        $this->storage = $storage;
+        $this->store = $storage;
 
         if (file_exists($config->getPath()) === false) {
             throw new DataCookerException("this path is invalid path.");
@@ -197,5 +197,10 @@ final class Spreadsheet extends AbstractMeta implements IDataStore
     public static function initialize()
     {
         self::$columnsMap = array();
+    }
+
+    public function commit($data = null)
+    {
+
     }
 }

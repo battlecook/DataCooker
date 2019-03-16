@@ -4,17 +4,19 @@ declare(strict_types=1);
 namespace battlecook\DataStore;
 
 use battlecook\Config\Database;
+use battlecook\Data\Status;
 use battlecook\DataCookerException;
+use battlecook\DataStorage\LeafNode;
 
 final class RelationDatabase extends AbstractMeta implements IDataStore
 {
     private $pdo = array();
 
-    private $storage;
+    private $store;
 
     public function __construct(?IDataStore $storage, Database $config)
     {
-        $this->storage = $storage;
+        $this->store = $storage;
 
         $dbName = $config->getDatabaseName();
         $ip = $config->getIp();
@@ -93,8 +95,8 @@ final class RelationDatabase extends AbstractMeta implements IDataStore
             throw new DataCookerException();
         }
 
-        if ($this->storage !== null) {
-            $ret = $this->storage->add($object);
+        if ($this->store !== null) {
+            $ret = $this->store->add($object);
         }
 
         return $ret;
@@ -242,8 +244,8 @@ final class RelationDatabase extends AbstractMeta implements IDataStore
         }
         */
 
-        if ($this->storage !== null) {
-            $this->storage->set($object);
+        if ($this->store !== null) {
+            $this->store->set($object);
         }
     }
 
@@ -290,10 +292,66 @@ final class RelationDatabase extends AbstractMeta implements IDataStore
             $ret = false;
         }
 
-        if ($this->storage !== null) {
-            $ret = $this->storage->remove($object);
+        if ($this->store !== null) {
+            $ret = $this->store->remove($object);
         }
 
         return $ret;
+    }
+
+    //todo this function would be tuning. ( multi insert, multi update and so on )
+    private function commitToDB($tableName, &$tree)
+    {
+        //leaf
+        if (is_array($tree) === false && $tree instanceof LeafNode) {
+            if ($tree->getStatus() === Status::DELETED) {
+                return Status::DELETED;
+            }
+
+            if ($tree->getStatus() === Status::NONE) {
+                return Status::NONE;
+            }
+
+            if ($tree->getStatus() === Status::UPDATED) {
+                return Status::UPDATED;
+            }
+
+            if ($tree->getStatus() === Status::INSERTED) {
+                return Status::INSERTED;
+            }
+        }
+        $keys = array_keys($tree);
+        foreach ($keys as $key) {
+            $ret = $this->commitToDB($tableName, $tree[$key]);
+
+            //leaf node process
+            if ($ret === Status::DELETED) {
+                unset($tree[$key]);
+            }
+            if ($ret === Status::INSERTED) {
+                $tree[$key] = $tree[$key]->getData();
+            }
+            if ($ret === Status::UPDATED) {
+                $tree[$key] = $tree[$key]->getData();
+            }
+            //end of leaf node process
+
+            //internals node
+            if ($ret === null) {
+                if (empty($tree[$key]) === true) {
+                    unset($tree[$key]);
+                }
+            }
+        }
+    }
+
+    public function commit($data = null)
+    {
+        $created = $data;
+
+        foreach($created as $key => $tree) {
+            $tableName = $this->getTableName($key);
+            $this->commitToDB($tableName, $created);
+        }
     }
 }
