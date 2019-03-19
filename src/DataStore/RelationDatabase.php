@@ -304,52 +304,6 @@ final class RelationDatabase extends AbstractMeta implements IDataStore
         return $ret;
     }
 
-    //todo this function would be tuning. ( multi insert, multi update and so on )
-    private function commitToDB($object, &$tree)
-    {
-        //leaf
-        if (is_array($tree) === false && $tree instanceof LeafNode) {
-            if ($tree->getStatus() === Status::DELETED) {
-                return Status::DELETED;
-            }
-
-            if ($tree->getStatus() === Status::NONE) {
-                return Status::NONE;
-            }
-
-            if ($tree->getStatus() === Status::UPDATED) {
-                return Status::UPDATED;
-            }
-
-            if ($tree->getStatus() === Status::INSERTED) {
-                return Status::INSERTED;
-            }
-        }
-        $keys = array_keys($tree);
-        foreach ($keys as $key) {
-            $ret = $this->commitToDB($object, $tree[$key]);
-
-            //leaf node process
-            if ($ret === Status::DELETED) {
-                $this->remove($object);
-            }
-            if ($ret === Status::INSERTED) {
-                $this->add($object);
-            }
-            if ($ret === Status::UPDATED) {
-                $this->set($object);
-            }
-            //end of leaf node process
-
-            //internals node
-            if ($ret === null) {
-                if (empty($tree[$key]) === true) {
-                    unset($tree[$key]);
-                }
-            }
-        }
-    }
-
     /**
      * @param null $data
      * @throws DataCookerException
@@ -357,6 +311,8 @@ final class RelationDatabase extends AbstractMeta implements IDataStore
     public function commit($data = null)
     {
         if ($data !== null) {
+
+            //todo this function would be tuning. ( multi insert, multi update and so on )
             foreach ($data as $status => $object) {
                 if ($status === Status::DELETED) {
                     $this->remove($object);

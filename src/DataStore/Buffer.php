@@ -208,8 +208,6 @@ final class Buffer extends AbstractMeta implements IDataStore
                 $this->store->commit($leafNodes);
             }
         }
-
-        self::initialize();
     }
 
     public function rollback()
