@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace test\DataStorage;
 
 use battlecook\DataStore\KeyValue\Memcached;
-use battlecook\DataStore\Spreadsheet;
 use battlecook\DataStorage\LeafNode;
 use PHPUnit\Framework\TestCase;
 use test\Fixture\DataStorage\Item;
@@ -15,13 +14,17 @@ class MemcachedTest extends TestCase
 {
     public function setUp()
     {
-        Spreadsheet::initialize();
+        $memcached = new \Memcached();
+        if($memcached->addServer('localhost', 11211) === false) {
+            die('memcached connection failed');
+        }
+        $memcached->flush();
     }
 
     public function testCommit()
     {
         //given
-        $store = new Memcached(null, array(new \battlecook\Config\Memcache()));
+        $store = new Memcached(null, array(new \battlecook\Config\Memcache('localhost')));
         $data = array(
             get_class(new Item()) =>
                 array(

@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace battlecook\DataStore\KeyValue;
 
+use battlecook\Config\Memcache;
+use battlecook\DataCookerException;
 use battlecook\DataStore\IDataStore;
 
 final class Memcached extends AbstractKeyValue
@@ -19,19 +21,23 @@ final class Memcached extends AbstractKeyValue
     /**
      * Memcached constructor.
      * @param IDataStore|null $store
-     * @param \battlecook\Config\Memcache[] $configArr
+     * @param Memcache[] $configArr
+     * @throws DataCookerException
      */
     public function __construct(?IDataStore $store, array $configArr)
     {
         $this->store = $store;
 
         $this->timeExpired = self::DEFAULT_EXPIRE_TIME;
-        /*
+
         $this->memcached = new \Memcached();
         foreach ($configArr as $config) {
-            $this->memcached->addServer($config->getIp(), $config->getPort());
+
+            if ( $this->memcached->addServer($config->getIp(), $config->getPort()) === false) {
+                throw new DataCookerException("connection error");
+            }
         }
-        */
+
     }
 
     public function add($object)
@@ -69,17 +75,24 @@ final class Memcached extends AbstractKeyValue
 
     public function commit($data = null)
     {
-        $items = array();
-        foreach ($data as $key => $tree) {
-            $created = $tree;
-            $this->travel($created);
-            $items[$key] = $created;
-        }
+        if($data !== null) {
+            $items = array();
+            foreach ($data as $key => $tree) {
+                $created = $tree;
+                $this->travel($created);
+                $items[$key] = $created;
+            }
 
-        if (empty($items) === false) {
-            $ret = $this->memcached->setMulti($items, $this->timeExpired);
-            if ($ret === false) {
-                //leave the log message
+            if (empty($items) === false) {
+                $ret = $this->memcached->setMulti($items, $this->timeExpired);
+                if ($ret === false) {
+                    //leave the log message
+                    //need a policy whether rollback or not
+                }
+            }
+
+            if($this->store !== null) {
+                $this->store->commit($data);
             }
         }
     }
