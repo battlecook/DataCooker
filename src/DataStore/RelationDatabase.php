@@ -6,7 +6,6 @@ namespace battlecook\DataStore;
 use battlecook\Config\Database;
 use battlecook\Data\Status;
 use battlecook\DataCookerException;
-use battlecook\DataStorage\LeafNode;
 use battlecook\DataStore\KeyValue\AbstractKeyValue;
 
 final class RelationDatabase extends AbstractMeta implements IDataStore
@@ -312,8 +311,28 @@ final class RelationDatabase extends AbstractMeta implements IDataStore
     {
         if ($data !== null) {
 
+            $trees = $data;
+
+            $leafNodes = array();
+            foreach ($trees as $className => $tree) {
+                $meta = self::getMetaData($className);
+                array_walk_recursive($trees, function ($data) use ($className, $meta, &$leafNodes) {
+                    $object = new $className();
+                    array_map(function ($key, $value) use ($object) {
+                        $object->$key = $value;
+                    }, $meta->getField()->getIdentifiers(), $data->getKey());
+                    array_map(function ($key, $value) use ($object) {
+                        $object->$key = $value;
+                    }, $meta->getField()->getAttributes(), $data->getData());
+
+                    if ($data->getStatus() !== Status::NONE) {
+                        $leafNodes[$data->getStatus()] = $object;
+                    }
+                });
+            }
+
             //todo this function would be tuning. ( multi insert, multi update and so on )
-            foreach ($data as $status => $object) {
+            foreach ($leafNodes as $status => $object) {
                 if ($status === Status::DELETED) {
                     $this->remove($object);
                 } elseif ($status === Status::UPDATED) {
@@ -327,6 +346,7 @@ final class RelationDatabase extends AbstractMeta implements IDataStore
 
             if($this->store !== null) {
                 if ($this->store instanceof AbstractKeyValue) {
+
                 } else {
                     $this->store->commit($data);
                 }

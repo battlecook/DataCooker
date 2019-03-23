@@ -9,14 +9,9 @@ use battlecook\DataCookerException;
 final class PhpMemory
 {
     private $trees;
-    /**
-     * @var $metas Meta[]
-     */
-    private $metas;
 
     public function __construct()
     {
-        $this->metas = array();
         $this->trees = array();
     }
 
@@ -43,15 +38,11 @@ final class PhpMemory
      * @param string $dataName
      * @param array $keys
      * @param array $data
+     * @param bool $hasAutoIncrement
      * @throws DataCookerException
      */
-    public function insert(string $dataName, array $keys, array $data)
+    public function insert(string $dataName, array $keys, array $data, bool $hasAutoIncrement)
     {
-        $meta = $this->metas[$dataName];
-        if (count($keys) !== $meta->getDepth()) {
-            throw new DataCookerException("invalid depth");
-        }
-
         /**
          * @var $leafNodeArr LeafNode[]
          */
@@ -59,7 +50,7 @@ final class PhpMemory
         if (empty($leafNodeArr)) {
             $this->insertRecursive($this->trees[$dataName], $keys, $keys, $data, Status::INSERTED);
         } else {
-            if ($meta->hasAutoIncrement()) {
+            if ($hasAutoIncrement) {
                 $changedStatus = Status::getStatusWithAutoIncrement($leafNodeArr[0]->getStatus(), Status::INSERTED);
             } else {
                 $changedStatus = Status::getStatusWithoutAutoincrement($leafNodeArr[0]->getStatus(), Status::INSERTED);
@@ -110,10 +101,6 @@ final class PhpMemory
      */
     public function search(string $dataName, array $keys)
     {
-        $meta = $this->metas[$dataName];
-        if (count($keys) > $meta->getDepth()) {
-            throw new DataCookerException("");
-        }
         return $this->searchRecursive($this->trees[$dataName], $keys);
     }
 
@@ -151,15 +138,11 @@ final class PhpMemory
     /**
      * @param string $dataName
      * @param array $keys
+     * @param bool $hasAutoIncrement
      * @throws DataCookerException
      */
-    public function delete(string $dataName, array $keys)
+    public function delete(string $dataName, array $keys, bool $hasAutoIncrement)
     {
-        $meta = $this->metas[$dataName];
-        if (count($keys) !== $meta->getDepth()) {
-            throw new DataCookerException("invalid depth");
-        }
-
         /**
          * @var $leafNodeArr LeafNode[]
          */
@@ -168,7 +151,7 @@ final class PhpMemory
             return;
         }
         $changedStatus = Status::getStatusWithoutAutoincrement($leafNodeArr[0]->getStatus(), Status::DELETED);
-        if ($meta->hasAutoIncrement()) {
+        if ($hasAutoIncrement) {
             $changedStatus = Status::getStatusWithAutoIncrement($leafNodeArr[0]->getStatus(), Status::DELETED);
         }
 
@@ -204,15 +187,11 @@ final class PhpMemory
      * @param string $dataName
      * @param array $keys
      * @param array $data
+     * @param bool $hasAutoIncrement
      * @throws DataCookerException
      */
-    public function update(string $dataName, array $keys, array $data)
+    public function update(string $dataName, array $keys, array $data, bool $hasAutoIncrement)
     {
-        $meta = $this->metas[$dataName];
-        if (count($keys) !== $meta->getDepth()) {
-            throw new DataCookerException("invalid depth");
-        }
-
         /**
          * @var $leafNodeArr LeafNode[]
          */
@@ -225,7 +204,7 @@ final class PhpMemory
             }
 
             $changedStatus = Status::getStatusWithoutAutoincrement($leafNodeArr[0]->getStatus(), Status::UPDATED);
-            if ($meta->hasAutoIncrement()) {
+            if ($hasAutoIncrement) {
                 $changedStatus = Status::getStatusWithAutoIncrement($leafNodeArr[0]->getStatus(), Status::UPDATED);
             }
             $this->updateRecursive($this->trees[$dataName], $keys, $keys, $data, $changedStatus);
@@ -235,16 +214,6 @@ final class PhpMemory
     public function hasData(string $dataName)
     {
         return isset($this->metas[$dataName]);
-    }
-
-    public function addMetaData(Meta $meta)
-    {
-        $this->metas[$meta->getDataName()] = $meta;
-    }
-
-    public function getMetaData($dataName)
-    {
-        return $this->metas[$dataName];
     }
 
     public function getTrees(): array
