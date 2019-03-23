@@ -5,6 +5,7 @@ namespace battlecook\DataStore;
 
 use battlecook\DataCookerException;
 use battlecook\DataStorage\Field;
+use battlecook\DataStorage\Meta;
 
 class AbstractMeta
 {
@@ -14,9 +15,9 @@ class AbstractMeta
     const ATTRIBUTE_DELIMITER = "@dataCookerAttribute";
 
     /**
-     * @var $cachedFieldMap Field[]
+     * @var $cachedMetaMap Meta[]
      */
-    private static $cachedFieldMap = array();
+    protected static $cachedMetaMap;
 
     /**
      * @param $object
@@ -80,7 +81,7 @@ class AbstractMeta
                 throw new DataCookerException("identifiers is empty");
             }
 
-            self::$cachedFieldMap[$cacheKey] = new Field($identifiers, $autoIncrement, $attributes);
+            self::$cachedMetaMap[$cacheKey] = new Meta(new Field($identifiers, $autoIncrement, $attributes), $cacheKey);
         } catch (\ReflectionException $e) {
             throw new DataCookerException("reflection error");
         }
@@ -88,7 +89,7 @@ class AbstractMeta
 
     protected function isGetAll($cacheKey, $object): bool
     {
-        $id1 = self::$cachedFieldMap[$cacheKey]->getIdentifiers()[0];
+        $id1 = self::$cachedMetaMap[$cacheKey]->getField()->getIdentifiers()[0];
         if ($object->$id1 === null) {
             return true;
         }
@@ -98,13 +99,13 @@ class AbstractMeta
 
     protected function getIdentifierKeys($cacheKey): array
     {
-        return self::$cachedFieldMap[$cacheKey]->getIdentifiers();
+        return self::$cachedMetaMap[$cacheKey]->getField()->getIdentifiers();
     }
 
     protected function getIdentifierValues($cacheKey, $object)
     {
         $keys = array();
-        foreach (self::$cachedFieldMap[$cacheKey]->getIdentifiers() as $identifier) {
+        foreach (self::$cachedMetaMap[$cacheKey]->getField()->getIdentifiers() as $identifier) {
             $keys[] = $object->$identifier;
         }
         return $keys;
@@ -112,13 +113,13 @@ class AbstractMeta
 
     protected function getAttributeKeys($cacheKey): array
     {
-        return self::$cachedFieldMap[$cacheKey]->getAttributes();
+        return self::$cachedMetaMap[$cacheKey]->getField()->getAttributes();
     }
 
     protected function getAttributeValues($cacheKey, $object)
     {
         $data = array();
-        foreach (self::$cachedFieldMap[$cacheKey]->getAttributes() as $attribute) {
+        foreach (self::$cachedMetaMap[$cacheKey]->getField()->getAttributes() as $attribute) {
             $data[] = $object->$attribute;
         }
         return $data;
@@ -126,7 +127,7 @@ class AbstractMeta
 
     protected function getFieldKeys($cacheKey): array
     {
-        return self::$cachedFieldMap[$cacheKey]->getFields();
+        return self::$cachedMetaMap[$cacheKey]->getField()->getFields();
     }
 
     /**
@@ -136,7 +137,7 @@ class AbstractMeta
     protected function setMeta($object)
     {
         $cacheKey = get_class($object);
-        if (isset(self::$cachedFieldMap[$cacheKey]) === false) {
+        if (isset(self::$cachedMetaMap[$cacheKey]) === false) {
             $this->setField($object);
         }
     }
@@ -148,7 +149,7 @@ class AbstractMeta
      */
     protected function checkHaveAllFieldData($cacheKey, $object)
     {
-        $fields = self::$cachedFieldMap[$cacheKey]->getFields();
+        $fields = self::$cachedMetaMap[$cacheKey]->getField()->getFields();
         foreach ($fields as $field) {
             //is_null 이 더 맞는거 같지만 exception 이 빠져버림
             if (empty($object->$field) === true) {
@@ -159,7 +160,7 @@ class AbstractMeta
 
     protected function haveOneDataAtLeast($cacheKey, $object): bool
     {
-        $fields = self::$cachedFieldMap[$cacheKey]->getFields();
+        $fields = self::$cachedMetaMap[$cacheKey]->getField()->getFields();
         foreach ($fields as $field) {
             //is_null 이 더 맞는거 같지만 exception 이 빠져버림
             if (empty($object->$field) !== true) {
@@ -176,24 +177,29 @@ class AbstractMeta
      */
     protected function checkNoHaveAnyFieldData($cacheKey, $object)
     {
-        if($this->haveOneDataAtLeast($cacheKey, $object) === false) {
+        if ($this->haveOneDataAtLeast($cacheKey, $object) === false) {
             throw new DataCookerException();
         }
     }
 
     protected function getAutoIncrementKey(string $cacheKey)
     {
-        return self::$cachedFieldMap[$cacheKey]->getAutoIncrement();
+        return self::$cachedMetaMap[$cacheKey]->getField()->getAutoIncrement();
     }
 
     protected function getFieldKeysWithAutoIncrement(string $cacheKey)
     {
-        return array_merge(self::$cachedFieldMap[$cacheKey]->getIdentifiers(),
-            self::$cachedFieldMap[$cacheKey]->getAttributes());
+        return array_merge(self::$cachedMetaMap[$cacheKey]->getField()->getIdentifiers(),
+            self::$cachedMetaMap[$cacheKey]->getField()->getAttributes());
+    }
+
+    public function getMetaData($dataName)
+    {
+        return self::$cachedMetaMap[$dataName];
     }
 
     protected static function initialize()
     {
-        self::$cachedFieldMap = array();
+        self::$cachedMetaMap = array();
     }
 }

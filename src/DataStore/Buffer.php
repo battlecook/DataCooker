@@ -8,7 +8,6 @@ use battlecook\DataCookerException;
 use battlecook\DataStorage\Field;
 use battlecook\DataStorage\Meta;
 use battlecook\DataStorage\PhpMemory;
-use battlecook\DataStore\KeyValue\AbstractKeyValue;
 use battlecook\DataUtility\TreeTrait;
 
 final class Buffer extends AbstractMeta implements IDataStore
@@ -19,7 +18,6 @@ final class Buffer extends AbstractMeta implements IDataStore
      * @var $phpData PhpMemory
      */
     private static $phpData;
-    private static $cache;
 
     private $store;
 
@@ -32,13 +30,18 @@ final class Buffer extends AbstractMeta implements IDataStore
     }
 
     /**
-     * @param string $cacheKey
+     * @param $cacheKey
      * @param $object
      * @throws DataCookerException
      */
-    private function cacheData(string $cacheKey, $object)
+    private function setUp($cacheKey, $object)
     {
-        if (isset(self::$cache[$cacheKey]) === false) {
+        $this->setMeta($object);
+
+        if (isset(self::$cachedMetaMap[$cacheKey]) === false) {
+
+            self::$cachedMetaMap[$cacheKey] = new Meta(new Field($this->getIdentifierKeys($cacheKey),
+                $this->getAutoIncrementKey($cacheKey), $this->getAttributeKeys($cacheKey)), $cacheKey);
 
             if ($this->store !== null) {
 
@@ -53,28 +56,15 @@ final class Buffer extends AbstractMeta implements IDataStore
                 foreach ($objectArray as $object) {
                     $keys = $this->getIdentifierValues($cacheKey, $object);
                     $data = $this->getAttributeValues($cacheKey, $object);
-                    self::$phpData->insert($cacheKey, $keys, $data);
+
+                    if (count($keys) !== self::$cachedMetaMap[$cacheKey]->getDepth()) {
+                        throw new DataCookerException("invalid depth");
+                    }
+                    self::$phpData->insert($cacheKey, $keys, $data,  self::$cachedMetaMap[$cacheKey]->hasAutoIncrement());
                 }
             }
 
-            self::$cache[$cacheKey] = true;
         }
-    }
-
-    /**
-     * @param $cacheKey
-     * @param $object
-     * @throws DataCookerException
-     */
-    private function setUp($cacheKey, $object)
-    {
-        $this->setMeta($object);
-        if (self::$phpData->hasData($cacheKey) === false) {
-            self::$phpData->addMetaData(new Meta(new Field($this->getIdentifierKeys($cacheKey),
-                $this->getAutoIncrementKey($cacheKey), $this->getAttributeKeys($cacheKey)), $cacheKey));
-        }
-
-        $this->cacheData($cacheKey, $object);
     }
 
     /**
@@ -103,7 +93,11 @@ final class Buffer extends AbstractMeta implements IDataStore
 
         $keys = $this->getIdentifierValues($cacheKey, $object);
         $data = $this->getAttributeValues($cacheKey, $object);
-        self::$phpData->insert($cacheKey, $keys, $data);
+
+        if (count($keys) !== self::$cachedMetaMap[$cacheKey]->getDepth()) {
+            throw new DataCookerException("invalid depth");
+        }
+        self::$phpData->insert($cacheKey, $keys, $data, self::$cachedMetaMap[$cacheKey]->hasAutoIncrement());
 
         return clone $object;
     }
@@ -119,6 +113,10 @@ final class Buffer extends AbstractMeta implements IDataStore
         $this->setUp($cacheKey, $object);
 
         $keys = $this->getIdentifierValues($cacheKey, $object);
+
+        if (count($keys) > self::$cachedMetaMap[$cacheKey]->getDepth()) {
+            throw new DataCookerException("");
+        }
         $nodeArr = self::$phpData->search($cacheKey, $keys);
 
         $identifierKeys = $this->getIdentifierKeys($cacheKey);
@@ -162,7 +160,10 @@ final class Buffer extends AbstractMeta implements IDataStore
         $keys = $this->getIdentifierValues($cacheKey, $object);
         $data = $this->getAttributeValues($cacheKey, $object);
 
-        self::$phpData->update($cacheKey, $keys, $data);
+        if (count($keys) !== self::$cachedMetaMap[$cacheKey]->getDepth()) {
+            throw new DataCookerException("invalid depth");
+        }
+        self::$phpData->update($cacheKey, $keys, $data, self::$cachedMetaMap[$cacheKey]->hasAutoIncrement());
     }
 
     /**
@@ -176,37 +177,21 @@ final class Buffer extends AbstractMeta implements IDataStore
 
         $keys = $this->getIdentifierValues($cacheKey, $object);
 
-        self::$phpData->delete($cacheKey, $keys);
+        if (count($keys) !== self::$cachedMetaMap[$cacheKey]->getDepth()) {
+            throw new DataCookerException("invalid depth");
+        }
+        self::$phpData->delete($cacheKey, $keys, self::$cachedMetaMap[$cacheKey]->hasAutoIncrement());
     }
 
     public function commit($data = null)
     {
-        if ($data === null) {
-            $trees = self::$phpData->getTrees();
-            if ($this->store instanceof AbstractKeyValue) {
-                $this->store->commit($trees);
-            } else {
+        if ($data !== null) {
 
-                $leafNodes = array();
-                foreach ($trees as $className => $tree) {
-                    $meta = self::$phpData->getMetaData($className);
-                    array_walk_recursive($trees, function ($data) use ($className, $meta, &$leafNodes) {
-                        $object = new $className();
-                        array_map(function ($key, $value) use ($object) {
-                            $object->$key = $value;
-                        }, $meta->getField()->getIdentifiers(), $data->getKey());
-                        array_map(function ($key, $value) use ($object) {
-                            $object->$key = $value;
-                        }, $meta->getField()->getAttributes(), $data->getData());
+        }
 
-                        if ($data->getStatus() !== Status::NONE) {
-                            $leafNodes[$data->getStatus()] = $object;
-                        }
-                    });
-                }
-
-                $this->store->commit($leafNodes);
-            }
+        $trees = self::$phpData->getTrees();
+        if($this->store !== null) {
+            $this->store->commit($trees);
         }
     }
 
@@ -220,6 +205,5 @@ final class Buffer extends AbstractMeta implements IDataStore
         parent::initialize();
 
         self::$phpData = new PhpMemory();
-        self::$cache = null;
     }
 }
