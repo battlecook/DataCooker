@@ -45,15 +45,15 @@ final class Memcached extends AbstractKeyValue
         $this->setMeta($object);
 
         $cacheKey = get_class($object);
-        $this->checkField($cacheKey, $object);
-
+        $this->checkHaveAllFieldData($cacheKey, $object);
+/*
         $cacheKey = get_class($object);
         $keys = $this->getIdentifierValues($cacheKey, $object);
 
 
         $this->memcached->get();
         $this->memcached->getResultCode();
-
+*/
         return clone $object;
     }
 
