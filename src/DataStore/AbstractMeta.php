@@ -87,9 +87,14 @@ class AbstractMeta
         }
     }
 
+    protected function getRootIdKey($cacheKey): string
+    {
+        return self::$cachedMetaMap[$cacheKey]->getField()->getIdentifiers()[0];
+    }
+
     protected function isGetAll($cacheKey, $object): bool
     {
-        $id1 = self::$cachedMetaMap[$cacheKey]->getField()->getIdentifiers()[0];
+        $id1 = $this->getRootIdKey($cacheKey);
         if ($object->$id1 === null) {
             return true;
         }
