@@ -7,48 +7,101 @@ use battlecook\DataStore\KeyValue\Memcached;
 use battlecook\DataStorage\LeafNode;
 use PHPUnit\Framework\TestCase;
 use test\Fixture\DataStorage\Item;
+use test\Fixture\DataStore\Quest;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
 class MemcachedTest extends TestCase
 {
+    private const IP = "memcached";
+
+    /**
+     * @var $memcached \Memcached();
+     */
+    private static $memcached;
+
+    public static function setUpBeforeClass(): void
+    {
+        self::$memcached = new \Memcached();
+        if (self::$memcached->addServer(self::IP, 11211) === false) {
+            die('memcached addServer failed');
+        }
+    }
+
+    public static function tearDownAfterClass()
+    {
+        self::$memcached = null;
+    }
+
     public function setUp()
     {
-        $memcached = new \Memcached();
-        if($memcached->addServer('localhost', 11211) === false) {
-            die('memcached connection failed');
-        }
-        $memcached->flush();
+        self::$memcached->flush();
     }
 
     public function testCommit()
     {
         //given
-        $store = new Memcached(null, array(new \battlecook\Config\Memcache('localhost')));
-        $data = array(
-            get_class(new Item()) =>
+        $key1 = get_class(new Item());
+        $value1 = array(
+            1 =>
                 array(
                     1 =>
                         array(
-                            1 =>
-                                array(
-                                    1 => new LeafNode(array(1, 1, 1), array(1, 1, 1)),
-                                    2 => new LeafNode(array(1, 1, 2), array(1, 1, 1))
-                                ),
-                        )
+                            1 => new LeafNode(array(1, 1, 1), array(1, 1, 1)),
+                            2 => new LeafNode(array(1, 1, 2), array(1, 1, 1))
+                        ),
                 )
         );
+
+        $key2 = get_class(new Quest());
+        $value2 = array(
+            1 =>
+                array(
+                    1 =>
+                        array(
+                            1 => new LeafNode(array(1, 1, 1), array(2, 2, 2)),
+                            2 => new LeafNode(array(1, 1, 2), array(2, 2, 2))
+                        ),
+                )
+        );
+
+        $store = new Memcached(null, array(new \battlecook\Config\Memcache(self::IP)));
+        $data = array($key1 => $value1, $key2 => $value2);
 
         //when
         $store->commit($data);
 
         //then
+        $expect1 = array(
+            1 =>
+                array(
+                    1 =>
+                        array(
+                            1 => array(1, 1, 1),
+                            2 => array(1, 1, 1)
+                        ),
+                )
+        );
+        $this->assertEquals($expect1, self::$memcached->get($key1));
+
+
+        $expect2 = array(
+            1 =>
+                array(
+                    1 =>
+                        array(
+                            1 => array(2, 2, 2),
+                            2 => array(2, 2, 2)
+                        ),
+                )
+        );
+        $this->assertEquals($expect2, self::$memcached->get($key2));
     }
 
     public function testGet()
     {
         //given
-        $store = new Memcached(null, array(new \battlecook\Config\Memcache()));
+        $store = new Memcached(null, array(new \battlecook\Config\Memcache(self::IP)));
         $data = array(
             get_class(new Item()) =>
                 array(
@@ -80,7 +133,7 @@ class MemcachedTest extends TestCase
     public function testAdd()
     {
         //given
-        $store = new Memcached(null, array(new \battlecook\Config\Memcache()));
+        $store = new Memcached(null, array(new \battlecook\Config\Memcache(self::IP)));
 
         $object = new Item();
         $object->id1 = 1;
@@ -89,8 +142,6 @@ class MemcachedTest extends TestCase
         $object->attr1 = 1;
         $object->attr2 = 1;
         $object->attr3 = 1;
-
-        $store->commit();
 
         //when
         $ret = $store->add($object);
@@ -102,7 +153,7 @@ class MemcachedTest extends TestCase
     public function testSet()
     {
         //given
-        $store = new Memcached(null, array(new \battlecook\Config\Memcache()));
+        $store = new Memcached(null, array(new \battlecook\Config\Memcache(self::IP)));
 
         $object = new Item();
         $object->id1 = 1;
@@ -131,7 +182,7 @@ class MemcachedTest extends TestCase
     public function testRemove()
     {
         //given
-        $store = new Memcached(null, array(new \battlecook\Config\Memcache()));
+        $store = new Memcached(null, array(new \battlecook\Config\Memcache(self::IP)));
 
         $object1 = new Item();
         $object1->id1 = 1;
