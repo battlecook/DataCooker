@@ -40,12 +40,24 @@ final class Memcached extends AbstractKeyValue
 
     }
 
+    /**
+     * @param $object
+     * @return mixed
+     * @throws DataCookerException
+     */
     public function add($object)
     {
         $this->setMeta($object);
 
         $cacheKey = get_class($object);
         $this->checkHaveAllFieldData($cacheKey, $object);
+
+        $object = $this->checkAutoIncrementAndAddIfNeed($cacheKey, $object);
+
+        $key = $this->getKey($cacheKey, $object);
+
+        $this->memcached->get($key);
+
 /*
         $cacheKey = get_class($object);
         $keys = $this->getIdentifierValues($cacheKey, $object);
@@ -54,12 +66,34 @@ final class Memcached extends AbstractKeyValue
         $this->memcached->get();
         $this->memcached->getResultCode();
 */
-        return clone $object;
+        return $object;
     }
 
+    private function getKey(string $cacheKey, $object): string
+    {
+        $id1 = $this->getRootIdentifierKey($cacheKey);
+
+        return $cacheKey . '\\' . $id1 . ':' . $object->$id1;
+    }
+
+    /**
+     * @param $object
+     * @return array
+     * @throws DataCookerException
+     */
     public function get($object): array
     {
         $this->setMeta($object);
+
+        $cacheKey = get_class($object);
+        if ($this->isGetAll($cacheKey, $object) === true && $this->store === null) {
+            throw new DataCookerException("Key Value store (Memcached) doesn't provide GetAll");
+        }
+
+        $key = $this->getKey($cacheKey, $object);
+
+        $ret = $this->memcached->get($key);
+
         return array();
     }
 

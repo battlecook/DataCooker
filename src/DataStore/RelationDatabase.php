@@ -8,12 +8,18 @@ use battlecook\Data\Status;
 use battlecook\DataCookerException;
 use battlecook\DataStore\KeyValue\AbstractKeyValue;
 
-final class RelationDatabase extends AbstractMeta implements IDataStore
+final class RelationDatabase extends AbstractStore implements IDataStore
 {
     private $pdo = array();
 
     private $store;
 
+    /**
+     * RelationDatabase constructor.
+     * @param IDataStore|null $storage
+     * @param Database $config
+     * @throws DataCookerException
+     */
     public function __construct(?IDataStore $storage, Database $config)
     {
         $this->store = $storage;
@@ -169,6 +175,10 @@ final class RelationDatabase extends AbstractMeta implements IDataStore
         return $ret;
     }
 
+    /**
+     * @param $object
+     * @throws DataCookerException
+     */
     public function set($object)
     {
         $this->setMeta($object);
@@ -344,7 +354,7 @@ final class RelationDatabase extends AbstractMeta implements IDataStore
                 }
             }
 
-            if($this->store !== null) {
+            if ($this->store !== null) {
                 if ($this->store instanceof AbstractKeyValue) {
 
                 } else {

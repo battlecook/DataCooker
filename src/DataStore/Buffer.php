@@ -10,7 +10,7 @@ use battlecook\DataStorage\Meta;
 use battlecook\DataStorage\PhpMemory;
 use battlecook\DataUtility\TreeTrait;
 
-final class Buffer extends AbstractMeta implements IDataStore
+final class Buffer extends AbstractStore implements IDataStore
 {
     use TreeTrait;
 
@@ -78,25 +78,14 @@ final class Buffer extends AbstractMeta implements IDataStore
         $this->setUp($cacheKey, $object);
         $this->checkHaveAllFieldData($cacheKey, $object);
 
-        $autoIncrement = $this->getAutoIncrementKey($cacheKey);
-        if ($autoIncrement !== "" && empty($object->$autoIncrement) === true) {
-            if ($this->store === null) {
-                throw new DataCookerException("autoIncrement value is null");
-            } else {
-                //rollback 을 위해 적어 둬야 하나 ...
-                $object = $this->store->add($object);
-                if (empty($object->$autoIncrement) === true) {
-                    throw new DataCookerException("autoIncrement value is null");
-                }
-            }
-        }
+        $object = $this->checkAutoIncrementAndAddIfNeed($cacheKey, $object);
 
         $keys = $this->getIdentifierValues($cacheKey, $object);
-        $data = $this->getAttributeValues($cacheKey, $object);
-
-        if (count($keys) !== self::$cachedMetaMap[$cacheKey]->getDepth()) {
+        if (count($keys) !== $this->getDepth($cacheKey)) {
             throw new DataCookerException("invalid depth");
         }
+
+        $data = $this->getAttributeValues($cacheKey, $object);
         self::$phpData->insert($cacheKey, $keys, $data, self::$cachedMetaMap[$cacheKey]->hasAutoIncrement());
 
         return clone $object;
