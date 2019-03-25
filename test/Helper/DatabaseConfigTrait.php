@@ -7,10 +7,10 @@ use battlecook\Config\Database;
 
 Trait DatabaseConfigTrait
 {
-    private $ip = "localhost";
+    private $ip = "mariadb";
     private $port = 3306;
     private $dbName = "DataCooker";
-    private $user = "user";
+    private $user = "root";
     private $password = "password";
 
     private function getConfig()

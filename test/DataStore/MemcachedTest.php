@@ -84,7 +84,6 @@ class MemcachedTest extends TestCase
         );
         $this->assertEquals($expect1, self::$memcached->get($key1));
 
-
         $expect2 = array(
             1 =>
                 array(
