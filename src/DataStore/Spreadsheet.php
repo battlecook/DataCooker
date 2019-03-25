@@ -7,7 +7,7 @@ use battlecook\DataCookerException;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
-final class Spreadsheet extends AbstractMeta implements IDataStore
+final class Spreadsheet extends AbstractStore implements IDataStore
 {
     private $store;
 

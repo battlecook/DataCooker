@@ -6,10 +6,10 @@ namespace battlecook\DataStore\KeyValue;
 use battlecook\Data\Status;
 use battlecook\DataCookerException;
 use battlecook\DataStorage\LeafNode;
-use battlecook\DataStore\AbstractMeta;
+use battlecook\DataStore\AbstractStore;
 use battlecook\DataStore\IDataStore;
 
-abstract class AbstractKeyValue extends AbstractMeta implements IDataStore
+abstract class AbstractKeyValue extends AbstractStore implements IDataStore
 {
     /**
      * @param $tree

@@ -1,19 +1,13 @@
 <?php
-declare(strict_types=1);
 
-namespace battlecook\DataStore;
+namespace battlecook\DataUtility;
 
 use battlecook\DataCookerException;
 use battlecook\DataStorage\Field;
 use battlecook\DataStorage\Meta;
 
-class AbstractMeta
+trait MetaTrait
 {
-    const VERSION_DELIMITER = "@dataCookerVersion";
-    const IDENTIFIER_DELIMITER = "@dataCookerIdentifier";
-    const AUTOINCREMENT_DELIMITER = "@dataCookerAutoIncrement";
-    const ATTRIBUTE_DELIMITER = "@dataCookerAttribute";
-
     /**
      * @var $cachedMetaMap Meta[]
      */
@@ -173,6 +167,11 @@ class AbstractMeta
             }
         }
         return false;
+    }
+
+    protected function getDepth($cacheKey)
+    {
+        return self::$cachedMetaMap[$cacheKey]->getDepth();
     }
 
     /**
