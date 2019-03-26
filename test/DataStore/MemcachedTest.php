@@ -5,6 +5,7 @@ namespace test\DataStorage;
 
 use battlecook\DataStore\KeyValue\Memcached;
 use battlecook\DataStorage\LeafNode;
+use battlecook\DataStructure\Attribute;
 use PHPUnit\Framework\TestCase;
 use test\Fixture\DataStorage\Item;
 use test\Fixture\DataStore\Quest;
@@ -77,27 +78,27 @@ class MemcachedTest extends TestCase
                 array(
                     1 =>
                         array(
-                            1 => array(1, 1, 1),
-                            2 => array(1, 1, 1)
+                            1 => new Attribute(array(1, 1, 1)),
+                            2 => new Attribute(array(1, 1, 1)),
                         ),
                 )
         );
-        $this->assertEquals($expect1, self::$memcached->get($key1));
+        $this->assertEquals($expect1, self::$memcached->get($key1 . '\\' . 1));
 
         $expect2 = array(
             1 =>
                 array(
                     1 =>
                         array(
-                            1 => array(2, 2, 2),
-                            2 => array(2, 2, 2)
+                            1 => new Attribute(array(2, 2, 2)),
+                            2 => new Attribute(array(2, 2, 2))
                         ),
                 )
         );
-        $this->assertEquals($expect2, self::$memcached->get($key2));
+        $this->assertEquals($expect2, self::$memcached->get($key2 . '\\' . 1));
     }
 
-    public function testGet()
+    public function testGetRoot()
     {
         //given
         $store = new Memcached(null, array(new \battlecook\Config\Memcache(self::IP)));
@@ -111,6 +112,21 @@ class MemcachedTest extends TestCase
                                     1 => new LeafNode(array(1, 1, 1), array(1, 1, 1)),
                                     2 => new LeafNode(array(1, 1, 2), array(1, 1, 1))
                                 ),
+
+                            2 =>
+                                array(
+                                    1 => new LeafNode(array(1, 2, 1), array(1, 1, 1)),
+                                    2 => new LeafNode(array(1, 2, 2), array(1, 1, 1))
+                                ),
+                        ),
+                    2 =>
+                        array(
+                            1 =>
+                                array(
+                                    1 => new LeafNode(array(2, 1, 1), array(1, 1, 1)),
+                                    2 => new LeafNode(array(2, 1, 2), array(1, 1, 1))
+                                ),
+
                         )
                 )
         );
@@ -119,16 +135,71 @@ class MemcachedTest extends TestCase
 
         $object = new Item();
         $object->id1 = 1;
-        $object->id2 = 1;
+
+        //when
+        $ret = $store->get($object);
+
+        //then
+        $this->assertEquals(4, count($ret));
+    }
+
+
+    public function testGetLeaf()
+    {
+        //given
+        $store = new Memcached(null, array(new \battlecook\Config\Memcache(self::IP)));
+        $data = array(
+            get_class(new Item()) =>
+                array(
+                    1 =>
+                        array(
+                            1 =>
+                                array(
+                                    1 => new LeafNode(array(1, 1, 1), array(1, 1, 1)),
+                                    2 => new LeafNode(array(1, 1, 2), array(1, 1, 1))
+                                ),
+
+                            2 =>
+                                array(
+                                    1 => new LeafNode(array(1, 2, 1), array(1, 1, 1)),
+                                    2 => new LeafNode(array(1, 2, 2), array(1, 1, 1))
+                                ),
+                        ),
+                    2 =>
+                        array(
+                            1 =>
+                                array(
+                                    1 => new LeafNode(array(2, 1, 1), array(1, 1, 1)),
+                                    2 => new LeafNode(array(2, 1, 2), array(1, 1, 1))
+                                ),
+
+                        )
+                )
+        );
+
+        $store->commit($data);
+
+        $object = new Item();
+        $object->id1 = 1;
+        $object->id2 = 2;
         $object->id3 = 1;
 
         //when
         $ret = $store->get($object);
 
         //then
-        $this->assertEquals($object, $ret[0]);
+        $expect = new Item();
+        $expect->id1 = 1;
+        $expect->id2 = 2;
+        $expect->id3 = 1;
+        $expect->attr1 = 1;
+        $expect->attr2 = 1;
+        $expect->attr3 = 1;
+
+        $this->assertEquals($expect, $ret[0]);
     }
 
+    /*
     public function testAdd()
     {
         //given
@@ -215,4 +286,5 @@ class MemcachedTest extends TestCase
         $ret = $store->get($object);
         $this->assertEquals($object2, $ret[0]);
     }
+    */
 }
