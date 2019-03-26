@@ -8,6 +8,7 @@ use battlecook\DataCookerException;
 use battlecook\DataStorage\LeafNode;
 use battlecook\DataStore\AbstractStore;
 use battlecook\DataStore\IDataStore;
+use battlecook\DataStructure\Attribute;
 
 abstract class AbstractKeyValue extends AbstractStore implements IDataStore
 {
@@ -45,10 +46,10 @@ abstract class AbstractKeyValue extends AbstractStore implements IDataStore
                 unset($tree[$key]);
             } else {
                 if ($ret === Status::UNSET) {
-                    throw new DataCookerException();
+                    throw new DataCookerException('invalid status ( unset status )');
                 } else {
                     if ($ret === Status::INSERTED || $ret === Status::UPDATED || $ret === Status::NONE) {
-                        $tree[$key] = $tree[$key]->getData();
+                        $tree[$key] = new Attribute($tree[$key]->getData());
                     }
                 }
             }
