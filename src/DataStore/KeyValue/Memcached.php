@@ -6,10 +6,12 @@ namespace battlecook\DataStore\KeyValue;
 use battlecook\Config\Memcache;
 use battlecook\DataCookerException;
 use battlecook\DataStore\IDataStore;
-use RecursiveArrayIterator;
+use battlecook\DataUtility\StoreTrait;
 
 final class Memcached extends AbstractKeyValue
 {
+    use StoreTrait;
+
     private $store;
     private $memcached;
 

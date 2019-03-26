@@ -8,11 +8,11 @@ use battlecook\DataCookerException;
 use battlecook\DataStorage\Field;
 use battlecook\DataStorage\Meta;
 use battlecook\DataStorage\PhpMemory;
-use battlecook\DataUtility\TreeTrait;
+use battlecook\DataUtility\StoreTrait;
 
 final class Buffer extends AbstractStore implements IDataStore
 {
-    use TreeTrait;
+    use StoreTrait;
 
     /**
      * @var $phpData PhpMemory
