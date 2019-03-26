@@ -172,10 +172,14 @@ final class Buffer extends AbstractStore implements IDataStore
         self::$phpData->delete($cacheKey, $keys, self::$cachedMetaMap[$cacheKey]->hasAutoIncrement());
     }
 
+    /**
+     * @param null $data
+     * @throws DataCookerException
+     */
     public function commit($data = null)
     {
         if ($data !== null) {
-
+            throw new DataCookerException("BufferStore can't commit to data");
         }
 
         $trees = self::$phpData->getTrees();
