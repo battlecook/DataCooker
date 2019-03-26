@@ -158,7 +158,7 @@ final class RelationDatabase extends AbstractStore implements IDataStore
 
             $pdoStatement->execute();
         } catch (\PDOException $e) {
-            throw new DataCookerException($e);
+            throw new DataCookerException("Error Pdo Exception");
         }
 
         $rowCount = $pdoStatement->rowCount();
