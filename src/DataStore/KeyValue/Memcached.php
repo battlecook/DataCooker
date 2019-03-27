@@ -59,17 +59,11 @@ final class Memcached extends AbstractKeyValue
         $object = $this->checkAutoIncrementAndAddIfNeed($cacheKey, $object);
 
         $key = $this->getKey($cacheKey, $object);
+        $tree = $this->memcached->get($key);
+        if (empty($tree) === false) {
+            throw new DataCookerException("data already exist");
+        }
 
-        $this->memcached->get($key);
-
-        /*
-                $cacheKey = get_class($object);
-                $keys = $this->getIdentifierValues($cacheKey, $object);
-
-
-                $this->memcached->get();
-                $this->memcached->getResultCode();
-        */
         return $object;
     }
 
@@ -167,11 +161,7 @@ final class Memcached extends AbstractKeyValue
             return array();
         }
 
-        $keys = $this->getCurrentIdentifierValue($cacheKey, $object);
-
-        $ret = $this->searchRecursive($tree, $keys, $object);
-
-        return $ret;
+        return $this->searchRecursive($tree, $this->getCurrentIdentifierValue($cacheKey, $object), $object);
     }
 
     public function set($object)
