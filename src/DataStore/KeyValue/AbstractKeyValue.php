@@ -49,7 +49,8 @@ abstract class AbstractKeyValue extends AbstractStore implements IDataStore
                     throw new DataCookerException('invalid status ( unset status )');
                 } else {
                     if ($ret === Status::INSERTED || $ret === Status::UPDATED || $ret === Status::NONE) {
-                        $tree[$key] = new Attribute($tree[$key]->getData());
+                        $object = $tree[$key]->getData();
+                        $tree[$key] = new Attribute($this->getAttributeValues(get_class($object), $object));
                     }
                 }
             }
