@@ -6,6 +6,7 @@ namespace battlecook\DataStore\KeyValue;
 use battlecook\Config\Memcache;
 use battlecook\DataCookerException;
 use battlecook\DataStore\IDataStore;
+use battlecook\DataStructure\Attribute;
 use battlecook\DataUtility\StoreTrait;
 
 final class Memcached extends AbstractKeyValue
@@ -83,7 +84,7 @@ final class Memcached extends AbstractKeyValue
     {
         $keys = array();
         foreach ($this->getIdentifierKeys($cacheKey) as $identifierKey) {
-            if($object->$identifierKey === null) {
+            if ($object->$identifierKey === null) {
                 break;
             }
             $keys[] = $object->$identifierKey;
@@ -97,6 +98,52 @@ final class Memcached extends AbstractKeyValue
         $identifierKeys = $this->getIdentifierKeys($cacheKey);
 
         return $identifierKeys[$depth];
+    }
+
+    private function searchRecursive(&$tree, array $keys, &$object): array
+    {
+        $searchKey = array_shift($keys);
+        if ($searchKey !== null) {
+            return $this->searchRecursive($tree[$searchKey], $keys, $object);
+        } elseif ($tree instanceof Attribute) { //leafs
+            $created = clone $object;
+            $cacheKey = get_class($created);
+            $attributeKeys = $this->getAttributeKeys($cacheKey);
+
+            $attributeValues = $tree->getAttributes();
+            foreach ($attributeKeys as $attributeKey) {
+                $created->$attributeKey = array_shift($attributeValues);
+            }
+
+            return array($created);
+        } else { //internals
+            $cacheKey = get_class($object);
+
+            $iterator = new \RecursiveIteratorIterator(
+                new \RecursiveArrayIterator($tree),
+                \RecursiveIteratorIterator::SELF_FIRST
+            );
+
+            $ret = array();
+            $created = clone $object;
+            $depth = count($this->getCurrentIdentifierValue($cacheKey, $created));
+            foreach ($iterator as $key => $value) {
+                $currentIdentifier = $this->getIdentifierKeyByDepth($cacheKey, $depth + $iterator->getDepth());
+                $created->$currentIdentifier = $key;
+                if ($value instanceof Attribute) { //leafs
+
+                    $attributeKeys = $this->getAttributeKeys($cacheKey);
+                    $attributeValues = $value->getAttributes();
+                    foreach ($attributeKeys as $attributeKey) {
+                        $created->$attributeKey = array_shift($attributeValues);
+                    }
+
+                    $ret[] = clone $created;
+                }
+            }
+
+            return $ret;
+        }
     }
 
     /**
@@ -116,62 +163,13 @@ final class Memcached extends AbstractKeyValue
         $key = $this->getKey($cacheKey, $object);
 
         $tree = $this->memcached->get($key);
+        if (empty($tree) === true) {
+            return array();
+        }
 
         $keys = $this->getCurrentIdentifierValue($cacheKey, $object);
 
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveArrayIterator($tree),
-            \RecursiveIteratorIterator::SELF_FIRST
-        );
-
-        $ret = array();
-        $created = clone $object;
-        $attributeKeys = $this->getAttributeKeys($cacheKey);
-        $maxDepth = $this->getDepth($cacheKey) - 1;
-        $breakDepth = -1;
-        foreach($iterator as $key => $value) {
-
-            if(empty($keys) === true) {
-                $currentIdentifier = $this->getIdentifierKeyByDepth($cacheKey, $iterator->getDepth());
-                $created->$currentIdentifier = $key;
-
-                if($breakDepth === -1) {
-
-                    $breakDepth = $iterator->getDepth() - 1;
-                    if($maxDepth === $iterator->getDepth()) {
-                        $attributeValues = $value->getAttributes();
-                        foreach($attributeKeys as $attributeKey) {
-                            $created->$attributeKey = array_shift($attributeValues);
-                        }
-
-                        $ret[] = clone $created;
-                        break;
-                    }
-                } else {
-
-                    if($breakDepth >= $iterator->getDepth()) {
-                        break;
-                    } else {
-                        if($maxDepth === $iterator->getDepth()) {
-
-                            $attributeValues = $value->getAttributes();
-                            foreach($attributeKeys as $attributeKey) {
-                                $created->$attributeKey = array_shift($attributeValues);
-                            }
-
-                            $ret[] = clone $created;
-                        }
-                    }
-                }
-
-            } else {
-                if($keys[0] === $key) {
-                    array_shift($keys);
-                } else {
-                    continue;
-                }
-            }
-        }
+        $ret = $this->searchRecursive($tree, $keys, $object);
 
         return $ret;
     }
