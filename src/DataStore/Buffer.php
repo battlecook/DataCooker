@@ -38,11 +38,8 @@ final class Buffer extends AbstractStore implements IDataStore
     {
         $this->setMeta($object);
 
-        if (isset(self::$cachedMetaMap[$cacheKey]) === false) {
-
-            self::$cachedMetaMap[$cacheKey] = new Meta(new Field($this->getIdentifierKeys($cacheKey),
-                $this->getAutoIncrementKey($cacheKey), $this->getAttributeKeys($cacheKey)), $cacheKey);
-
+        if ($this->isCached($cacheKey) === false) {
+            $this->cache($cacheKey);
             if ($this->store !== null) {
 
                 $paramObject = new $object();
@@ -57,10 +54,10 @@ final class Buffer extends AbstractStore implements IDataStore
                     $keys = $this->getIdentifierValues($cacheKey, $object);
                     $data = $this->getAttributeValues($cacheKey, $object);
 
-                    if (count($keys) !== self::$cachedMetaMap[$cacheKey]->getDepth()) {
+                    if (count($keys) !== $this->getDepth($cacheKey)) {
                         throw new DataCookerException("invalid depth");
                     }
-                    self::$phpData->insert($cacheKey, $keys, $data,  self::$cachedMetaMap[$cacheKey]->hasAutoIncrement());
+                    self::$phpData->insert($cacheKey, $keys, $data, $this->hasAutoIncrement($cacheKey));
                 }
             }
 
@@ -86,7 +83,8 @@ final class Buffer extends AbstractStore implements IDataStore
         }
 
         $data = $this->getAttributeValues($cacheKey, $object);
-        self::$phpData->insert($cacheKey, $keys, $data, self::$cachedMetaMap[$cacheKey]->hasAutoIncrement());
+
+        self::$phpData->insert($cacheKey, $keys, $data, $this->hasAutoIncrement($cacheKey));
 
         return clone $object;
     }
@@ -103,7 +101,7 @@ final class Buffer extends AbstractStore implements IDataStore
 
         $keys = $this->getIdentifierValues($cacheKey, $object);
 
-        if (count($keys) > self::$cachedMetaMap[$cacheKey]->getDepth()) {
+        if (count($keys) > $this->getDepth($cacheKey)) {
             throw new DataCookerException("");
         }
         $nodeArr = self::$phpData->search($cacheKey, $keys);
@@ -149,10 +147,10 @@ final class Buffer extends AbstractStore implements IDataStore
         $keys = $this->getIdentifierValues($cacheKey, $object);
         $data = $this->getAttributeValues($cacheKey, $object);
 
-        if (count($keys) !== self::$cachedMetaMap[$cacheKey]->getDepth()) {
+        if (count($keys) !== $this->getDepth($cacheKey)) {
             throw new DataCookerException("invalid depth");
         }
-        self::$phpData->update($cacheKey, $keys, $data, self::$cachedMetaMap[$cacheKey]->hasAutoIncrement());
+        self::$phpData->update($cacheKey, $keys, $data, $this->hasAutoIncrement($cacheKey));
     }
 
     /**
@@ -166,10 +164,10 @@ final class Buffer extends AbstractStore implements IDataStore
 
         $keys = $this->getIdentifierValues($cacheKey, $object);
 
-        if (count($keys) !== self::$cachedMetaMap[$cacheKey]->getDepth()) {
+        if (count($keys) !== $this->getDepth($cacheKey)) {
             throw new DataCookerException("invalid depth");
         }
-        self::$phpData->delete($cacheKey, $keys, self::$cachedMetaMap[$cacheKey]->hasAutoIncrement());
+        self::$phpData->delete($cacheKey, $keys, $this->hasAutoIncrement($cacheKey));
     }
 
     /**
