@@ -13,6 +13,12 @@ trait MetaTrait
      */
     protected static $cachedMetaMap;
 
+    protected function cache($cacheKey)
+    {
+        self::$cachedMetaMap[$cacheKey] = new Meta(new Field($this->getIdentifierKeys($cacheKey),
+            $this->getAutoIncrementKey($cacheKey), $this->getAttributeKeys($cacheKey)), $cacheKey);
+    }
+
     /**
      * @param $object
      * @throws DataCookerException
@@ -81,12 +87,12 @@ trait MetaTrait
         }
     }
 
-    protected function getRootIdentifierKey($cacheKey): string
+    protected function getRootIdentifierKey(string $cacheKey): string
     {
         return self::$cachedMetaMap[$cacheKey]->getField()->getIdentifiers()[0];
     }
 
-    protected function isGetAll($cacheKey, $object): bool
+    protected function isGetAll(string $cacheKey, $object): bool
     {
         $id1 = $this->getRootIdentifierKey($cacheKey);
         if ($object->$id1 === null) {
@@ -96,12 +102,22 @@ trait MetaTrait
         return false;
     }
 
-    protected function getIdentifierKeys($cacheKey): array
+    protected function isCached(string $cacheKey)
+    {
+        return isset(self::$cachedMetaMap[$cacheKey]);
+    }
+
+    protected function hasAutoIncrement(string $cacheKey): bool
+    {
+        return self::$cachedMetaMap[$cacheKey]->hasAutoIncrement();
+    }
+
+    protected function getIdentifierKeys(string $cacheKey): array
     {
         return self::$cachedMetaMap[$cacheKey]->getField()->getIdentifiers();
     }
 
-    protected function getIdentifierValues($cacheKey, $object)
+    protected function getIdentifierValues(string $cacheKey, $object)
     {
         $keys = array();
         foreach (self::$cachedMetaMap[$cacheKey]->getField()->getIdentifiers() as $identifier) {
@@ -110,12 +126,12 @@ trait MetaTrait
         return $keys;
     }
 
-    protected function getAttributeKeys($cacheKey): array
+    protected function getAttributeKeys(string $cacheKey): array
     {
         return self::$cachedMetaMap[$cacheKey]->getField()->getAttributes();
     }
 
-    protected function getAttributeValues($cacheKey, $object)
+    protected function getAttributeValues(string $cacheKey, $object)
     {
         $data = array();
         foreach (self::$cachedMetaMap[$cacheKey]->getField()->getAttributes() as $attribute) {
@@ -124,7 +140,7 @@ trait MetaTrait
         return $data;
     }
 
-    protected function getFieldKeys($cacheKey): array
+    protected function getFieldKeys(string $cacheKey): array
     {
         return self::$cachedMetaMap[$cacheKey]->getField()->getFields();
     }
@@ -146,7 +162,7 @@ trait MetaTrait
      * @param $object
      * @throws DataCookerException
      */
-    protected function checkHaveAllFieldData($cacheKey, $object)
+    protected function checkHaveAllFieldData(string $cacheKey, $object)
     {
         $fields = self::$cachedMetaMap[$cacheKey]->getField()->getFields();
         foreach ($fields as $field) {
@@ -157,7 +173,7 @@ trait MetaTrait
         }
     }
 
-    protected function haveOneDataAtLeast($cacheKey, $object): bool
+    protected function haveOneDataAtLeast(string $cacheKey, $object): bool
     {
         $fields = self::$cachedMetaMap[$cacheKey]->getField()->getFields();
         foreach ($fields as $field) {
@@ -169,7 +185,7 @@ trait MetaTrait
         return false;
     }
 
-    protected function getDepth($cacheKey)
+    protected function getDepth(string $cacheKey)
     {
         return self::$cachedMetaMap[$cacheKey]->getDepth();
     }
@@ -179,7 +195,7 @@ trait MetaTrait
      * @param $object
      * @throws DataCookerException
      */
-    protected function checkNoHaveAnyFieldData($cacheKey, $object)
+    protected function checkNoHaveAnyFieldData(string $cacheKey, $object)
     {
         if ($this->haveOneDataAtLeast($cacheKey, $object) === false) {
             throw new DataCookerException();
@@ -197,7 +213,7 @@ trait MetaTrait
             self::$cachedMetaMap[$cacheKey]->getField()->getAttributes());
     }
 
-    public function getMetaData($dataName)
+    public function getMetaData(string $dataName)
     {
         return self::$cachedMetaMap[$dataName];
     }
