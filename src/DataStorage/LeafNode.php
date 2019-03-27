@@ -7,14 +7,16 @@ use battlecook\Data\Status;
 
 final class LeafNode extends Node
 {
+    private $originalData;
     private $data;
     private $status;
 
-    public function __construct(array $key, array $data, $status = Status::INSERTED)
+    public function __construct(array $key, $data, $status = Status::INSERTED)
     {
         parent::__construct($key);
 
-        $this->data = $data;
+        $this->data = clone $data;
+        $this->originalData = clone $data;
         $this->status = $status;
     }
 
