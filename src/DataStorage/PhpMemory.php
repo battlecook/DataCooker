@@ -46,7 +46,7 @@ final class PhpMemory
         /**
          * @var $leafNodeArr LeafNode[]
          */
-        $leafNodeArr = $this->searchRecursive($this->trees[$dataName], $keys);
+        $leafNodeArr = $this->search($dataName, $keys);
         if (empty($leafNodeArr)) {
             $this->insertRecursive($this->trees[$dataName], $keys, $keys, $data, Status::INSERTED);
         } else {

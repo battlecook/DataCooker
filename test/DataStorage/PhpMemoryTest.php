@@ -23,11 +23,7 @@ class PhpMemoryTest extends TestCase
     {
         //given
         $dataName = get_class(new Item());
-        $identifiers = array('id1', 'id2', 'id3');
-        $attributes = array("attr1", "attr2", "attr3");
-
         $storage = new PhpMemory();
-        $storage->addMetaData(new Meta(new Field($identifiers, "", $attributes), $dataName));
 
         //when
         $keys = array(1, '2', 3);
@@ -45,7 +41,7 @@ class PhpMemoryTest extends TestCase
         $attributes = array("attr1", "attr2", "attr3");
 
         $storage = new PhpMemory();
-        $storage->addMetaData(new Meta(new Field($identifiers, "", $attributes), $dataName));
+        //$storage->addMetaData(new Meta(new Field($identifiers, "", $attributes), $dataName));
 
         $keys = array(1, 1, 1);
         $data1 = array(1, 1, 1);
