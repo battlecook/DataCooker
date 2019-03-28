@@ -242,9 +242,6 @@ final class Memcached extends AbstractKeyValue
 
         $key = $this->getKey($cacheKey, $object);
         $tree = $this->memcached->get($key);
-        if ($tree === false) {
-            throw new DataCookerException("data already exist");
-        }
 
         $this->updateRecursive($tree, $this->getCurrentIdentifierValue($cacheKey, $object), $object);
         $ret = $this->memcached->set($key, $tree, $this->timeExpired);
@@ -259,6 +256,20 @@ final class Memcached extends AbstractKeyValue
         }
     }
 
+    private function removeRecursive(&$tree, array $keys, &$object)
+    {
+        $searchKey = array_shift($keys);
+        if ($searchKey !== null) {
+            return $this->removeRecursive($tree[$searchKey], $keys, $object);
+        } elseif ($tree instanceof Attribute) { //leafs
+            $cacheKey = get_class($object);
+            $attributeValues = $this->getAttributeValues($cacheKey, $object);
+            $tree = new Attribute($attributeValues);
+        } else {
+
+        }
+    }
+
     /**
      * @param $object
      * @throws DataCookerException
@@ -266,8 +277,28 @@ final class Memcached extends AbstractKeyValue
     public function remove($object)
     {
         $this->setMeta($object);
+
+        $cacheKey = get_class($object);
+        $key = $this->getKey($cacheKey, $object);
+        $tree = $this->memcached->get($key);
+        $this->removeRecursive($tree, $this->getCurrentIdentifierValue($cacheKey, $object), $object);
+
+        $ret = $this->memcached->delete($key);
+        if ($ret === false) {
+            throw new DataCookerException(
+                "memcached set failed result code : " . $this->memcached->getResultCode()
+                . " message : " . $this->memcached->getResultMessage());
+        }
+
+        if($this->store !== null) {
+            $this->store->remove($object);
+        }
     }
 
+    /**
+     * @param null $data
+     * @throws DataCookerException
+     */
     public function commit($data = null)
     {
         if ($data !== null) {
@@ -284,8 +315,9 @@ final class Memcached extends AbstractKeyValue
             if (empty($items) === false) {
                 $ret = $this->memcached->setMulti($items, $this->timeExpired);
                 if ($ret === false) {
-                    //leave the log message
-                    //need a policy whether rollback or not
+                    throw new DataCookerException(
+                        "memcached set failed result code : " . $this->memcached->getResultCode()
+                        . " message : " . $this->memcached->getResultMessage());
                 }
             }
 
