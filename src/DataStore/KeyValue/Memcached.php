@@ -43,6 +43,27 @@ final class Memcached extends AbstractKeyValue
     }
 
     /**
+     * @param $tree
+     * @param array $keys
+     * @param $object
+     * @return array
+     * @throws DataCookerException
+     */
+    private function insertRecursive(&$tree, array $keys, &$object)
+    {
+        $searchKey = array_shift($keys);
+        if ($searchKey !== null) {
+            return $this->insertRecursive($tree[$searchKey], $keys, $object);
+        } elseif ($tree instanceof Attribute) { //leafs
+            throw new DataCookerException("already exist data at leafnode");
+        } else {
+            $cacheKey = get_class($object);
+            $attributeValues = $this->getAttributeValues($cacheKey, $object);
+            $tree = new Attribute($attributeValues);
+        }
+    }
+
+    /**
      * @param $object
      * @return mixed
      * @throws DataCookerException
@@ -54,15 +75,39 @@ final class Memcached extends AbstractKeyValue
         $cacheKey = get_class($object);
         $this->checkHaveAllFieldData($cacheKey, $object);
 
-        $object = $this->checkAutoIncrementAndAddIfNeed($cacheKey, $object);
+        $haveToAddOtherStore = true;
+        $autoIncrement = $this->getAutoIncrementKey($cacheKey);
+        if ($autoIncrement !== "" && empty($object->$autoIncrement) === true) {
+            if ($this->store === null) {
+                throw new DataCookerException("autoIncrement value is null");
+            } else {
+                $object = $this->store->add($object);
+                if (empty($object->$autoIncrement) === true) {
+                    throw new DataCookerException("autoIncrement value is null");
+                }
+                $haveToAddOtherStore = false;
+            }
+        }
 
         $key = $this->getKey($cacheKey, $object);
         $tree = $this->memcached->get($key);
-        if (empty($tree) === false) {
-            throw new DataCookerException("data already exist");
+        if ($tree === null) {
+            $tree = array();
         }
 
-        return $object;
+        $this->insertRecursive($tree, $this->getCurrentIdentifierValue($cacheKey, $object), $object);
+        if ($this->memcached->set($key, $tree, $this->timeExpired) === false) {
+            throw new DataCookerException(
+                "memcached set failed result code : " . $this->memcached->getResultCode()
+                . " message : " . $this->memcached->getResultMessage());
+        }
+
+
+        if ($this->store !== null && $haveToAddOtherStore === true) {
+            $object = $this->store->add($object);
+        }
+
+        return clone $object;
     }
 
     private function getKey(string $cacheKey, $object): string
@@ -162,11 +207,62 @@ final class Memcached extends AbstractKeyValue
         return $this->searchRecursive($tree, $this->getCurrentIdentifierValue($cacheKey, $object), $object);
     }
 
+
+    /**
+     * @param $tree
+     * @param array $keys
+     * @param $object
+     * @return array
+     * @throws DataCookerException
+     */
+    private function updateRecursive(&$tree, array $keys, &$object)
+    {
+        $searchKey = array_shift($keys);
+        if ($searchKey !== null) {
+            return $this->updateRecursive($tree[$searchKey], $keys, $object);
+        } elseif ($tree instanceof Attribute) { //leafs
+            $cacheKey = get_class($object);
+            $attributeValues = $this->getAttributeValues($cacheKey, $object);
+            $tree = new Attribute($attributeValues);
+        } else {
+            throw new DataCookerException("update keys can not be empty leaf node");
+        }
+    }
+
+    /**
+     * @param $object
+     * @throws DataCookerException
+     */
     public function set($object)
     {
         $this->setMeta($object);
+
+        $cacheKey = get_class($object);
+        $this->checkHaveAllFieldData($cacheKey, $object);
+
+        $key = $this->getKey($cacheKey, $object);
+        $tree = $this->memcached->get($key);
+        if ($tree === false) {
+            throw new DataCookerException("data already exist");
+        }
+
+        $this->updateRecursive($tree, $this->getCurrentIdentifierValue($cacheKey, $object), $object);
+        $ret = $this->memcached->set($key, $tree, $this->timeExpired);
+        if ($ret === false) {
+            throw new DataCookerException(
+                "memcached set failed result code : " . $this->memcached->getResultCode()
+                . " message : " . $this->memcached->getResultMessage());
+        }
+
+        if($this->store !== null) {
+            $this->store->set($object);
+        }
     }
 
+    /**
+     * @param $object
+     * @throws DataCookerException
+     */
     public function remove($object)
     {
         $this->setMeta($object);
