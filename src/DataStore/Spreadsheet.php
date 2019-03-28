@@ -91,7 +91,6 @@ final class Spreadsheet extends AbstractStore implements IDataStore
             throw new DataCookerException("already data inserted");
         }
 
-
         /*
         $sheet = $this->spreadsheet->getSheetByName($sheetName);
         $header = $sheet->getCellByColumnAndRow(1, 1);
