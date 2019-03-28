@@ -50,15 +50,30 @@ final class Buffer extends AbstractStore implements IDataStore
                 $objectArray = $this->store->get($paramObject);
                 foreach ($objectArray as $object) {
                     $keys = $this->getIdentifierValues($cacheKey, $object);
-                    $data = $this->getAttributeValues($cacheKey, $object);
 
                     if (count($keys) !== $this->getDepth($cacheKey)) {
                         throw new DataCookerException("invalid depth");
                     }
-                    self::$phpData->insert($cacheKey, $keys, $data, $this->hasAutoIncrement($cacheKey));
+                    self::$phpData->insert($cacheKey, $keys, $object, $this->getChangeStatus($cacheKey, $keys));
                 }
             }
         }
+    }
+
+    private function getChangeStatus($cacheKey, $keys)
+    {
+        $ret = self::$phpData->search($cacheKey, $keys);
+        if (empty($ret) === false) {
+            if ($this->hasAutoIncrement($cacheKey) === true) {
+                $changedStatus = Status::getStatusWithAutoIncrement($ret[0]->getStatus(), Status::INSERTED);
+            } else {
+                $changedStatus = Status::getStatusWithoutAutoincrement($ret[0]->getStatus(), Status::INSERTED);
+            }
+        } else {
+            $changedStatus = Status::INSERTED;
+        }
+
+        return $changedStatus;
     }
 
     /**
@@ -79,9 +94,7 @@ final class Buffer extends AbstractStore implements IDataStore
             throw new DataCookerException("invalid depth");
         }
 
-        $data = $this->getAttributeValues($cacheKey, $object);
-
-        self::$phpData->insert($cacheKey, $keys, $data, $this->hasAutoIncrement($cacheKey));
+        self::$phpData->insert($cacheKey, $keys, $object, $this->getChangeStatus($cacheKey, $keys));
 
         return clone $object;
     }
@@ -103,28 +116,10 @@ final class Buffer extends AbstractStore implements IDataStore
         }
         $nodeArr = self::$phpData->search($cacheKey, $keys);
 
-        $identifierKeys = $this->getIdentifierKeys($cacheKey);
-        $attributeKeys = $this->getAttributeKeys($cacheKey);
-
         $ret = array();
         foreach ($nodeArr as $node) {
             if ($node->getStatus() !== Status::DELETED) {
-                //order dependency
-                $identifierDataArr = $node->getKey();
-                $attributeDataArr = $node->getData();
-
-                $tmp = new $object();
-                for ($i = 0; $i < count($identifierKeys); $i++) {
-                    $key = $identifierKeys[$i];
-                    $tmp->$key = $identifierDataArr[$i];
-                }
-
-                for ($i = 0; $i < count($attributeKeys); $i++) {
-                    $key = $attributeKeys[$i];
-                    $tmp->$key = $attributeDataArr[$i];
-                }
-
-                $ret[] = $tmp;
+                $ret[] = $node->getData();
             }
         }
 
@@ -142,12 +137,10 @@ final class Buffer extends AbstractStore implements IDataStore
         $this->checkNoHaveAnyFieldData($cacheKey, $object);
 
         $keys = $this->getIdentifierValues($cacheKey, $object);
-        $data = $this->getAttributeValues($cacheKey, $object);
-
         if (count($keys) !== $this->getDepth($cacheKey)) {
             throw new DataCookerException("invalid depth");
         }
-        self::$phpData->update($cacheKey, $keys, $data, $this->hasAutoIncrement($cacheKey));
+        self::$phpData->update($cacheKey, $keys, $object, $this->hasAutoIncrement($cacheKey));
     }
 
     /**
@@ -178,7 +171,7 @@ final class Buffer extends AbstractStore implements IDataStore
         }
 
         $trees = self::$phpData->getTrees();
-        if($this->store !== null) {
+        if ($this->store !== null) {
             $this->store->commit($trees);
         }
     }

@@ -38,25 +38,11 @@ final class PhpMemory
      * @param string $dataName
      * @param array $keys
      * @param array $data
-     * @param bool $hasAutoIncrement
-     * @throws DataCookerException
+     * @param $changedStatus
      */
-    public function insert(string $dataName, array $keys, array $data, bool $hasAutoIncrement)
+    public function insert(string $dataName, array $keys, $data, int $changedStatus)
     {
-        /**
-         * @var $leafNodeArr LeafNode[]
-         */
-        $leafNodeArr = $this->search($dataName, $keys);
-        if (empty($leafNodeArr)) {
-            $this->insertRecursive($this->trees[$dataName], $keys, $keys, $data, Status::INSERTED);
-        } else {
-            if ($hasAutoIncrement) {
-                $changedStatus = Status::getStatusWithAutoIncrement($leafNodeArr[0]->getStatus(), Status::INSERTED);
-            } else {
-                $changedStatus = Status::getStatusWithoutAutoincrement($leafNodeArr[0]->getStatus(), Status::INSERTED);
-            }
-            $this->insertRecursive($this->trees[$dataName], $keys, $keys, $data, $changedStatus);
-        }
+        $this->insertRecursive($this->trees[$dataName], $keys, $keys, $data, $changedStatus);
     }
 
     /**
@@ -190,7 +176,7 @@ final class PhpMemory
      * @param bool $hasAutoIncrement
      * @throws DataCookerException
      */
-    public function update(string $dataName, array $keys, array $data, bool $hasAutoIncrement)
+    public function update(string $dataName, array $keys, $data, bool $hasAutoIncrement)
     {
         /**
          * @var $leafNodeArr LeafNode[]
@@ -199,7 +185,7 @@ final class PhpMemory
         if (empty($leafNodeArr)) {
             throw new DataCookerException("data is empty for update");
         } else {
-            if ($leafNodeArr[0]->getData() === $data || count($leafNodeArr[0]->getData()) !== count($data)) {
+            if ($leafNodeArr[0]->getOriginalData() === $data) {
                 return;
             }
 

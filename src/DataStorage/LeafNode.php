@@ -35,7 +35,12 @@ final class LeafNode extends Node
         return $this->data;
     }
 
-    public function update(int $status, array $data)
+    public function getOriginalData()
+    {
+        return $this->originalData;
+    }
+
+    public function update(int $status, $data)
     {
         $this->status = $status;
         $this->data = $data;
