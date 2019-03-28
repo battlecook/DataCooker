@@ -36,12 +36,10 @@ final class Memcached extends AbstractKeyValue
 
         $this->memcached = new \Memcached();
         foreach ($configArr as $config) {
-
             if ($this->memcached->addServer($config->getIp(), $config->getPort()) === false) {
                 throw new DataCookerException("connection error");
             }
         }
-
     }
 
     /**

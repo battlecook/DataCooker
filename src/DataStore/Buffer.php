@@ -5,8 +5,6 @@ namespace battlecook\DataStore;
 
 use battlecook\Data\Status;
 use battlecook\DataCookerException;
-use battlecook\DataStorage\Field;
-use battlecook\DataStorage\Meta;
 use battlecook\DataStorage\PhpMemory;
 use battlecook\DataUtility\StoreTrait;
 
@@ -60,7 +58,6 @@ final class Buffer extends AbstractStore implements IDataStore
                     self::$phpData->insert($cacheKey, $keys, $data, $this->hasAutoIncrement($cacheKey));
                 }
             }
-
         }
     }
 
