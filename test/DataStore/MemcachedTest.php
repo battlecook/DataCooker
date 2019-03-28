@@ -422,8 +422,61 @@ class MemcachedTest extends TestCase
         $this->assertEquals($object3, $ret[0]);
     }
 
-    /*
-    public function testAdd()
+    /**
+     * @expectedException \battlecook\DataCookerException
+     * @expectedExceptionMessage already exist data at leafnode
+     */
+    public function testAddAlreadyExistData()
+    {
+        //given
+        $object1 = new Item();
+        $object1->id1 = 1;
+        $object1->id2 = 1;
+        $object1->id3 = 1;
+        $object1->attr1 = 1;
+        $object1->attr2 = 1;
+        $object1->attr3 = 1;
+
+        $object2 = new Item();
+        $object2->id1 = 1;
+        $object2->id2 = 1;
+        $object2->id3 = 2;
+        $object2->attr1 = 1;
+        $object2->attr2 = 1;
+        $object2->attr3 = 1;
+
+        $key1 = get_class(new Item());
+        $value1 = array(
+            1 =>
+                array(
+                    1 =>
+                        array(
+                            1 => new LeafNode(array(1, 1, 1), $object1),
+                            2 => new LeafNode(array(1, 1, 2), $object2)
+                        ),
+                )
+        );
+
+        $store = new Memcached(null, array(new \battlecook\Config\Memcache(self::IP)));
+        $data = array($key1 => $value1);
+
+        $store->commit($data);
+
+        $object = new Item();
+        $object->id1 = 1;
+        $object->id2 = 1;
+        $object->id3 = 1;
+        $object->attr1 = 1;
+        $object->attr2 = 1;
+        $object->attr3 = 1;
+
+        //when
+        $store->add($object);
+
+        //then
+    }
+
+    public function testAddEmptyData()
     {
         //given
         $store = new Memcached(null, array(new \battlecook\Config\Memcache(self::IP)));
@@ -441,6 +494,94 @@ class MemcachedTest extends TestCase
 
         //then
         $this->assertEquals($object, $ret);
+
+        $object = new Item();
+        $object->id1 = 1;
+        $object->id2 = 1;
+        $object->id3 = 1;
+        $expected = $store->get($object);
+
+        $this->assertEquals($expected[0], $ret);
+
+    }
+
+    public function testAdd()
+    {
+        //given
+
+        $object2 = new Item();
+        $object2->id1 = 1;
+        $object2->id2 = 1;
+        $object2->id3 = 2;
+        $object2->attr1 = 1;
+        $object2->attr2 = 1;
+        $object2->attr3 = 1;
+
+        $key1 = get_class(new Item());
+        $value1 = array(
+            1 =>
+                array(
+                    1 =>
+                        array(
+                            2 => new LeafNode(array(1, 1, 2), $object2)
+                        ),
+                )
+        );
+
+        $object3 = new Item();
+        $object3->id1 = 1;
+        $object3->id2 = 1;
+        $object3->id3 = 1;
+        $object3->attr1 = 2;
+        $object3->attr2 = 2;
+        $object3->attr3 = 2;
+
+        $object4 = new Item();
+        $object4->id1 = 1;
+        $object4->id2 = 1;
+        $object4->id3 = 2;
+        $object4->attr1 = 2;
+        $object4->attr2 = 2;
+        $object4->attr3 = 2;
+
+        $key2 = get_class(new Quest());
+        $value2 = array(
+            1 =>
+                array(
+                    1 =>
+                        array(
+                            1 => new LeafNode(array(1, 1, 1), $object3),
+                            2 => new LeafNode(array(1, 1, 2), $object4)
+                        ),
+                )
+        );
+
+        $store = new Memcached(null, array(new \battlecook\Config\Memcache(self::IP)));
+        $data = array($key1 => $value1, $key2 => $value2);
+
+        $store->commit($data);
+
+        $object = new Item();
+        $object->id1 = 1;
+        $object->id2 = 1;
+        $object->id3 = 1;
+        $object->attr1 = 1;
+        $object->attr2 = 1;
+        $object->attr3 = 1;
+
+        //when
+        $ret = $store->add($object);
+
+        //then
+        $this->assertEquals($object, $ret);
+
+        $object = new Item();
+        $object->id1 = 1;
+        $object->id2 = 1;
+        $object->id3 = 1;
+        $expected = $store->get($object);
+
+        $this->assertEquals($expected[0], $ret);
     }
 
     public function testSet()
@@ -468,10 +609,15 @@ class MemcachedTest extends TestCase
         $store->set($object2);
 
         //then
-        $ret = $store->get(new Item());
+        $object = new Item();
+        $object->id1 = 1;
+        $object->id2 = 1;
+        $object->id3 = 1;
+        $ret = $store->get($object);
         $this->assertEquals($object2, $ret[0]);
     }
 
+    /*
     public function testRemove()
     {
         //given
