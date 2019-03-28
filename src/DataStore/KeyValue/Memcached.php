@@ -251,7 +251,7 @@ final class Memcached extends AbstractKeyValue
                 . " message : " . $this->memcached->getResultMessage());
         }
 
-        if($this->store !== null) {
+        if ($this->store !== null) {
             $this->store->set($object);
         }
     }
@@ -260,13 +260,13 @@ final class Memcached extends AbstractKeyValue
     {
         $searchKey = array_shift($keys);
         if ($searchKey !== null) {
-            return $this->removeRecursive($tree[$searchKey], $keys, $object);
-        } elseif ($tree instanceof Attribute) { //leafs
-            $cacheKey = get_class($object);
-            $attributeValues = $this->getAttributeValues($cacheKey, $object);
-            $tree = new Attribute($attributeValues);
-        } else {
+            $this->removeRecursive($tree[$searchKey], $keys, $object);
+            if ($tree[$searchKey] === null || empty($tree[$searchKey]) === true) {
+                unset($tree[$searchKey]);
+            }
 
+        } else {
+            $tree = null;
         }
     }
 
@@ -283,14 +283,24 @@ final class Memcached extends AbstractKeyValue
         $tree = $this->memcached->get($key);
         $this->removeRecursive($tree, $this->getCurrentIdentifierValue($cacheKey, $object), $object);
 
-        $ret = $this->memcached->delete($key);
-        if ($ret === false) {
-            throw new DataCookerException(
-                "memcached set failed result code : " . $this->memcached->getResultCode()
-                . " message : " . $this->memcached->getResultMessage());
+        if (empty($tree) === true) {
+            $ret = $this->memcached->delete($key);
+            if ($ret === false) {
+                throw new DataCookerException(
+                    "memcached delete failed result code : " . $this->memcached->getResultCode()
+                    . " message : " . $this->memcached->getResultMessage());
+            }
+        } else {
+            $ret = $this->memcached->set($key, $tree, $this->timeExpired);
+            if ($ret === false) {
+                throw new DataCookerException(
+                    "memcached set failed result code : " . $this->memcached->getResultCode()
+                    . " message : " . $this->memcached->getResultMessage());
+            }
         }
 
-        if($this->store !== null) {
+
+        if ($this->store !== null) {
             $this->store->remove($object);
         }
     }

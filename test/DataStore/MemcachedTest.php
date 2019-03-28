@@ -617,8 +617,7 @@ class MemcachedTest extends TestCase
         $this->assertEquals($object2, $ret[0]);
     }
 
-    /*
-    public function testRemove()
+    public function testRemoveLeaf()
     {
         //given
         $store = new Memcached(null, array(new \battlecook\Config\Memcache(self::IP)));
@@ -655,5 +654,150 @@ class MemcachedTest extends TestCase
         $ret = $store->get($object);
         $this->assertEquals($object2, $ret[0]);
     }
-    */
+
+    public function testRemoveInternal()
+    {
+        //given
+        $store = new Memcached(null, array(new \battlecook\Config\Memcache(self::IP)));
+
+        $object1 = new Item();
+        $object1->id1 = 1;
+        $object1->id2 = 1;
+        $object1->id3 = 1;
+        $object1->attr1 = 1;
+        $object1->attr2 = 1;
+        $object1->attr3 = 1;
+
+        $object2 = new Item();
+        $object2->id1 = 1;
+        $object2->id2 = 1;
+        $object2->id3 = 2;
+        $object2->attr1 = 2;
+        $object2->attr2 = 2;
+        $object2->attr3 = 2;
+
+        $object3 = new Item();
+        $object3->id1 = 1;
+        $object3->id2 = 2;
+        $object3->id3 = 1;
+        $object3->attr1 = 3;
+        $object3->attr2 = 3;
+        $object3->attr3 = 3;
+
+        $object4 = new Item();
+        $object4->id1 = 1;
+        $object4->id2 = 2;
+        $object4->id3 = 2;
+        $object4->attr1 = 4;
+        $object4->attr2 = 4;
+        $object4->attr3 = 4;
+
+        $data = array(
+            get_class(new Item()) =>
+                array(
+                    1 =>
+                        array(
+                            1 =>
+                                array(
+                                    1 => new LeafNode(array(1, 1, 1), $object1),
+                                    2 => new LeafNode(array(1, 1, 2), $object2)
+                                ),
+
+                            2 =>
+                                array(
+                                    1 => new LeafNode(array(1, 2, 1), $object3),
+                                    2 => new LeafNode(array(1, 2, 2), $object4)
+                                ),
+                        ),
+                )
+        );
+
+        $store->commit($data);
+
+        //when
+        $object = new Item();
+        $object->id1 = 1;
+        $object->id2 = 1;
+        $store->remove($object);
+
+        //then
+        $object = new Item();
+        $object->id1 = 1;
+        $ret = $store->get($object);
+
+        $this->assertEquals(array($object3, $object4), $ret);
+    }
+
+    public function testRemoveAll()
+    {
+        //given
+        $store = new Memcached(null, array(new \battlecook\Config\Memcache(self::IP)));
+
+        $object1 = new Item();
+        $object1->id1 = 1;
+        $object1->id2 = 1;
+        $object1->id3 = 1;
+        $object1->attr1 = 1;
+        $object1->attr2 = 1;
+        $object1->attr3 = 1;
+
+        $object2 = new Item();
+        $object2->id1 = 1;
+        $object2->id2 = 1;
+        $object2->id3 = 2;
+        $object2->attr1 = 2;
+        $object2->attr2 = 2;
+        $object2->attr3 = 2;
+
+        $object3 = new Item();
+        $object3->id1 = 1;
+        $object3->id2 = 2;
+        $object3->id3 = 1;
+        $object3->attr1 = 3;
+        $object3->attr2 = 3;
+        $object3->attr3 = 3;
+
+        $object4 = new Item();
+        $object4->id1 = 1;
+        $object4->id2 = 2;
+        $object4->id3 = 2;
+        $object4->attr1 = 4;
+        $object4->attr2 = 4;
+        $object4->attr3 = 4;
+
+        $data = array(
+            get_class(new Item()) =>
+                array(
+                    1 =>
+                        array(
+                            1 =>
+                                array(
+                                    1 => new LeafNode(array(1, 1, 1), $object1),
+                                    2 => new LeafNode(array(1, 1, 2), $object2)
+                                ),
+
+                            2 =>
+                                array(
+                                    1 => new LeafNode(array(1, 2, 1), $object3),
+                                    2 => new LeafNode(array(1, 2, 2), $object4)
+                                ),
+                        ),
+                )
+        );
+
+        $store->commit($data);
+
+
+        //when
+        $object = new Item();
+        $object->id1 = 1;
+        $store->remove($object);
+
+        //then
+        $object = new Item();
+        $object->id1 = 1;
+        $object->id2 = 1;
+        $ret = $store->get($object);
+        $this->assertEquals(array(), $ret);
+    }
 }
