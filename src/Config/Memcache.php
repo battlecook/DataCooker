@@ -14,12 +14,12 @@ final class Memcache
         $this->port = $port;
     }
 
-    public function getIp()
+    public function getIp(): string
     {
         return $this->ip;
     }
 
-    public function getPort()
+    public function getPort(): int
     {
         return $this->port;
     }

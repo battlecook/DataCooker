@@ -23,27 +23,27 @@ final class Database
         }
     }
 
-    public function getIp()
+    public function getIp(): string
     {
         return $this->ip;
     }
 
-    public function getPort()
+    public function getPort(): int
     {
         return $this->port;
     }
 
-    public function getDatabaseName()
+    public function getDatabaseName(): string
     {
         return $this->dbName;
     }
 
-    public function getUser()
+    public function getUser(): string
     {
         return $this->user;
     }
 
-    public function getPassword()
+    public function getPassword(): string
     {
         return $this->password;
     }
