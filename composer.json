@@ -1,5 +1,5 @@
 {
-  "minimum-stability": "stable",
+  "minimum-stability": "dev",
   "require": {
     "php": "^7.1.0",
     "phpoffice/phpspreadsheet": "dev-master",
