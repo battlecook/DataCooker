@@ -36,8 +36,6 @@ class RedisTest extends TestCase
         $mockStore = new MockStore();
         $mockStore->tearDown();
         $mockStore->setUp(new Item());
-
-        self::$redis->flush();
     }
 
     public function testCommit()
@@ -99,7 +97,7 @@ class RedisTest extends TestCase
                 )
         );
 
-        $store = new Redis(null, array(new \battlecook\Config\Memcache(self::IP)));
+        $store = new Redis(null, new \battlecook\Config\Redis(self::IP));
         $data = array($key1 => $value1, $key2 => $value2);
 
         //when
@@ -134,7 +132,7 @@ class RedisTest extends TestCase
     public function testGetRoot()
     {
         //given
-        $store = new Redis(null, array(new \battlecook\Config\Memcache(self::IP)));
+        $store = new Redis(null, new \battlecook\Config\Redis(self::IP));
 
         $object1 = new Item();
         $object1->id1 = 1;
@@ -227,7 +225,7 @@ class RedisTest extends TestCase
     public function testGetInternal()
     {
         //given
-        $store = new Redis(null, array(new \battlecook\Config\Memcache(self::IP)));
+        $store = new Redis(null, new \battlecook\Config\Redis(self::IP));
 
         $object1 = new Item();
         $object1->id1 = 1;
@@ -324,7 +322,7 @@ class RedisTest extends TestCase
     public function testGetLeaf()
     {
         //given
-        $store = new Redis(null, array(new \battlecook\Config\Memcache(self::IP)));
+        $store = new Redis(null, new \battlecook\Config\Redis(self::IP));
 
         $object1 = new Item();
         $object1->id1 = 1;
@@ -452,7 +450,7 @@ class RedisTest extends TestCase
                 )
         );
 
-        $store = new Redis(null, array(new \battlecook\Config\Memcache(self::IP)));
+        $store = new Redis(null, new \battlecook\Config\Redis(self::IP));
         $data = array($key1 => $value1);
 
         $store->commit($data);
@@ -474,7 +472,7 @@ class RedisTest extends TestCase
     public function testAddEmptyData()
     {
         //given
-        $store = new Redis(null, array(new \battlecook\Config\Memcache(self::IP)));
+        $store = new Redis(null, new \battlecook\Config\Redis(self::IP));
 
         $object = new Item();
         $object->id1 = 1;
@@ -551,7 +549,7 @@ class RedisTest extends TestCase
                 )
         );
 
-        $store = new Redis(null, array(new \battlecook\Config\Memcache(self::IP)));
+        $store = new Redis(null, new \battlecook\Config\Redis(self::IP));
         $data = array($key1 => $value1, $key2 => $value2);
 
         $store->commit($data);
@@ -582,7 +580,7 @@ class RedisTest extends TestCase
     public function testSet()
     {
         //given
-        $store = new Redis(null, array(new \battlecook\Config\Memcache(self::IP)));
+        $store = new Redis(null, new \battlecook\Config\Redis(self::IP));
 
         $object = new Item();
         $object->id1 = 1;
@@ -615,7 +613,7 @@ class RedisTest extends TestCase
     public function testRemoveLeaf()
     {
         //given
-        $store = new Redis(null, array(new \battlecook\Config\Memcache(self::IP)));
+        $store = new Redis(null, new \battlecook\Config\Redis(self::IP));
 
         $object1 = new Item();
         $object1->id1 = 1;
@@ -653,7 +651,7 @@ class RedisTest extends TestCase
     public function testRemoveInternal()
     {
         //given
-        $store = new Redis(null, array(new \battlecook\Config\Memcache(self::IP)));
+        $store = new Redis(null, new \battlecook\Config\Redis(self::IP));
 
         $object1 = new Item();
         $object1->id1 = 1;
@@ -726,7 +724,7 @@ class RedisTest extends TestCase
     public function testRemoveAll()
     {
         //given
-        $store = new Redis(null, array(new \battlecook\Config\Memcache(self::IP)));
+        $store = new Redis(null, new \battlecook\Config\Redis(self::IP));
 
         $object1 = new Item();
         $object1->id1 = 1;
