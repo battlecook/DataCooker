@@ -34,10 +34,8 @@ final class Buffer extends AbstractStore implements IDataStore
      */
     private function setUp($cacheKey, $object)
     {
-        $this->setMeta($object);
-
         if ($this->isCached($cacheKey) === false) {
-            $this->cache($cacheKey);
+            $this->setField($object);
             if ($this->store !== null) {
 
                 $paramObject = new $object();
