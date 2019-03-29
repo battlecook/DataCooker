@@ -14,12 +14,12 @@ final class Auth
         $this->password = $password;
     }
 
-    public function getUser()
+    public function getUser(): string
     {
         return $this->user;
     }
 
-    public function getPassword()
+    public function getPassword(): string
     {
         return $this->password;
     }
