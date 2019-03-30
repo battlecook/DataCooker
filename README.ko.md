@@ -79,6 +79,21 @@ you can use as bellows.
 ```php
 
 $store = new Buffer(new RelationDatabase(null, new Database('localhost', 3306, 'dbName, new Auth('id', 'password'))));
+       
+$object = new Item();
+$object->id1 = 1;
+$object->id2 = 1;
+$object->id3 = 1;
+$object->attr1 = 1;
+$object->attr2 = 1;
+$object->attr3 = 1;
+
+$ret = $store->get($object);
+$ret = $store->set($object);
+$ret = $store->add($object);
+$ret = $store->remove($object);
+$ret = $store->commit($object);
+$ret = $store->rollback($object);
 
 ```
 
