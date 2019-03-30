@@ -15,7 +15,7 @@ DataCooker 는 다양한 저장소에 접근하는 방법을 추상화해서 몇
 
 파일 : [PhpSpreadsheet](https://github.com/PHPOffice/PhpSpreadsheet) 라이브러리 에서 제공하는 파일 포맷
 
-README 지원언어 : [영어](README.md)
+README 지원언어 : [English](README.md)
 
 ## How to use
 
