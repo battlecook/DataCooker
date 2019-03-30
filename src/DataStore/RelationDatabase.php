@@ -16,13 +16,13 @@ final class RelationDatabase extends AbstractStore implements IDataStore
 
     /**
      * RelationDatabase constructor.
-     * @param IDataStore|null $storage
+     * @param IDataStore|null $store
      * @param Database $config
      * @throws DataCookerException
      */
-    public function __construct(?IDataStore $storage, Database $config)
+    public function __construct(?IDataStore $store, Database $config)
     {
-        $this->store = $storage;
+        $this->store = $store;
 
         $dbName = $config->getDatabaseName();
         $ip = $config->getIp();

@@ -19,9 +19,9 @@ final class Buffer extends AbstractStore implements IDataStore
 
     private $store;
 
-    public function __construct(IDataStore $storage = null)
+    public function __construct(IDataStore $store = null)
     {
-        $this->store = $storage;
+        $this->store = $store;
         if (empty(self::$phpData) === true) {
             self::initialize();
         }

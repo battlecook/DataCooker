@@ -20,13 +20,13 @@ final class Spreadsheet extends AbstractStore implements IDataStore
 
     /**
      * Spreadsheet constructor.
-     * @param IDataStore|null $storage
+     * @param IDataStore|null $store
      * @param \battlecook\Config\Spreadsheet $config
      * @throws DataCookerException
      */
-    public function __construct(?IDataStore $storage, \battlecook\Config\Spreadsheet $config)
+    public function __construct(?IDataStore $store, \battlecook\Config\Spreadsheet $config)
     {
-        $this->store = $storage;
+        $this->store = $store;
 
         if (file_exists($config->getPath()) === false) {
             throw new DataCookerException("this path is invalid path.");
