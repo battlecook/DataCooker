@@ -13,7 +13,7 @@ Relation Database : Pdo-managed database
 
 KeyValue Store : Memcached, redis (It's on development) 
 
-README 지원언어 : [한국어](README.ko.md)
+Read this in other languages : [한국어](README.ko.md)
 
 ## How to use
 
