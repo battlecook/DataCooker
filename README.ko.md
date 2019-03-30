@@ -3,17 +3,19 @@
 
 ## What is it ?
 
-It's library to different kinds of data store. 
+DataCooker 는 다양한 저장소에 접근하는 방법을 추상화해서 몇개의 인터페이스로 제공하는 라이브러리 입니다. 
 
-This library provide to interface by abstracting access data store (\pdo, \Redis, \Memcached and so on) 
+데이타 저장소들에 접근하는 개별 라이브러리들 (\pdo, \Redis, \Memcached 등)을 추상화 하여 인터페이스를 제공합니다. 
 
-Supported DataStore
+현재 제공중인 데이타 저장소 목록은 다음과 같습니다.
 
-Relation Database : Pdo-managed database  
+관계형 데이타베이스 : Pdo 라이브러리에서 관리하는 데이타베이스들 
 
-KeyValue Store : Memcached, redis (It's on development) 
+키 벨류 저장소 : Memcached, redis (개발중에 있습니다.) 
 
-README 지원언어 : [한국어](README.ko.md)
+파일 : [PhpSpreadsheet](https://github.com/PHPOffice/PhpSpreadsheet) 라이브러리 에서 제공하는 파일 포맷
+
+README 지원언어 : [영어](README.md)
 
 ## How to use
 
@@ -93,4 +95,8 @@ $store = new Buffer(
 
 ## License
 
-DataCooker is licensed under MIT
+DataCooker 는 MIT 라이센스를 사용합니다.
+
+
+
+
