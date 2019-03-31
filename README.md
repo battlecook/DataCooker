@@ -3,7 +3,7 @@
 
 ## What is it ?
 
-It's library to different kinds of data store. 
+It's project to different kinds of data store. 
 
 This library provide to interface by abstracting access data store (\pdo, \Redis, \Memcached and so on) 
 
@@ -11,7 +11,7 @@ Supported DataStore
 
 Relation Database : Pdo-managed database  
 
-KeyValue Store : Memcached, redis (It's on development) 
+KeyValue Store : Memcached, redis, apcu (It's on development) 
 
 Read this in other languages : [한국어](README.ko.md)
 

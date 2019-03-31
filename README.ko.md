@@ -11,7 +11,7 @@ DataCooker 는 다양한 저장소에 접근하는 방법을 추상화해서 몇
 
 관계형 데이타베이스 : Pdo 라이브러리에서 관리하는 데이타베이스들 
 
-키 벨류 저장소 : Memcached, redis (개발중에 있습니다.) 
+키 벨류 저장소 : Memcached, redis, apcu(개발중에 있습니다.) 
 
 파일 : [PhpSpreadsheet](https://github.com/PHPOffice/PhpSpreadsheet) 라이브러리 에서 제공하는 파일 포맷
 
@@ -74,7 +74,20 @@ final class Item
 }
 ```
 
-you can use as bellows.
+클레스의 어노테이션으로 데이터의 속성을 구분합니다.
+
+어노테이션으로 표현 할 수 있는 속성엔 다음의 3가지가 있습니다.
+
+* @dataCookerIdentifier : 데이터의 필수 항목입니다.
+
+* @dataCookerAttribute : 데이터의 필수 항목입니다.
+
+* @dataCookerAutoIncrement : 데이터의 선택 항목입니다. 
+
+DataStore 에는 5가지 인터페이스(get, set, add, remove, commit)를 제공합니다. 
+
+@dataCookerAutoIncrement 의 사용 유무에 따라 add 사용시 동작이 달라집니다.
+ 
 
 ```php
 
@@ -92,8 +105,7 @@ $ret = $store->get($object);
 $ret = $store->set($object);
 $ret = $store->add($object);
 $ret = $store->remove($object);
-$ret = $store->commit($object);
-$ret = $store->rollback($object);
+$ret = $store->commit($data = null);
 
 ```
 
