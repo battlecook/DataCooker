@@ -42,25 +42,9 @@ final class Memcached extends AbstractKeyValue
         }
     }
 
-    /**
-     * @param $tree
-     * @param array $keys
-     * @param $object
-     * @return array
-     * @throws DataCookerException
-     */
-    private function insertRecursive(&$tree, array $keys, &$object)
+    private function isEmpty($tree): bool
     {
-        $searchKey = array_shift($keys);
-        if ($searchKey !== null) {
-            return $this->insertRecursive($tree[$searchKey], $keys, $object);
-        } elseif ($tree instanceof Attribute) { //leafs
-            throw new DataCookerException("already exist data at leafnode");
-        } else {
-            $cacheKey = get_class($object);
-            $attributeValues = $this->getAttributeValues($cacheKey, $object);
-            $tree = new Attribute($attributeValues);
-        }
+        return $tree === null;
     }
 
     /**
@@ -91,7 +75,7 @@ final class Memcached extends AbstractKeyValue
 
         $key = $this->getKey($cacheKey, $object);
         $tree = $this->memcached->get($key);
-        if ($tree === null) {
+        if ($this->isEmpty($tree) === true) {
             $tree = array();
         }
 
@@ -102,85 +86,11 @@ final class Memcached extends AbstractKeyValue
                 . " message : " . $this->memcached->getResultMessage());
         }
 
-
         if ($this->store !== null && $haveToAddOtherStore === true) {
             $object = $this->store->add($object);
         }
 
         return clone $object;
-    }
-
-    private function getKey(string $cacheKey, $object): string
-    {
-        $id1 = $this->getRootIdentifierKey($cacheKey);
-
-        return $cacheKey . '\\' . $object->$id1;
-    }
-
-    private function getCurrentIdentifierValue($cacheKey, $object): array
-    {
-        $keys = array();
-        foreach ($this->getIdentifierKeys($cacheKey) as $identifierKey) {
-            if ($object->$identifierKey === null) {
-                break;
-            }
-            $keys[] = $object->$identifierKey;
-        }
-
-        return $keys;
-    }
-
-    private function getIdentifierKeyByDepth($cacheKey, $depth): string
-    {
-        $identifierKeys = $this->getIdentifierKeys($cacheKey);
-
-        return $identifierKeys[$depth];
-    }
-
-    private function searchRecursive(&$tree, array $keys, &$object): array
-    {
-        $searchKey = array_shift($keys);
-        if ($searchKey !== null) {
-            return $this->searchRecursive($tree[$searchKey], $keys, $object);
-        } elseif ($tree instanceof Attribute) { //leafs
-            $created = clone $object;
-            $cacheKey = get_class($created);
-            $attributeKeys = $this->getAttributeKeys($cacheKey);
-
-            $attributeValues = $tree->getAttributes();
-            foreach ($attributeKeys as $attributeKey) {
-                $created->$attributeKey = array_shift($attributeValues);
-            }
-
-            return array($created);
-        } else { //internals
-            $cacheKey = get_class($object);
-
-            $iterator = new \RecursiveIteratorIterator(
-                new \RecursiveArrayIterator($tree),
-                \RecursiveIteratorIterator::SELF_FIRST
-            );
-
-            $ret = array();
-            $created = clone $object;
-            $depth = count($this->getCurrentIdentifierValue($cacheKey, $created));
-            foreach ($iterator as $key => $value) {
-                $currentIdentifier = $this->getIdentifierKeyByDepth($cacheKey, $depth + $iterator->getDepth());
-                $created->$currentIdentifier = $key;
-                if ($value instanceof Attribute) { //leafs
-
-                    $attributeKeys = $this->getAttributeKeys($cacheKey);
-                    $attributeValues = $value->getAttributes();
-                    foreach ($attributeKeys as $attributeKey) {
-                        $created->$attributeKey = array_shift($attributeValues);
-                    }
-
-                    $ret[] = clone $created;
-                }
-            }
-
-            return $ret;
-        }
     }
 
     /**
@@ -207,28 +117,6 @@ final class Memcached extends AbstractKeyValue
         return $this->searchRecursive($tree, $this->getCurrentIdentifierValue($cacheKey, $object), $object);
     }
 
-
-    /**
-     * @param $tree
-     * @param array $keys
-     * @param $object
-     * @return array
-     * @throws DataCookerException
-     */
-    private function updateRecursive(&$tree, array $keys, &$object)
-    {
-        $searchKey = array_shift($keys);
-        if ($searchKey !== null) {
-            return $this->updateRecursive($tree[$searchKey], $keys, $object);
-        } elseif ($tree instanceof Attribute) { //leafs
-            $cacheKey = get_class($object);
-            $attributeValues = $this->getAttributeValues($cacheKey, $object);
-            $tree = new Attribute($attributeValues);
-        } else {
-            throw new DataCookerException("update keys can not be empty leaf node");
-        }
-    }
-
     /**
      * @param $object
      * @throws DataCookerException
@@ -253,20 +141,6 @@ final class Memcached extends AbstractKeyValue
 
         if ($this->store !== null) {
             $this->store->set($object);
-        }
-    }
-
-    private function removeRecursive(&$tree, array $keys, &$object)
-    {
-        $searchKey = array_shift($keys);
-        if ($searchKey !== null) {
-            $this->removeRecursive($tree[$searchKey], $keys, $object);
-            if ($tree[$searchKey] === null || empty($tree[$searchKey]) === true) {
-                unset($tree[$searchKey]);
-            }
-
-        } else {
-            $tree = null;
         }
     }
 

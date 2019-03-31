@@ -24,6 +24,18 @@ class RedisTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
+
+        self::$redis = new \Redis();
+
+
+        if (self::$redis->pconnect(self::IP, 6379) === false) {
+            throw new DataCookerException("redis connection failed");
+        }
+
+        $ret = self::$redis->ping();
+        if ($ret !== '+PONG') {
+            throw new DataCookerException("redis ping failed");
+        }
     }
 
     public static function tearDownAfterClass()
@@ -36,6 +48,8 @@ class RedisTest extends TestCase
         $mockStore = new MockStore();
         $mockStore->tearDown();
         $mockStore->setUp(new Item());
+
+        self::$redis->flushAll();
     }
 
     public function testCommit()
@@ -114,7 +128,8 @@ class RedisTest extends TestCase
                         ),
                 )
         );
-        $this->assertEquals($expect1, self::$redis->get($key1 . '\\' . 1));
+
+        $this->assertEquals($expect1, unserialize(self::$redis->get($key1 . '\\' . 1)));
 
         $expect2 = array(
             1 =>
@@ -126,7 +141,7 @@ class RedisTest extends TestCase
                         ),
                 )
         );
-        $this->assertEquals($expect2, self::$redis->get($key2 . '\\' . 1));
+        $this->assertEquals($expect2, unserialize(self::$redis->get($key2 . '\\' . 1)));
     }
 
     public function testGetRoot()
