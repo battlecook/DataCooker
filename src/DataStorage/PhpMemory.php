@@ -24,7 +24,7 @@ final class PhpMemory
     private function insertRecursive(&$tree, array $keys, $key, $data, $changedStatus)
     {
         if (empty($keys) === true) {
-            $tree = new LeafNode($key, $data);
+            $tree = new LeafNode($key, $data, $changedStatus);
             return;
         }
         $searchKey = array_shift($keys);

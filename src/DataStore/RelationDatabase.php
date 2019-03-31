@@ -326,7 +326,7 @@ final class RelationDatabase extends AbstractStore implements IDataStore
             $leafNodes = array();
             foreach ($trees as $className => $tree) {
                 $meta = self::getMetaData($className);
-                array_walk_recursive($trees, function ($data) use ($className, $meta, &$leafNodes) {
+                array_walk_recursive($tree, function ($data) use ($className, $meta, &$leafNodes) {
                     $object = new $className();
                     array_map(function ($key, $value) use ($object) {
                         $object->$key = $value;
