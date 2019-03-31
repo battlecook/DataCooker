@@ -331,9 +331,11 @@ final class RelationDatabase extends AbstractStore implements IDataStore
                     array_map(function ($key, $value) use ($object) {
                         $object->$key = $value;
                     }, $meta->getField()->getIdentifiers(), $data->getKey());
-                    array_map(function ($key, $value) use ($object) {
-                        $object->$key = $value;
-                    }, $meta->getField()->getAttributes(), $data->getData());
+
+                    $dataObject = $data->getData();
+                    array_map(function ($key) use ($object, $dataObject) {
+                        $object->$key = $dataObject->$key;
+                    }, $meta->getField()->getAttributes());
 
                     if ($data->getStatus() !== Status::NONE) {
                         $leafNodes[$data->getStatus()] = $object;
