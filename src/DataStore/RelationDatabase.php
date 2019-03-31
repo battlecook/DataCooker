@@ -323,10 +323,10 @@ final class RelationDatabase extends AbstractStore implements IDataStore
 
             $trees = $data;
 
-            $leafNodes = array();
+            $commitObjectMap = array();
             foreach ($trees as $className => $tree) {
                 $meta = self::getMetaData($className);
-                array_walk_recursive($tree, function ($data) use ($className, $meta, &$leafNodes) {
+                array_walk_recursive($tree, function ($data) use ($className, $meta, &$commitObjectMap) {
                     $object = new $className();
                     array_map(function ($key, $value) use ($object) {
                         $object->$key = $value;
@@ -338,19 +338,25 @@ final class RelationDatabase extends AbstractStore implements IDataStore
                     }, $meta->getField()->getAttributes());
 
                     if ($data->getStatus() !== Status::NONE) {
-                        $leafNodes[$data->getStatus()] = $object;
+                        $commitObjectMap[$data->getStatus()][] = $object;
                     }
                 });
             }
 
             //todo this function would be tuning. ( multi insert, multi update and so on )
-            foreach ($leafNodes as $status => $object) {
+            foreach ($commitObjectMap as $status => $commitObjectGroup) {
                 if ($status === Status::DELETED) {
-                    $this->remove($object);
+                    foreach($commitObjectGroup as $object) {
+                        $this->remove($object);
+                    }
                 } elseif ($status === Status::UPDATED) {
-                    $this->set($object);
+                    foreach($commitObjectGroup as $object) {
+                        $this->set($object);
+                    }
                 } elseif ($status === Status::INSERTED) {
-                    $this->add($object);
+                    foreach($commitObjectGroup as $object) {
+                        $this->add($object);
+                    }
                 } else {
                     throw new DataCookerException();
                 }
