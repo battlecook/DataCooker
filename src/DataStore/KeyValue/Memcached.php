@@ -6,7 +6,6 @@ namespace battlecook\DataStore\KeyValue;
 use battlecook\Config\Memcache;
 use battlecook\DataCookerException;
 use battlecook\DataStore\IDataStore;
-use battlecook\DataStructure\Attribute;
 use battlecook\DataUtility\StoreTrait;
 
 final class Memcached extends AbstractKeyValue
