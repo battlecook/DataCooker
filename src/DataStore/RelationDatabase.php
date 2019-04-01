@@ -60,10 +60,10 @@ final class RelationDatabase extends AbstractStore implements IDataStore
         $tableName = $this->getTableName($cacheKey);
 
         $autoIncrement = $this->getAutoIncrementKey($cacheKey);
-        if ($object->$autoIncrement === null) {
-            $fields = $this->getFieldKeys($cacheKey);
-        } else {
+        if ($this->hasAutoIncrement($cacheKey) === true && $object->$autoIncrement !== null) {
             $fields = $this->getFieldKeysWithAutoIncrement($cacheKey);
+        } else {
+            $fields = $this->getFieldKeys($cacheKey);
         }
 
         $sql = "insert into {$tableName}";
@@ -345,20 +345,16 @@ final class RelationDatabase extends AbstractStore implements IDataStore
 
             //todo this function would be tuning. ( multi insert, multi update and so on )
             foreach ($commitObjectMap as $status => $commitObjectGroup) {
-                if ($status === Status::DELETED) {
-                    foreach($commitObjectGroup as $object) {
+                foreach($commitObjectGroup as $object) {
+                    if ($status === Status::DELETED) {
                         $this->remove($object);
-                    }
-                } elseif ($status === Status::UPDATED) {
-                    foreach($commitObjectGroup as $object) {
+                    } elseif ($status === Status::UPDATED) {
                         $this->set($object);
-                    }
-                } elseif ($status === Status::INSERTED) {
-                    foreach($commitObjectGroup as $object) {
+                    } elseif ($status === Status::INSERTED) {
                         $this->add($object);
+                    } else {
+                        throw new DataCookerException("invalid status");
                     }
-                } else {
-                    throw new DataCookerException();
                 }
             }
 
