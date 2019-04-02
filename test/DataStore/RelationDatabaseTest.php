@@ -6,24 +6,15 @@ namespace test\DataStorage;
 use battlecook\DataStore\RelationDatabase;
 use PHPUnit\Framework\TestCase;
 use test\Fixture\DataStorage\Item;
-use test\Helper\DatabaseConfigTrait;
+use test\Helper\Config;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
 class RelationDatabaseTest extends TestCase
 {
-    use DatabaseConfigTrait;
-
-    private function getPdo()
-    {
-        $dsn = "mysql:host={$this->ip};port={$this->port};dbname={$this->dbName}";
-
-        return new \PDO($dsn, $this->user, $this->password, array());
-    }
-
     public function setUp()
     {
-        $pdo = $this->getPdo();
+        $pdo = Config::getPdo();
         $dropSql = "drop table Item;";
         $st = $pdo->prepare($dropSql);
         $st->execute();
@@ -51,7 +42,7 @@ class RelationDatabaseTest extends TestCase
     public function testAddWithAutoIncrement()
     {
         //given
-        $store = new RelationDatabase(null, $this->getConfig());
+        $store = new RelationDatabase(null, Config::getDatabaseConfig());
 
         $object = new Item();
         $object->id1 = 1;
@@ -75,7 +66,7 @@ class RelationDatabaseTest extends TestCase
     public function testAddDuplicated()
     {
         //given
-        $store = new RelationDatabase(null, $this->getConfig());
+        $store = new RelationDatabase(null, Config::getDatabaseConfig());
 
         $object = new Item();
         $object->id1 = 1;
@@ -98,7 +89,7 @@ class RelationDatabaseTest extends TestCase
     public function testAddWithoutAutoIncrement()
     {
         //given
-        $store = new RelationDatabase(null, $this->getConfig());
+        $store = new RelationDatabase(null, Config::getDatabaseConfig());
 
         $object = new Item();
         $object->id2 = 1;
@@ -128,7 +119,7 @@ class RelationDatabaseTest extends TestCase
     public function testGet()
     {
         //given
-        $store = new RelationDatabase(null, $this->getConfig());
+        $store = new RelationDatabase(null, Config::getDatabaseConfig());
 
         $object = new Item();
 
@@ -145,7 +136,7 @@ class RelationDatabaseTest extends TestCase
     public function testSet()
     {
         //given
-        $store = new RelationDatabase(null, $this->getConfig());
+        $store = new RelationDatabase(null, Config::getDatabaseConfig());
 
         $object = new Item();
         $object->id1 = 1;
@@ -177,7 +168,7 @@ class RelationDatabaseTest extends TestCase
     public function testRemove()
     {
         //given
-        $store = new RelationDatabase(null, $this->getConfig());
+        $store = new RelationDatabase(null, Config::getDatabaseConfig());
 
         $object1 = new Item();
         $object1->id1 = 1;

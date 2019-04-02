@@ -7,24 +7,15 @@ use battlecook\DataStore\Buffer;
 use battlecook\DataStore\RelationDatabase;
 use PHPUnit\Framework\TestCase;
 use test\Fixture\DataStorage\Item;
-use test\Helper\DatabaseConfigTrait;
+use test\Helper\Config;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
 class ComplexTest extends TestCase
 {
-    use DatabaseConfigTrait;
-
-    private function getPdo()
-    {
-        $dsn = "mysql:host={$this->ip};port={$this->port};dbname={$this->dbName}";
-
-        return new \PDO($dsn, $this->user, $this->password, array());
-    }
-
     public function setUp()
     {
-        $pdo = $this->getPdo();
+        $pdo = Config::getPdo();
         $dropSql = "drop table Item;";
         $st = $pdo->prepare($dropSql);
         $st->execute();
@@ -51,7 +42,7 @@ class ComplexTest extends TestCase
     public function testBufferRelationDatabase()
     {
         //given
-        $store = new Buffer(new RelationDatabase(null, $this->getConfig()));
+        $store = new Buffer(new RelationDatabase(null, Config::getDatabaseConfig()));
 
         $object = new Item();
         $object->id1 = 1;
@@ -75,7 +66,7 @@ class ComplexTest extends TestCase
     public function testAddDuplicated()
     {
         //given
-        $storage = new Buffer(new RelationDatabase(null, $this->getConfig()));
+        $storage = new Buffer(new RelationDatabase(null, Config::getDatabaseConfig()));
 
         $object = new Item();
         $object->id1 = 1;
@@ -99,7 +90,7 @@ class ComplexTest extends TestCase
     {
         //given
         Buffer::initialize();
-        $store = new Buffer(new RelationDatabase(null, $this->getConfig()));
+        $store = new Buffer(new RelationDatabase(null, Config::getDatabaseConfig()));
 
         $object = new Item();
         //$object->id1 = 1;
@@ -126,7 +117,7 @@ class ComplexTest extends TestCase
         $ret = $store->get(new Item());
         $this->assertEquals($object2, $ret[0]);
 
-        $rdbStore = new RelationDatabase(null, $this->getConfig());
+        $rdbStore = new RelationDatabase(null, Config::getDatabaseConfig());
         $ret = $rdbStore->get(new Item());
         $this->assertEquals($object2, $ret[0]);
     }
@@ -135,7 +126,7 @@ class ComplexTest extends TestCase
     {
         //given
         Buffer::initialize();
-        $store = new RelationDatabase(new Buffer(), $this->getConfig());
+        $store = new RelationDatabase(new Buffer(), Config::getDatabaseConfig());
 
         $object = new Item();
         //$object->id1 = 1;
@@ -162,7 +153,7 @@ class ComplexTest extends TestCase
         $ret = $store->get(new Item());
         $this->assertEquals($object2, $ret[0]);
 
-        $rdbStore = new RelationDatabase(null, $this->getConfig());
+        $rdbStore = new RelationDatabase(null, Config::getDatabaseConfig());
         $ret = $rdbStore->get(new Item());
         $this->assertEquals($object2, $ret[0]);
     }
