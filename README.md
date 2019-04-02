@@ -11,7 +11,7 @@ Supported DataStore
 
 Relation Database : Pdo-managed database  
 
-KeyValue Store : Memcached, redis, apcu (It's on development) 
+KeyValue Store : memcached, redis, apcu
 
 Read this in other languages : [한국어](README.ko.md)
 

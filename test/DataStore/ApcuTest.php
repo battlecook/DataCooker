@@ -117,9 +117,7 @@ class ApcuTest extends TestCase
                 )
         );
 
-
-        $success = null;
-        $this->assertEquals($expect1, apcu_fetch($key1 . '\\' . 1));
+        $this->assertEquals($expect1, unserialize(apcu_fetch($key1 . '\\' . 1)));
 
         $expect2 = array(
             1 =>
@@ -131,7 +129,7 @@ class ApcuTest extends TestCase
                         ),
                 )
         );
-        $this->assertEquals($expect2, apcu_fetch($key2 . '\\' . 1));
+        $this->assertEquals($expect2, unserialize(apcu_fetch($key2 . '\\' . 1)));
     }
 
     public function testGetRoot()

@@ -24,3 +24,4 @@ script:
 - ./vendor/phpunit/phpunit/phpunit ./test/DataStore/BufferTest.php
 - ./vendor/phpunit/phpunit/phpunit ./test/DataStore/MemcachedTest.php
 - ./vendor/phpunit/phpunit/phpunit ./test/DataStore/RedisTest.php
+- ./vendor/phpunit/phpunit/phpunit ./test/DataStore/ApcuTest.php
