@@ -22,3 +22,4 @@ install:
 
 script:
 - ./vendor/phpunit/phpunit/phpunit ./test/DataStore/BufferTest.php
+- ./vendor/phpunit/phpunit/phpunit ./test/DataStore/MemcachedTest.php
