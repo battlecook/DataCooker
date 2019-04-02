@@ -17,6 +17,14 @@ class ApcuTest extends TestCase
 {
     public static function setUpBeforeClass(): void
     {
+        if(ini_get('apc.enable_cli') !== '1')
+        {
+            if(ini_set ('apc.enable_cli', '1' ) === false)
+            {
+                print_r("apc.enable_cli value is not set. please set to On at apc.enable_cli config");
+                exit;
+            }
+        }
     }
 
     public static function tearDownAfterClass()
