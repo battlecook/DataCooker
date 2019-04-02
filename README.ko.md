@@ -11,7 +11,7 @@ DataCooker 는 다양한 저장소에 접근하는 방법을 추상화해서 몇
 
 관계형 데이타베이스 : Pdo 라이브러리에서 관리하는 데이타베이스들 
 
-키 벨류 저장소 : Memcached, redis, apcu(개발중에 있습니다.) 
+키 벨류 저장소 : memcached, redis, apcu
 
 파일 : [PhpSpreadsheet](https://github.com/PHPOffice/PhpSpreadsheet) 라이브러리 에서 제공하는 파일 포맷
 
