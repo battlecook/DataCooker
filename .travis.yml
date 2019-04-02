@@ -10,7 +10,7 @@ services:
 - mysql
 - redis-server
 
-before-install:
+before_install:
 - echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 - echo "extension = redis.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 - composer self-update
@@ -19,6 +19,7 @@ install:
 - php --version
 - php -m
 - cat /etc/*release
+- pwd
 
 script:
 - phpunit BufferTest.php
