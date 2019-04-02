@@ -16,6 +16,7 @@ before_install:
 - composer self-update
 
 install:
+- php -m
 - composer install
 
 before_script:
