@@ -166,8 +166,7 @@ trait MetaTrait
     {
         $fields = self::$cachedMetaMap[$cacheKey]->getField()->getFields();
         foreach ($fields as $field) {
-            //is_null 이 더 맞는거 같지만 exception 이 빠져버림
-            if (empty($object->$field) === true) {
+            if ($object->$field === null) {
                 throw new DataCookerException("fields don't fill all");
             }
         }
@@ -178,7 +177,7 @@ trait MetaTrait
         $fields = self::$cachedMetaMap[$cacheKey]->getField()->getFields();
         foreach ($fields as $field) {
             //is_null 이 더 맞는거 같지만 exception 이 빠져버림
-            if (empty($object->$field) !== true) {
+            if ($object->$field !== null) {
                 return true;
             }
         }
