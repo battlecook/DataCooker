@@ -16,10 +16,14 @@ before_install:
 - composer self-update
 
 install:
+
+before_script:
 - php --version
 - php -m
 - cat /etc/*release
 - pwd
+- ls -la
+- ls -la ./vendor/
 
 script:
-- phpunit BufferTest.php
+- ./vendor/phpunit/phpunit/phpunit BufferTest.php
