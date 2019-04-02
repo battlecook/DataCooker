@@ -27,6 +27,8 @@ final class Config
         return new Memcache(self::$memcachedIP);
     }
 
+    public static $redisIP = 'localhost';
+
     public static function getRedisConfig()
     {
         return new Redis("localhost");
