@@ -9,14 +9,13 @@ use battlecook\DataStructure\Attribute;
 use PHPUnit\Framework\TestCase;
 use test\Fixture\DataStorage\Item;
 use test\Fixture\DataStore\Quest;
+use test\Helper\Config;
 use test\Helper\MockStore;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
 class RedisTest extends TestCase
 {
-    private const IP = "redis";
-
     /**
      * @var $redis \Redis();
      */
@@ -24,11 +23,9 @@ class RedisTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-
         self::$redis = new \Redis();
 
-
-        if (self::$redis->pconnect(self::IP, 6379) === false) {
+        if (self::$redis->pconnect(Config::$redisIP, 6379) === false) {
             throw new DataCookerException("redis connection failed");
         }
 
@@ -50,6 +47,11 @@ class RedisTest extends TestCase
         $mockStore->setUp(new Item());
 
         self::$redis->flushAll();
+    }
+
+    private function createStore()
+    {
+        return new Redis(null, Config::getRedisConfig());
     }
 
     public function testCommit()
@@ -111,7 +113,7 @@ class RedisTest extends TestCase
                 )
         );
 
-        $store = new Redis(null, new \battlecook\Config\Redis(self::IP));
+        $store = $this->createStore();
         $data = array($key1 => $value1, $key2 => $value2);
 
         //when
@@ -147,7 +149,7 @@ class RedisTest extends TestCase
     public function testGetRoot()
     {
         //given
-        $store = new Redis(null, new \battlecook\Config\Redis(self::IP));
+        $store = $this->createStore();
 
         $object1 = new Item();
         $object1->id1 = 1;
@@ -240,7 +242,7 @@ class RedisTest extends TestCase
     public function testGetInternal()
     {
         //given
-        $store = new Redis(null, new \battlecook\Config\Redis(self::IP));
+        $store = $this->createStore();
 
         $object1 = new Item();
         $object1->id1 = 1;
@@ -337,7 +339,7 @@ class RedisTest extends TestCase
     public function testGetLeaf()
     {
         //given
-        $store = new Redis(null, new \battlecook\Config\Redis(self::IP));
+        $store = $this->createStore();
 
         $object1 = new Item();
         $object1->id1 = 1;
@@ -465,7 +467,7 @@ class RedisTest extends TestCase
                 )
         );
 
-        $store = new Redis(null, new \battlecook\Config\Redis(self::IP));
+        $store = $this->createStore();
         $data = array($key1 => $value1);
 
         $store->commit($data);
@@ -487,7 +489,7 @@ class RedisTest extends TestCase
     public function testAddEmptyData()
     {
         //given
-        $store = new Redis(null, new \battlecook\Config\Redis(self::IP));
+        $store = $this->createStore();
 
         $object = new Item();
         $object->id1 = 1;
@@ -516,7 +518,6 @@ class RedisTest extends TestCase
     public function testAdd()
     {
         //given
-
         $object2 = new Item();
         $object2->id1 = 1;
         $object2->id2 = 1;
@@ -564,7 +565,7 @@ class RedisTest extends TestCase
                 )
         );
 
-        $store = new Redis(null, new \battlecook\Config\Redis(self::IP));
+        $store = $this->createStore();
         $data = array($key1 => $value1, $key2 => $value2);
 
         $store->commit($data);
@@ -595,7 +596,7 @@ class RedisTest extends TestCase
     public function testSet()
     {
         //given
-        $store = new Redis(null, new \battlecook\Config\Redis(self::IP));
+        $store = $this->createStore();
 
         $object = new Item();
         $object->id1 = 1;
@@ -628,7 +629,7 @@ class RedisTest extends TestCase
     public function testRemoveLeaf()
     {
         //given
-        $store = new Redis(null, new \battlecook\Config\Redis(self::IP));
+        $store = $this->createStore();
 
         $object1 = new Item();
         $object1->id1 = 1;
@@ -666,7 +667,7 @@ class RedisTest extends TestCase
     public function testRemoveInternal()
     {
         //given
-        $store = new Redis(null, new \battlecook\Config\Redis(self::IP));
+        $store = $this->createStore();
 
         $object1 = new Item();
         $object1->id1 = 1;
@@ -739,7 +740,7 @@ class RedisTest extends TestCase
     public function testRemoveAll()
     {
         //given
-        $store = new Redis(null, new \battlecook\Config\Redis(self::IP));
+        $store = $this->createStore();
 
         $object1 = new Item();
         $object1->id1 = 1;
