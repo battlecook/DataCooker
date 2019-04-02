@@ -9,14 +9,13 @@ use battlecook\DataStructure\Attribute;
 use PHPUnit\Framework\TestCase;
 use test\Fixture\DataStorage\Item;
 use test\Fixture\DataStore\Quest;
+use test\Helper\Config;
 use test\Helper\MockStore;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
 class MemcachedTest extends TestCase
 {
-    private const IP = "memcached";
-
     /**
      * @var $memcached \Memcached();
      */
@@ -25,7 +24,7 @@ class MemcachedTest extends TestCase
     public static function setUpBeforeClass(): void
     {
         self::$memcached = new \Memcached();
-        if (self::$memcached->addServer(self::IP, 11211) === false) {
+        if (self::$memcached->addServer(Config::$memcachedIP, 11211) === false) {
             die('memcached addServer failed');
         }
     }
@@ -42,6 +41,11 @@ class MemcachedTest extends TestCase
         $mockStore->setUp(new Item());
 
         self::$memcached->flush();
+    }
+
+    private function createStore()
+    {
+        return new Memcached(null, array(Config::getMemcachedConfig()));
     }
 
     public function testCommit()
@@ -103,7 +107,7 @@ class MemcachedTest extends TestCase
                 )
         );
 
-        $store = new Memcached(null, array(new \battlecook\Config\Memcache(self::IP)));
+        $store = $this->createStore();
         $data = array($key1 => $value1, $key2 => $value2);
 
         //when
@@ -138,7 +142,7 @@ class MemcachedTest extends TestCase
     public function testGetRoot()
     {
         //given
-        $store = new Memcached(null, array(new \battlecook\Config\Memcache(self::IP)));
+        $store = $this->createStore();
 
         $object1 = new Item();
         $object1->id1 = 1;
@@ -232,7 +236,7 @@ class MemcachedTest extends TestCase
     public function testGetInternal()
     {
         //given
-        $store = new Memcached(null, array(new \battlecook\Config\Memcache(self::IP)));
+        $store = $this->createStore();
 
         $object1 = new Item();
         $object1->id1 = 1;
@@ -329,7 +333,7 @@ class MemcachedTest extends TestCase
     public function testGetLeaf()
     {
         //given
-        $store = new Memcached(null, array(new \battlecook\Config\Memcache(self::IP)));
+        $store = $this->createStore();
 
         $object1 = new Item();
         $object1->id1 = 1;
@@ -457,7 +461,7 @@ class MemcachedTest extends TestCase
                 )
         );
 
-        $store = new Memcached(null, array(new \battlecook\Config\Memcache(self::IP)));
+        $store = new Memcached(null, array(Config::getMemcachedConfig()));
         $data = array($key1 => $value1);
 
         $store->commit($data);
@@ -479,7 +483,7 @@ class MemcachedTest extends TestCase
     public function testAddEmptyData()
     {
         //given
-        $store = new Memcached(null, array(new \battlecook\Config\Memcache(self::IP)));
+        $store = $this->createStore();
 
         $object = new Item();
         $object->id1 = 1;
@@ -556,7 +560,7 @@ class MemcachedTest extends TestCase
                 )
         );
 
-        $store = new Memcached(null, array(new \battlecook\Config\Memcache(self::IP)));
+        $store = $this->createStore();
         $data = array($key1 => $value1, $key2 => $value2);
 
         $store->commit($data);
@@ -587,7 +591,7 @@ class MemcachedTest extends TestCase
     public function testSet()
     {
         //given
-        $store = new Memcached(null, array(new \battlecook\Config\Memcache(self::IP)));
+        $store = $this->createStore();
 
         $object = new Item();
         $object->id1 = 1;
@@ -620,7 +624,7 @@ class MemcachedTest extends TestCase
     public function testRemoveLeaf()
     {
         //given
-        $store = new Memcached(null, array(new \battlecook\Config\Memcache(self::IP)));
+        $store = $this->createStore();
 
         $object1 = new Item();
         $object1->id1 = 1;
@@ -658,7 +662,7 @@ class MemcachedTest extends TestCase
     public function testRemoveInternal()
     {
         //given
-        $store = new Memcached(null, array(new \battlecook\Config\Memcache(self::IP)));
+        $store = $this->createStore();
 
         $object1 = new Item();
         $object1->id1 = 1;
@@ -731,7 +735,7 @@ class MemcachedTest extends TestCase
     public function testRemoveAll()
     {
         //given
-        $store = new Memcached(null, array(new \battlecook\Config\Memcache(self::IP)));
+        $store = $this->createStore();
 
         $object1 = new Item();
         $object1->id1 = 1;
