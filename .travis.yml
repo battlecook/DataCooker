@@ -13,6 +13,7 @@ services:
 before_install:
 - echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 - echo "extension = redis.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+- echo "extension = apcu.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 - composer self-update
 
 install:
@@ -28,4 +29,4 @@ before_script:
 - ls -la ./vendor/
 
 script:
-- ./vendor/phpunit/phpunit/phpunit BufferTest.php
+- ./vendor/phpunit/phpunit/phpunit ./test/DataStore/BufferTest.php
