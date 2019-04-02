@@ -12,11 +12,12 @@ services:
 
 before-install:
 - composer self-update
+- echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+- echo "extension = redis.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 
 install:
 - php --version
-- "sudo apt-get install php73-memcached"
-- "sudo apt install -y php7.3 php-xdebug php7.3-mysql php-memcache php-memcached php-redis php-apcu"
+- cat /etc/*release
 - composer install
 
 script:
