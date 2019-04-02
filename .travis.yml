@@ -1,0 +1,23 @@
+language: php
+
+php:
+- 7.3
+
+sudo: true
+
+services:
+- memcached
+- mysql
+- redis-server
+
+before-install:
+- composer self-update
+
+install:
+- php --version
+- "sudo apt-get install php73-memcached"
+- "sudo apt install -y php7.3 php-xdebug php7.3-mysql php-memcache php-memcached php-redis php-apcu"
+- composer install
+
+script:
+- phpunit BufferTest.php
