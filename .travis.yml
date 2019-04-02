@@ -1,0 +1,24 @@
+language: php
+
+php:
+- 7.3
+
+sudo: true
+
+services:
+- memcached
+- mysql
+- redis-server
+
+before_install:
+- echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+- echo "extension = redis.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+- echo "extension = apcu.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+- composer self-update
+
+install:
+- php -m
+- composer install
+
+script:
+- ./vendor/phpunit/phpunit/phpunit ./test/DataStore/BufferTest.php
