@@ -20,13 +20,5 @@ install:
 - php -m
 - composer install
 
-before_script:
-- php --version
-- php -m
-- cat /etc/*release
-- pwd
-- ls -la
-- ls -la ./vendor/
-
 script:
 - ./vendor/phpunit/phpunit/phpunit ./test/DataStore/BufferTest.php
