@@ -1,7 +1,7 @@
 # DataCooker
 
 
-## What is it ?
+## 프로젝트 설명
 
 DataCooker 는 다양한 저장소에 접근하는 방법을 추상화해서 몇개의 인터페이스로 제공하는 라이브러리 입니다. 
 
@@ -13,13 +13,13 @@ DataCooker 는 다양한 저장소에 접근하는 방법을 추상화해서 몇
 
 키 벨류 저장소 : memcached, redis, apcu
 
-파일 : [PhpSpreadsheet](https://github.com/PHPOffice/PhpSpreadsheet) 라이브러리 에서 제공하는 파일 포맷
+파일 : [PhpSpreadsheet](https://github.com/PHPOffice/PhpSpreadsheet) 라이브러리 에서 제공하는 파일 포맷 ( 읽기만 제공 )
 
 README 지원언어 : [English](README.md)
 
-## How to use
+## 사용하는 방법
 
-data base schema
+정의한 데이터베이스 테이블
 
 ```
 create table Item
@@ -36,7 +36,7 @@ create table Item
 
 ```
 
-class defined 
+정의된 클래스
 
 ```
 final class Item
@@ -74,7 +74,7 @@ final class Item
 }
 ```
 
-클레스의 어노테이션으로 데이터의 속성을 구분합니다.
+클래스의 어노테이션으로 데이터의 속성을 구분합니다.
 
 어노테이션으로 표현 할 수 있는 속성엔 다음의 3가지가 있습니다.
 
@@ -86,8 +86,17 @@ final class Item
 
 DataStore 에는 5가지 인터페이스(get, set, add, remove, commit)를 제공합니다. 
 
-@dataCookerAutoIncrement 의 사용 유무에 따라 add 사용시 동작이 달라집니다.
+@dataCookerAutoIncrement 의 사용 유무에 따라 add 시 동작이 달라집니다.
  
+@dataCookerAutoIncrement 가 정의 되어 있다면 add 함수 사용시 관계형 데이터 베이스에서 autoIncrement 값을 증가를 위해 먼저 add를 처리합니다. 
+
+관계형데이터베이스 저장소를 사용하지 않는다면 예외처리를 합니다.
+
+버퍼 저장소는 특별한 저장소 입니다.
+
+버퍼 저장소와 다른 저장소를 같이 사용 할때 
+
+set, delete, autoIncrement 를 정의하지 않은 add() 함수는 commit 시 다른 저장소에도 저장이 됩니다. 
 
 ```php
 
@@ -120,7 +129,7 @@ $store = new Buffer(
 ```
 
 
-## License
+## 라이센스
 
 DataCooker 는 MIT 라이센스를 사용합니다.
 
