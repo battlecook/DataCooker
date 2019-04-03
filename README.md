@@ -91,7 +91,6 @@ $ret = $store->set($object);
 $ret = $store->add($object);
 $ret = $store->remove($object);
 $ret = $store->commit($object);
-$ret = $store->rollback($object);
 
 ```
 
