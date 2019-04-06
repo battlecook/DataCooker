@@ -91,7 +91,6 @@ final class Item
 DataStore 에는 5가지 인터페이스(get, set, add, remove, commit)를 제공합니다. 
 
 ```php
-
 $store = new RelationDatabase(null, new Database('localhost', 3306, 'dbName, new Auth('id', 'password')));
        
 $object = new Item();
@@ -107,7 +106,6 @@ $ret = $store->set($object);
 $ret = $store->add($object);
 $ret = $store->remove($object);
 $ret = $store->commit($data = null);
-
 ```
 
 Memcached 와 RelationDatabase 를 같이사용 했을때의 예시
@@ -123,7 +121,6 @@ Memcached 와 RelationDatabase 를 같이사용 했을때의 예시
 +-----+-----+-----+-------+-------+-------+
 |  1  |  1  |  1  |   1   |   1   |   1   |
 +-----+-----+-----+-------+-------+-------+
-
 
 ##### progress #####
 
@@ -156,21 +153,21 @@ $ret = $store->add($object);
 
 ```
 
-
 버퍼 데이터 저장소 : 
 
 버퍼 데이터 저장소는 기본적으로 php 메모리에 데이터를 저장하게 됩니다.
 
 다른 저장소와 혼용해서 사용 시 동작방식이 조금 다릅니다.
 
-버퍼 데이터 저장소 는 get set add remove 호출시 최초 1회 다른 저장소에서 데이터를 가져와 php 메모리에 적재한 후 php 메모리에서만 작업을 진행합니다.
+버퍼 데이터 저장소 는 get set add remove 호출시, 최초 1회 다른 저장소에서 데이터를 가져와 php 메모리에 적재합니다. 
+
+그 후 commit() 함수가 수행 되기 전까지 php 메모리에서만 작업을 진행합니다.
 
 지금까지 수행했던 인터페이스의 수행을 다른 데이터 저장소에 적용을 원한다면 commit 함수를 호출하여야 합니다. 
 
 버퍼 데이터 저장소를 사용하고 클래스에 @dataCookerAutoIncrement 가 정의 되어 있다면 관계형 데이터 베이스에서 autoIncrement 값을 증가하고 그 값을 사용하기 위해서 다른 DataStore 에서는 add 함수를 선 처리 합니다.
 
 정의되어 있지 않다면 다른 함수들과 마찬가지로 후 처리 합니다.
-
 
 ```php
 
