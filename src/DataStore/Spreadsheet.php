@@ -26,6 +26,10 @@ final class Spreadsheet extends AbstractStore implements IDataStore
      */
     public function __construct(?IDataStore $store, \battlecook\Config\Spreadsheet $config)
     {
+        if($store instanceof Buffer) {
+            throw new DataCookerException("Buffer DataStore can't be exist for other DataStore.");
+        }
+
         $this->store = $store;
 
         if (file_exists($config->getPath()) === false) {

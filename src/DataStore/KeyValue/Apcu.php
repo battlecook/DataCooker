@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace battlecook\DataStore\KeyValue;
 
 use battlecook\DataCookerException;
+use battlecook\DataStore\Buffer;
 use battlecook\DataStore\IDataStore;
 
 final class Apcu extends AbstractKeyValue
@@ -11,11 +12,15 @@ final class Apcu extends AbstractKeyValue
     private $store;
 
     /**
-     * Redis constructor.
+     * Apcu constructor.
      * @param IDataStore|null $store
+     * @throws DataCookerException
      */
     public function __construct(?IDataStore $store)
     {
+        if($store instanceof Buffer) {
+            throw new DataCookerException("Buffer DataStore can't be exist for other DataStore.");
+        }
         $this->store = $store;
     }
 

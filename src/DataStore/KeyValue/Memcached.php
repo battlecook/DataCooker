@@ -5,6 +5,7 @@ namespace battlecook\DataStore\KeyValue;
 
 use battlecook\Config\Memcache;
 use battlecook\DataCookerException;
+use battlecook\DataStore\Buffer;
 use battlecook\DataStore\IDataStore;
 use battlecook\DataUtility\StoreTrait;
 
@@ -29,6 +30,9 @@ final class Memcached extends AbstractKeyValue
      */
     public function __construct(?IDataStore $store, array $configArr)
     {
+        if($store instanceof Buffer) {
+            throw new DataCookerException("Buffer DataStore can't be exist for other DataStore.");
+        }
         $this->store = $store;
 
         $this->timeExpired = self::DEFAULT_EXPIRE_TIME;

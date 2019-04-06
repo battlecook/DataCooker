@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace battlecook\DataStore\KeyValue;
 
 use battlecook\DataCookerException;
+use battlecook\DataStore\Buffer;
 use battlecook\DataStore\IDataStore;
 
 final class Redis extends AbstractKeyValue
@@ -19,6 +20,9 @@ final class Redis extends AbstractKeyValue
      */
     public function __construct(?IDataStore $store, \battlecook\Config\Redis $config)
     {
+        if($store instanceof Buffer) {
+            throw new DataCookerException("Buffer DataStore can't be exist for other DataStore.");
+        }
         $this->store = $store;
 
         $this->redis = new \Redis();
