@@ -17,6 +17,10 @@ DataCooker 는 다양한 저장소에 접근하는 방법을 추상화해서 몇
 
 README 지원언어 : [English](README.md)
 
+## 설치하는 방법
+
+packagist.org 에 업로드 예정 입니다.
+
 ## 사용하는 방법
 
 정의한 데이터베이스 테이블
@@ -78,29 +82,17 @@ final class Item
 
 어노테이션으로 표현 할 수 있는 속성엔 다음의 3가지가 있습니다.
 
-* @dataCookerIdentifier : 데이터의 필수 항목입니다.
+* @dataCookerIdentifier : 데이터의 필수 항목입니다. 복합키를 나타냅니다. 한번 이상은 선언하여야 합니다.
 
-* @dataCookerAttribute : 데이터의 필수 항목입니다.
+* @dataCookerAttribute : 데이터의 필수 항목입니다. 속성을 나타냅니다. 한번 이상은 선언하여야 합니다.
 
-* @dataCookerAutoIncrement : 데이터의 선택 항목입니다. 
+* @dataCookerAutoIncrement : 데이터의 선택 항목입니다. 자동증가값을 나타냅니다.
 
 DataStore 에는 5가지 인터페이스(get, set, add, remove, commit)를 제공합니다. 
 
-@dataCookerAutoIncrement 의 사용 유무에 따라 add 시 동작이 달라집니다.
- 
-@dataCookerAutoIncrement 가 정의 되어 있다면 add 함수 사용시 관계형 데이터 베이스에서 autoIncrement 값을 증가를 위해 먼저 add를 처리합니다. 
-
-관계형데이터베이스 저장소를 사용하지 않는다면 예외처리를 합니다.
-
-버퍼 저장소는 특별한 저장소 입니다.
-
-버퍼 저장소와 다른 저장소를 같이 사용 할때 
-
-set, delete, autoIncrement 를 정의하지 않은 add() 함수는 commit 시 다른 저장소에도 저장이 됩니다. 
-
 ```php
 
-$store = new Buffer(new RelationDatabase(null, new Database('localhost', 3306, 'dbName, new Auth('id', 'password'))));
+$store = new RelationDatabase(null, new Database('localhost', 3306, 'dbName, new Auth('id', 'password')));
        
 $object = new Item();
 $object->id1 = 1;
@@ -118,15 +110,121 @@ $ret = $store->commit($data = null);
 
 ```
 
-other complex example
+Memcached 와 RelationDatabase 를 같이사용 했을때의 예시
 
 ```php
 
-$store = new Buffer(
-            new Memcached(
-                new RelationDatabase(null, new Database('localhost', 3306, 'dbName, new Auth('id', 'password')))
-                , array(new \battlecook\Config\Memcache('localhost'))));
+##### before #####
+
+수행전 데이터베이스 상태 
+  
++-----+-----+-----+-------+-------+-------+
+| id1 | id2 | id3 | attr1 | attr2 | attr3 |
++-----+-----+-----+-------+-------+-------+
+|  1  |  1  |  1  |   1   |   1   |   1   |
++-----+-----+-----+-------+-------+-------+
+
+
+##### progress #####
+
+$store =  new Memcached(
+            new RelationDatabase(null, new Database('localhost', 3306, 'dbName, new Auth('id', 'password')))
+             , array(new \battlecook\Config\Memcache('localhost')))
+             
+$object = new Item();
+$object->id1 = 1;
+$object->id2 = 1;
+$object->id3 = 2;
+$object->attr1 = 1;
+$object->attr2 = 1;
+$object->attr3 = 1;
+
+$ret = $store->add($object);
+
+##### after #####
+
+수행 후 데이터 베이스 상태
+  
++-----+-----+-----+-------+-------+-------+
+| id1 | id2 | id3 | attr1 | attr2 | attr3 |
++-----+-----+-----+-------+-------+-------+
+|  1  |  1  |  1  |   1   |   1   |   1   |
++-----+-----+-----+-------+-------+-------+
+|  1  |  1  |  2  |   1   |   1   |   1   |
++-----+-----+-----+-------+-------+-------+
+
+
 ```
+
+
+버퍼 데이터 저장소 : 
+
+버퍼 데이터 저장소는 기본적으로 php 메모리에 데이터를 저장하게 됩니다.
+
+다른 저장소와 혼용해서 사용 시 동작방식이 조금 다릅니다.
+
+버퍼 데이터 저장소 는 get set add remove 호출시 최초 1회 다른 저장소에서 데이터를 가져와 php 메모리에 적재한 후 php 메모리에서만 작업을 진행합니다.
+
+지금까지 수행했던 인터페이스의 수행을 다른 데이터 저장소에 적용을 원한다면 commit 함수를 호출하여야 합니다. 
+
+버퍼 데이터 저장소를 사용하고 클래스에 @dataCookerAutoIncrement 가 정의 되어 있다면 관계형 데이터 베이스에서 autoIncrement 값을 증가하고 그 값을 사용하기 위해서 다른 DataStore 에서는 add 함수를 선 처리 합니다.
+
+정의되어 있지 않다면 다른 함수들과 마찬가지로 후 처리 합니다.
+
+
+```php
+
+##### before #####
+
+수행 전 데이터 베이스 상태
+  
++-----+-----+-----+-------+-------+-------+
+| id1 | id2 | id3 | attr1 | attr2 | attr3 |
++-----+-----+-----+-------+-------+-------+
+|  1  |  1  |  1  |   1   |   1   |   1   |
++-----+-----+-----+-------+-------+-------+
+
+
+##### progress1 #####
+
+$store =  new Buffer(new RelationDatabase(null, new Database('localhost', 3306, 'dbName, new Auth('id', 'password'))));
+             
+$object = new Item();
+$object->id1 = 1;
+$object->id2 = 1;
+$object->id3 = 1;
+$object->attr1 = 2;
+$object->attr2 = 2;
+$object->attr3 = 2;
+
+$ret = $store->set($object);
+
+##### after1 #####
+
+수행 후 데이터 베이스 상태
+  
++-----+-----+-----+-------+-------+-------+
+| id1 | id2 | id3 | attr1 | attr2 | attr3 |
++-----+-----+-----+-------+-------+-------+
+|  1  |  1  |  1  |   1   |   1   |   1   |
++-----+-----+-----+-------+-------+-------+
+
+
+##### progress2 #####
+
+$store->commit();
+
+##### after2 #####
+
+수행 후 데이터 베이스 상태
+  
++-----+-----+-----+-------+-------+-------+
+| id1 | id2 | id3 | attr1 | attr2 | attr3 |
++-----+-----+-----+-------+-------+-------+
+|  1  |  1  |  1  |   2   |   2   |   2   |
++-----+-----+-----+-------+-------+-------+
+```
+
 
 
 ## 라이센스
