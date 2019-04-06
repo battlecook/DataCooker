@@ -3,6 +3,8 @@
 
 ## What is it ?
 
+Buffer DataStore can't be exist for other DataStore.
+
 It's project to different kinds of data store. 
 
 This library provide to interface by abstracting access data store (\pdo, \Redis, \Memcached and so on) 

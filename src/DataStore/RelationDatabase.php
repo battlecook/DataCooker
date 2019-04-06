@@ -22,6 +22,9 @@ final class RelationDatabase extends AbstractStore implements IDataStore
      */
     public function __construct(?IDataStore $store, Database $config)
     {
+        if($store instanceof Buffer) {
+            throw new DataCookerException("Buffer DataStore can't be exist for other DataStore.");
+        }
         $this->store = $store;
 
         $dbName = $config->getDatabaseName();
