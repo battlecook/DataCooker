@@ -43,7 +43,7 @@ create table Item
 
 class defined 
 
-```
+```php
 final class Item
 {
     /**
@@ -114,10 +114,9 @@ $ret = $store->commit($data = null);
 
 complex DataStore example ( Memcached and RelationDatabase )
 
-```php
-
 ##### before #####
 
+```
 status in database
   
 +-----+-----+-----+-------+-------+-------+
@@ -127,10 +126,10 @@ status in database
 +-----+-----+-----+-------+-------+-------+
 
 status in memcached
-
+```
 
 ##### progress #####
-
+```php
 $store =  new Memcached(
             new RelationDatabase(null, new Database('localhost', 3306, 'dbName, new Auth('id', 'password')))
              , array(new \battlecook\Config\Memcache('localhost')))
@@ -144,9 +143,10 @@ $object->attr2 = 1;
 $object->attr3 = 1;
 
 $ret = $store->add($object);
+```
 
 ##### after #####
-
+```
 status in database
   
 +-----+-----+-----+-------+-------+-------+
@@ -178,9 +178,9 @@ The add function is performed first to get the autoIncrement value incremented.
 
 If it is not defined, it is postprocessed like any other function.
 
-```php
 ##### before #####
 
+```
 before status in database
   
 +-----+-----+-----+-------+-------+-------+
@@ -188,9 +188,9 @@ before status in database
 +-----+-----+-----+-------+-------+-------+
 |  1  |  1  |  1  |   1   |   1   |   1   |
 +-----+-----+-----+-------+-------+-------+
-
+```
 ##### progress1 #####
-
+```php
 $store =  new Buffer(new RelationDatabase(null, new Database('localhost', 3306, 'dbName, new Auth('id', 'password'))));
              
 $object = new Item();
@@ -202,9 +202,9 @@ $object->attr2 = 2;
 $object->attr3 = 2;
 
 $ret = $store->set($object);
-
+```
 ##### after1 #####
-
+```
 after status in database
   
 +-----+-----+-----+-------+-------+-------+
@@ -212,14 +212,14 @@ after status in database
 +-----+-----+-----+-------+-------+-------+
 |  1  |  1  |  1  |   1   |   1   |   1   |
 +-----+-----+-----+-------+-------+-------+
-
+```
 
 ##### progress2 #####
-
+```php
 $store->commit();
-
+```
 ##### after2 #####
-
+```
 after status in database
   
 +-----+-----+-----+-------+-------+-------+
