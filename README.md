@@ -3,7 +3,7 @@
 
 ## What is it ?
 
-Buffer DataStore can't be exist for other DataStore.
+Buffer DataStore cannot be existed for other DataStore.
 
 It's project to different kinds of data store. 
 
@@ -20,7 +20,6 @@ Read this in other languages : [한국어](README.ko.md)
 ## How to install
 
 this project is being prepared to upload at packagist.org
-
 
 ## How to use
 
@@ -91,7 +90,7 @@ There are three attribution to represent.
 
 * @dataCookerAutoIncrement : optional. represent auto increment value.
 
-DataStore provide five interface (get, set, add, remove, commit) 
+DataStore provides five interface (get, set, add, remove, commit) 
 
 
 ```php
