@@ -12,7 +12,7 @@ final class Attribute
         $this->attributes = $attributes;
     }
 
-    public function getAttributes()
+    public function getAttributes(): array
     {
         return $this->attributes;
     }

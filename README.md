@@ -3,8 +3,6 @@
 
 ## What is it ?
 
-Buffer DataStore cannot be existed for other DataStore.
-
 It's project for different kinds of data store. 
 
 It provides an interface by abstracting individual libraries (\ pdo, \ Redis, \ Memcached, etc.) that access data stores.
@@ -159,19 +157,19 @@ status in database
 status in memcached
 ```
 
-Buffer DataStore : 
+Buffered DataStore : 
 
-Buffer DataStore basically store in Php memory.
+BufferedDataStore basically store in Php memory.
 
-If you use multiple DataStore with Buffer DataStore, It is different to operate a little.
+If you use multiple DataStore with BufferedDataStore, It is different to operate a little.
 
-When Buffer DataStore operate function (get set add remove), The first time, it get data from another repository and load it into php memory.
+When BufferedDataStore operate function (get set add remove), The first time, it get data from another repository and load it into php memory.
 
 After that, it only work in php Memory until called commit() function.
 
 Therefore, if you want to be applied from another DataStore, you must call the commit function.
 
-If you are using a Buffer DataStore and @dataCookerAutoIncrement is defined in your class, 
+If you are using a BufferedDataStore and @dataCookerAutoIncrement is defined in your class, 
 
 The add function is performed first to get the autoIncrement value incremented.
 
@@ -190,7 +188,7 @@ before status in database
 ```
 ##### progress1 #####
 ```php
-$store =  new Buffer(new RelationDatabase(null, new Database('localhost', 3306, 'dbName, new Auth('id', 'password'))));
+$store =  new Buffered(new RelationDatabase(null, new Database('localhost', 3306, 'dbName, new Auth('id', 'password'))));
              
 $object = new Item();
 $object->id1 = 1;

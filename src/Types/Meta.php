@@ -16,7 +16,7 @@ final class Meta
         $this->depth = count($field->getIdentifiers());
     }
 
-    public function getField()
+    public function getField(): Field
     {
         return $this->field;
     }
@@ -26,12 +26,12 @@ final class Meta
         return $this->field->hasAutoIncrement();
     }
 
-    public function getDataName()
+    public function getDataName(): string
     {
         return $this->dataName;
     }
 
-    public function getDepth()
+    public function getDepth(): int
     {
         return $this->depth;
     }

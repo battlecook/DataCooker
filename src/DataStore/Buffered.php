@@ -7,7 +7,7 @@ use battlecook\Types\Status;
 use battlecook\DataCookerException;
 use battlecook\Types\PhpMemory;
 
-final class Buffer extends AbstractStore implements IDataStore
+final class Buffered extends AbstractStore implements IDataStore
 {
     /**
      * @var $phpData PhpMemory
@@ -91,6 +91,8 @@ final class Buffer extends AbstractStore implements IDataStore
                 if (empty($object->$autoIncrement) === true) {
                     throw new DataCookerException("autoIncrement value is null");
                 }
+
+                //todo have to have added $object, because when convert, can remove added data
                 $keys = $this->getIdentifierValues($cacheKey, $object);
                 self::$phpData->insert($cacheKey, $keys, $object, Status::NONE);
             }
@@ -170,7 +172,7 @@ final class Buffer extends AbstractStore implements IDataStore
     public function commit($data = null)
     {
         if ($data !== null) {
-            throw new DataCookerException("BufferStore can't commit to data");
+            throw new DataCookerException("BufferedDataStore can't commit to data");
         }
 
         $trees = self::$phpData->getTrees();
@@ -179,15 +181,9 @@ final class Buffer extends AbstractStore implements IDataStore
         }
     }
 
-    public function rollback()
-    {
-        self::initialize();
-    }
-
-    public static function initialize()
+    public function convert()
     {
         parent::initialize();
-
         self::$phpData = new PhpMemory();
     }
 }
