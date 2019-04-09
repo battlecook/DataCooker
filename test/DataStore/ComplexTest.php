@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace test\DataStore;
 
-use battlecook\DataStore\Buffer;
+use battlecook\DataStore\Buffered;
 use battlecook\DataStore\RelationDatabase;
 use PHPUnit\Framework\TestCase;
 use test\Fixture\DataStore\Item;
@@ -42,7 +42,7 @@ class ComplexTest extends TestCase
     public function testBufferRelationDatabase()
     {
         //given
-        $store = new Buffer(new RelationDatabase(null, Config::getDatabaseConfig()));
+        $store = new Buffered(new RelationDatabase(null, Config::getDatabaseConfig()));
 
         $object = new Item();
         $object->id1 = 1;
@@ -66,7 +66,7 @@ class ComplexTest extends TestCase
     public function testAddDuplicated()
     {
         //given
-        $storage = new Buffer(new RelationDatabase(null, Config::getDatabaseConfig()));
+        $storage = new Buffered(new RelationDatabase(null, Config::getDatabaseConfig()));
 
         $object = new Item();
         $object->id1 = 1;
@@ -89,8 +89,10 @@ class ComplexTest extends TestCase
     public function testSetBufferRDB()
     {
         //given
-        Buffer::initialize();
-        $store = new Buffer(new RelationDatabase(null, Config::getDatabaseConfig()));
+        $buffered = new Buffered();
+        $buffered->convert();
+
+        $store = new Buffered(new RelationDatabase(null, Config::getDatabaseConfig()));
 
         $object = new Item();
         //$object->id1 = 1;

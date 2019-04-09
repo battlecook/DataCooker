@@ -45,9 +45,4 @@ final class LeafNode extends Node
         $this->status = $status;
         $this->data = $data;
     }
-
-    public function delete(int $status)
-    {
-        $this->status = $status;
-    }
 }

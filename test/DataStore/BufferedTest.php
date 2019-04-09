@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace test\DataStore;
 
-use battlecook\DataStore\Buffer;
+use battlecook\DataStore\Buffered;
 use PHPUnit\Framework\TestCase;
 use test\Fixture\DataStore\Item;
 use test\Fixture\DataStore\ItemAutoIncrementAlone;
@@ -12,11 +12,12 @@ use test\Fixture\DataStore\ItemMultiAutoIncrement;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
-class BufferTest extends TestCase
+class BufferedTest extends TestCase
 {
     public function setUp()
     {
-        Buffer::initialize();
+        $buffered = new Buffered();
+        $buffered->convert();
     }
 
     /**
@@ -26,7 +27,7 @@ class BufferTest extends TestCase
     public function testNoCachedFieldMultiAutoIncrement()
     {
         //given
-        $store = new Buffer();
+        $store = new Buffered();
 
         $object = new ItemMultiAutoIncrement();
 
@@ -43,7 +44,7 @@ class BufferTest extends TestCase
     public function testAutoIncrementNotInteger()
     {
         //given
-        $store = new Buffer();
+        $store = new Buffered();
 
         $object = new Item();
         $object->id1 = '1';
@@ -61,7 +62,7 @@ class BufferTest extends TestCase
     public function testEmptyIdentifiers()
     {
         //given
-        $store = new Buffer();
+        $store = new Buffered();
 
         $object = new ItemEmptyIdentifiers();
 
@@ -78,7 +79,7 @@ class BufferTest extends TestCase
     public function testAutoIncrementAlone()
     {
         //given
-        $store = new Buffer();
+        $store = new Buffered();
 
         $object = new ItemAutoIncrementAlone();
         $object->id1 = 1;
@@ -97,7 +98,7 @@ class BufferTest extends TestCase
     public function testGetAll()
     {
         //given
-        $store = new Buffer();
+        $store = new Buffered();
 
         $object1 = new Item();
         $object1->id1 = 1;
@@ -131,7 +132,7 @@ class BufferTest extends TestCase
     public function testAdd()
     {
         //given
-        $store = new Buffer();
+        $store = new Buffered();
 
         $object = new Item();
         $object->id1 = 1;
@@ -151,7 +152,7 @@ class BufferTest extends TestCase
     public function testSet()
     {
         //given
-        $store = new Buffer();
+        $store = new Buffered();
 
         $object = new Item();
         $object->id1 = 1;
@@ -180,7 +181,7 @@ class BufferTest extends TestCase
     public function testRemove()
     {
         //given
-        $store = new Buffer();
+        $store = new Buffered();
 
         $object1 = new Item();
         $object1->id1 = 1;
