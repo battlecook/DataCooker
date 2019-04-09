@@ -5,9 +5,9 @@
 
 Buffer DataStore cannot be existed for other DataStore.
 
-It's project to different kinds of data store. 
+It's project for different kinds of data store. 
 
-This library provide to interface by abstracting access data store (\pdo, \Redis, \Memcached and so on) 
+It provides an interface by abstracting individual libraries (\ pdo, \ Redis, \ Memcached, etc.) that access data stores.
 
 Supported DataStore
 
