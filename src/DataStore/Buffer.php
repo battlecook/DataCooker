@@ -6,12 +6,9 @@ namespace battlecook\DataStore;
 use battlecook\Data\Status;
 use battlecook\DataCookerException;
 use battlecook\DataStorage\PhpMemory;
-use battlecook\DataUtility\StoreTrait;
 
 final class Buffer extends AbstractStore implements IDataStore
 {
-    use StoreTrait;
-
     /**
      * @var $phpData PhpMemory
      */

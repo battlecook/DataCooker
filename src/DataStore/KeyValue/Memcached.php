@@ -7,12 +7,9 @@ use battlecook\Config\Memcache;
 use battlecook\DataCookerException;
 use battlecook\DataStore\Buffer;
 use battlecook\DataStore\IDataStore;
-use battlecook\DataUtility\StoreTrait;
 
 final class Memcached extends AbstractKeyValue
 {
-    use StoreTrait;
-
     private $store;
     private $memcached;
 
