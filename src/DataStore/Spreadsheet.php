@@ -219,7 +219,6 @@ final class Spreadsheet extends AbstractStore implements IDataStore
 
     public static function initialize()
     {
-        parent::initialize();
         self::$columnsMap = array();
     }
 

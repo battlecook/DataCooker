@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace test\DataStore;
 
+use battlecook\DataStore\AbstractStore;
 use battlecook\DataStore\Buffered;
 use PHPUnit\Framework\TestCase;
 use test\Fixture\DataStore\Item;
@@ -16,6 +17,8 @@ class BufferedTest extends TestCase
 {
     public function setUp()
     {
+        AbstractStore::initializeCachedMeta();
+
         $buffered = new Buffered();
         $buffered->convert();
     }
