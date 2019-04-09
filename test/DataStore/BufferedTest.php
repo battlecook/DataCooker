@@ -95,7 +95,7 @@ class BufferedTest extends TestCase
         //then
     }
 
-    public function testGetAll()
+    public function testSearchAll()
     {
         //given
         $store = new Buffered();
@@ -120,7 +120,7 @@ class BufferedTest extends TestCase
 
         //when
         $object = new Item();
-        $ret = $store->get($object);
+        $ret = $store->search($object);
 
         //then
         $this->assertEquals(2, count($ret));
@@ -174,7 +174,7 @@ class BufferedTest extends TestCase
         $store->set($object2);
 
         //then
-        $ret = $store->get(new Item());
+        $ret = $store->search(new Item());
         $this->assertEquals($object2, $ret[0]);
     }
 
@@ -212,7 +212,7 @@ class BufferedTest extends TestCase
         $object = new Item();
         $object->id1 = 1;
         $object->id2 = 1;
-        $ret = $store->get($object);
+        $ret = $store->search($object);
         $this->assertEquals($object2, $ret[0]);
     }
 }

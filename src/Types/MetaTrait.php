@@ -172,6 +172,21 @@ trait MetaTrait
         }
     }
 
+    /**
+     * @param string $cacheKey
+     * @param $object
+     * @throws DataCookerException
+     */
+    protected function checkHaveAllIdentifiersData(string $cacheKey, $object)
+    {
+        $identifiers = self::$cachedMetaMap[$cacheKey]->getField()->getIdentifiers();
+        foreach ($identifiers as $identifier) {
+            if ($object->$identifier === null) {
+                throw new DataCookerException("identifiers don't fill all");
+            }
+        }
+    }
+
     protected function haveOneDataAtLeast(string $cacheKey, $object): bool
     {
         $fields = self::$cachedMetaMap[$cacheKey]->getField()->getFields();

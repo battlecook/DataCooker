@@ -42,7 +42,7 @@ final class Buffered extends AbstractStore implements IDataStore
                 }
 
                 //todo if array is big, performance is raw. so need insertMulti which better than insert many time
-                $objectArray = $this->store->get($paramObject);
+                $objectArray = $this->store->search($paramObject);
                 foreach ($objectArray as $object) {
                     $keys = $this->getIdentifierValues($cacheKey, $object);
 
@@ -109,7 +109,22 @@ final class Buffered extends AbstractStore implements IDataStore
      * @return array
      * @throws DataCookerException
      */
-    public function get($object): array
+    public function get($object)
+    {
+        $cacheKey = get_class($object);
+        $this->setMeta($object);
+        $this->checkHaveAllIdentifiersData($cacheKey, $object);
+        $ret = $this->search($object);
+
+        return $ret[0];
+    }
+
+    /**
+     * @param $object
+     * @return array
+     * @throws DataCookerException
+     */
+    public function search($object): array
     {
         $cacheKey = get_class($object);
         $this->setUp($cacheKey, $object);

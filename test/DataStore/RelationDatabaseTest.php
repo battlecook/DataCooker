@@ -116,7 +116,7 @@ class RelationDatabaseTest extends TestCase
     /**
      * @throws \battlecook\DataCookerException
      */
-    public function testGet()
+    public function testSearchEmptyData()
     {
         //given
         $store = new RelationDatabase(null, Config::getDatabaseConfig());
@@ -124,7 +124,7 @@ class RelationDatabaseTest extends TestCase
         $object = new Item();
 
         //when
-        $ret = $store->get($object);
+        $ret = $store->search($object);
 
         //then
         $this->assertEquals(array(), $ret);
@@ -158,7 +158,7 @@ class RelationDatabaseTest extends TestCase
         $store->set($object2);
 
         //then
-        $ret = $store->get(new Item());
+        $ret = $store->search(new Item());
         $this->assertEquals($object2, $ret[0]);
     }
 
@@ -198,7 +198,7 @@ class RelationDatabaseTest extends TestCase
         //then
         $object = new Item();
         $object->id2 = 1;
-        $ret = $store->get($object);
+        $ret = $store->search($object);
         $this->assertEquals($object2, $ret[0]);
     }
 }

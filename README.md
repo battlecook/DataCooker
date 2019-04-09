@@ -88,7 +88,7 @@ There are three attribution to represent.
 
 * @dataCookerAutoIncrement : optional. represent auto increment value.
 
-DataStore provides five interface (get, set, add, remove, commit) 
+DataStore provides six interface (get, search, set, add, remove, commit) 
 
 
 ```php
@@ -103,6 +103,7 @@ $object->attr2 = 1;
 $object->attr3 = 1;
 
 $ret = $store->get($object);
+$ret = $store->search($object): array;
 $ret = $store->set($object);
 $ret = $store->add($object);
 $ret = $store->remove($object);

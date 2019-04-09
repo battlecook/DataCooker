@@ -111,18 +111,17 @@ class SpreadsheetTest extends TestCase
         $object->attr1 = 1;
         $object->attr2 = 1;
         $object->attr3 = 1;
-
         //when
         $ret = $store->get($object);
 
         //then
-        $this->assertEquals($object, $ret[0]);
+        $this->assertEquals($object, $ret);
     }
 
     /**
      * @throws \battlecook\DataCookerException
      */
-    public function testGetAll()
+    public function testSearchAll()
     {
         //given
         $store = new Spreadsheet(null,
@@ -131,7 +130,7 @@ class SpreadsheetTest extends TestCase
         $object = new Quest();
 
         //when
-        $ret = $store->get($object);
+        $ret = $store->search($object);
 
         //then
         $this->assertEquals(9, count($ret));

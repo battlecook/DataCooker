@@ -109,7 +109,27 @@ final class Spreadsheet extends AbstractStore implements IDataStore
         return clone $object;
     }
 
-    public function get($object): array
+    /**
+     * @param $object
+     * @return array
+     * @throws DataCookerException
+     */
+    public function get($object)
+    {
+        $cacheKey = get_class($object);
+        $this->setMeta($object);
+        $this->checkHaveAllIdentifiersData($cacheKey, $object);
+        $ret = $this->search($object);
+
+        return $ret[0];
+    }
+
+    /**
+     * @param $object
+     * @return array
+     * @throws DataCookerException
+     */
+    public function search($object): array
     {
         $cacheKey = get_class($object);
         $this->setMeta($object);

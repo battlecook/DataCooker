@@ -88,7 +88,7 @@ final class Item
 
 * @dataCookerAutoIncrement : 데이터의 선택 항목입니다. 자동증가값을 나타냅니다.
 
-DataStore 에는 5가지 인터페이스(get, set, add, remove, commit)를 제공합니다. 
+DataStore 에는 6가지 인터페이스(get, search, set, add, remove, commit)를 제공합니다. 
 
 ```php
 $store = new RelationDatabase(null, new Database('localhost', 3306, 'dbName, new Auth('id', 'password')));
@@ -102,6 +102,7 @@ $object->attr2 = 1;
 $object->attr3 = 1;
 
 $ret = $store->get($object);
+$ret = $store->search($object): array;
 $ret = $store->set($object);
 $ret = $store->add($object);
 $ret = $store->remove($object);
