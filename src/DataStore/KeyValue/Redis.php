@@ -98,7 +98,22 @@ final class Redis extends AbstractKeyValue
      * @return array
      * @throws DataCookerException
      */
-    public function get($object): array
+    public function get($object)
+    {
+        $cacheKey = get_class($object);
+        $this->setMeta($object);
+        $this->checkHaveAllIdentifiersData($cacheKey, $object);
+        $ret = $this->search($object);
+
+        return $ret[0];
+    }
+
+    /**
+     * @param $object
+     * @return array
+     * @throws DataCookerException
+     */
+    public function search($object): array
     {
         $cacheKey = get_class($object);
         if ($this->isGetAll($cacheKey, $object) === true && $this->store === null) {

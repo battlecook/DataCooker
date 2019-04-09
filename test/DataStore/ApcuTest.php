@@ -132,7 +132,7 @@ class ApcuTest extends TestCase
         $this->assertEquals($expect2, unserialize(apcu_fetch($key2 . '\\' . 1)));
     }
 
-    public function testGetRoot()
+    public function testSearchRoot()
     {
         //given
         $store = new Apcu(null);
@@ -219,13 +219,13 @@ class ApcuTest extends TestCase
         $object->id1 = 1;
 
         //when
-        $ret = $store->get($object);
+        $ret = $store->search($object);
 
         //then
         $this->assertEquals(4, count($ret));
     }
 
-    public function testGetInternal()
+    public function testSearchInternal()
     {
         //given
         $store = new Apcu(null);
@@ -314,7 +314,7 @@ class ApcuTest extends TestCase
         $object->id2 = 1;
 
         //when
-        $ret = $store->get($object);
+        $ret = $store->search($object);
 
         //then
         $this->assertEquals(2, count($ret));
@@ -322,7 +322,104 @@ class ApcuTest extends TestCase
         $this->assertEquals($object6, $ret[1]);
     }
 
-    public function testGetLeaf()
+    public function testSearchLeaf()
+    {
+        //given
+        $store = new Apcu(null);
+
+        $object1 = new Item();
+        $object1->id1 = 1;
+        $object1->id2 = 1;
+        $object1->id3 = 1;
+        $object1->attr1 = 1;
+        $object1->attr2 = 1;
+        $object1->attr3 = 1;
+
+        $object2 = new Item();
+        $object2->id1 = 1;
+        $object2->id2 = 1;
+        $object2->id3 = 2;
+        $object2->attr1 = 2;
+        $object2->attr2 = 2;
+        $object2->attr3 = 2;
+
+        $object3 = new Item();
+        $object3->id1 = 1;
+        $object3->id2 = 2;
+        $object3->id3 = 1;
+        $object3->attr1 = 3;
+        $object3->attr2 = 3;
+        $object3->attr3 = 3;
+
+        $object4 = new Item();
+        $object4->id1 = 1;
+        $object4->id2 = 2;
+        $object4->id3 = 2;
+        $object4->attr1 = 4;
+        $object4->attr2 = 4;
+        $object4->attr3 = 4;
+
+        $object5 = new Item();
+        $object5->id1 = 2;
+        $object5->id2 = 1;
+        $object5->id3 = 1;
+        $object5->attr1 = 5;
+        $object5->attr2 = 5;
+        $object5->attr3 = 5;
+
+        $object6 = new Item();
+        $object6->id1 = 2;
+        $object6->id2 = 1;
+        $object6->id3 = 2;
+        $object6->attr1 = 6;
+        $object6->attr2 = 6;
+        $object6->attr3 = 6;
+
+        $data = array(
+            get_class(new Item()) =>
+                array(
+                    1 =>
+                        array(
+                            1 =>
+                                array(
+                                    1 => new LeafNode(array(1, 1, 1), $object1),
+                                    2 => new LeafNode(array(1, 1, 2), $object2)
+                                ),
+
+                            2 =>
+                                array(
+                                    1 => new LeafNode(array(1, 2, 1), $object3),
+                                    2 => new LeafNode(array(1, 2, 2), $object4)
+                                ),
+                        ),
+                    2 =>
+                        array(
+                            1 =>
+                                array(
+                                    1 => new LeafNode(array(2, 1, 1), $object5),
+                                    2 => new LeafNode(array(2, 1, 2), $object6)
+                                ),
+
+                        )
+                )
+        );
+
+        $store->commit($data);
+
+        $object = new Item();
+        $object->id1 = 1;
+        $object->id2 = 2;
+        $object->id3 = 1;
+
+        //when
+        $ret = $store->search($object);
+
+        //then
+        $this->assertEquals($object3, $ret[0]);
+    }
+
+
+    public function testGet()
     {
         //given
         $store = new Apcu(null);
@@ -415,7 +512,7 @@ class ApcuTest extends TestCase
         $ret = $store->get($object);
 
         //then
-        $this->assertEquals($object3, $ret[0]);
+        $this->assertEquals($object3, $ret);
     }
 
     /**
@@ -495,7 +592,7 @@ class ApcuTest extends TestCase
         $object->id1 = 1;
         $object->id2 = 1;
         $object->id3 = 1;
-        $expected = $store->get($object);
+        $expected = $store->search($object);
 
         $this->assertEquals($expected[0], $ret);
 
@@ -574,7 +671,7 @@ class ApcuTest extends TestCase
         $object->id1 = 1;
         $object->id2 = 1;
         $object->id3 = 1;
-        $expected = $store->get($object);
+        $expected = $store->search($object);
 
         $this->assertEquals($expected[0], $ret);
     }
@@ -608,7 +705,7 @@ class ApcuTest extends TestCase
         $object->id1 = 1;
         $object->id2 = 1;
         $object->id3 = 1;
-        $ret = $store->get($object);
+        $ret = $store->search($object);
         $this->assertEquals($object2, $ret[0]);
     }
 
@@ -646,7 +743,7 @@ class ApcuTest extends TestCase
         $object = new Item();
         $object->id1 = 1;
         $object->id2 = 1;
-        $ret = $store->get($object);
+        $ret = $store->search($object);
         $this->assertEquals($object2, $ret[0]);
     }
 
@@ -718,7 +815,7 @@ class ApcuTest extends TestCase
         //then
         $object = new Item();
         $object->id1 = 1;
-        $ret = $store->get($object);
+        $ret = $store->search($object);
 
         $this->assertEquals(array($object3, $object4), $ret);
     }
@@ -791,7 +888,7 @@ class ApcuTest extends TestCase
         $object = new Item();
         $object->id1 = 1;
         $object->id2 = 1;
-        $ret = $store->get($object);
+        $ret = $store->search($object);
         $this->assertEquals(array(), $ret);
     }
 }

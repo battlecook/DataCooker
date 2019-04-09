@@ -7,7 +7,9 @@ interface IDataStore
 {
     public function add($object);
 
-    public function get($object): array;
+    public function get($object);
+
+    public function search($filter): array;
 
     public function set($object);
 

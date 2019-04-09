@@ -24,9 +24,14 @@ final class MockStore extends AbstractStore implements IDataStore
         // TODO: Implement add() method.
     }
 
-    public function get($object): array
+    public function get($object)
     {
         // TODO: Implement get() method.
+    }
+
+    public function search($object): array
+    {
+        // TODO: Implement search() method.
     }
 
     public function set($object)
