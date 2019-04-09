@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace battlecook\DataStorage;
+namespace battlecook\Types;
 
-use battlecook\Data\Status;
+use battlecook\Types\Status;
 use battlecook\DataCookerException;
 
 final class PhpMemory

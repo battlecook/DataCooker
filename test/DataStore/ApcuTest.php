@@ -1,13 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace test\DataStorage;
+namespace test\DataStore;
 
 use battlecook\DataStore\KeyValue\Apcu;
-use battlecook\DataStorage\LeafNode;
-use battlecook\DataStructure\Attribute;
+use battlecook\Types\LeafNode;
+use battlecook\Types\Attribute;
 use PHPUnit\Framework\TestCase;
-use test\Fixture\DataStorage\Item;
+use test\Fixture\DataStore\Item;
 use test\Fixture\DataStore\Quest;
 use test\Helper\MockStore;
 

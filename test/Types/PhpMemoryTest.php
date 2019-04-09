@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace test\DataStorage;
 
-use battlecook\Data\Status;
-use battlecook\DataStorage\Field;
-use battlecook\DataStorage\LeafNode;
-use battlecook\DataStorage\Meta;
-use battlecook\DataStorage\PhpMemory;
+use battlecook\Types\Status;
+use battlecook\Types\Field;
+use battlecook\Types\LeafNode;
+use battlecook\Types\Meta;
+use battlecook\Types\PhpMemory;
 use PHPUnit\Framework\TestCase;
-use test\Fixture\DataStorage\Item;
+use test\Fixture\DataStore\Item;
 use test\Fixture\DataStore\Quest;
 
 require __DIR__ . '/../../vendor/autoload.php';

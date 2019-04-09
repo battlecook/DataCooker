@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace battlecook\DataStore;
 
 use battlecook\Config\Database;
-use battlecook\Data\Status;
+use battlecook\Types\Status;
 use battlecook\DataCookerException;
 use battlecook\DataStore\KeyValue\AbstractKeyValue;
 

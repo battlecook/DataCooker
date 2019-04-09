@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace test\DataStorage;
+namespace test\DataStore;
 
 use battlecook\DataStore\Buffer;
 use battlecook\DataStore\RelationDatabase;
 use PHPUnit\Framework\TestCase;
-use test\Fixture\DataStorage\Item;
+use test\Fixture\DataStore\Item;
 use test\Helper\Config;
 
 require __DIR__ . '/../../vendor/autoload.php';

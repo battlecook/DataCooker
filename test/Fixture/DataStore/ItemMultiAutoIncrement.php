@@ -1,22 +1,22 @@
 <?php
 declare(strict_types=1);
 
-namespace test\Fixture\DataStorage;
+namespace test\Fixture\DataStore;
 
-require __DIR__  . '/../../../vendor/autoload.php';
+require __DIR__ . '/../../../vendor/autoload.php';
 
-final class User
+final class ItemMultiAutoIncrement
 {
     /**
      * @dataCookerVersion
      */
     public $version;
     /**
-     * @dataCookerAutoIncrement
      * @dataCookerIdentifier
      */
     public $id1;
     /**
+     * @dataCookerAutoIncrement
      * @dataCookerIdentifier
      */
     public $id2;
@@ -25,6 +25,7 @@ final class User
      */
     public $id3;
     /**
+     * @dataCookerAutoIncrement
      * @dataCookerAttribute
      */
     public $attr1;

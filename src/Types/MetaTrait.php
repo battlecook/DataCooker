@@ -1,10 +1,10 @@
 <?php
 
-namespace battlecook\DataUtility;
+namespace battlecook\Types;
 
 use battlecook\DataCookerException;
-use battlecook\DataStorage\Field;
-use battlecook\DataStorage\Meta;
+use battlecook\Types\Field;
+use battlecook\Types\Meta;
 
 trait MetaTrait
 {

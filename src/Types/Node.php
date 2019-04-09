@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace battlecook\DataStorage;
+namespace battlecook\Types;
 
 class Node
 {
