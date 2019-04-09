@@ -16,7 +16,7 @@ final class MockStore extends AbstractStore implements IDataStore
 
     public function tearDown()
     {
-        self::initialize();
+        AbstractStore::initializeCachedMeta();
     }
 
     public function add($object)

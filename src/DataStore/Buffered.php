@@ -10,16 +10,18 @@ use battlecook\Types\PhpMemory;
 final class Buffered extends AbstractStore implements IDataStore
 {
     /**
-     * @var $phpData PhpMemory
+     * @var $bufferedData PhpMemory
      */
-    private static $phpData;
+    private static $bufferedData;
+
+    private static $addedObjectGroup = array();
 
     private $store;
 
     public function __construct(IDataStore $store = null)
     {
         $this->store = $store;
-        if (empty(self::$phpData) === true) {
+        if (empty(self::$bufferedData) === true) {
             self::initialize();
         }
     }
@@ -49,15 +51,21 @@ final class Buffered extends AbstractStore implements IDataStore
                     if (count($keys) !== $this->getDepth($cacheKey)) {
                         throw new DataCookerException("invalid depth");
                     }
-                    self::$phpData->insert($cacheKey, $keys, $object, Status::NONE);
+                    self::$bufferedData->insert($cacheKey, $keys, $object, Status::NONE);
                 }
             }
         }
     }
 
+    /**
+     * @param $cacheKey
+     * @param $keys
+     * @return int
+     * @throws DataCookerException
+     */
     private function getChangeStatus($cacheKey, $keys)
     {
-        $ret = self::$phpData->search($cacheKey, $keys);
+        $ret = self::$bufferedData->search($cacheKey, $keys);
         if (empty($ret) === false) {
             if ($this->hasAutoIncrement($cacheKey) === true) {
                 $changedStatus = Status::getStatusWithAutoIncrement($ret[0]->getStatus(), Status::INSERTED);
@@ -92,13 +100,14 @@ final class Buffered extends AbstractStore implements IDataStore
                     throw new DataCookerException("autoIncrement value is null");
                 }
 
-                //todo have to have added $object, because when convert, can remove added data
+                $addedObjectGroup[] = $object;
+
                 $keys = $this->getIdentifierValues($cacheKey, $object);
-                self::$phpData->insert($cacheKey, $keys, $object, Status::NONE);
+                self::$bufferedData->insert($cacheKey, $keys, $object, Status::NONE);
             }
         } else {
             $keys = $this->getIdentifierValues($cacheKey, $object);
-            self::$phpData->insert($cacheKey, $keys, $object, $this->getChangeStatus($cacheKey, $keys));
+            self::$bufferedData->insert($cacheKey, $keys, $object, $this->getChangeStatus($cacheKey, $keys));
         }
 
         return clone $object;
@@ -134,7 +143,7 @@ final class Buffered extends AbstractStore implements IDataStore
         if (count($keys) > $this->getDepth($cacheKey)) {
             throw new DataCookerException("");
         }
-        $nodeArr = self::$phpData->search($cacheKey, $keys);
+        $nodeArr = self::$bufferedData->search($cacheKey, $keys);
 
         $ret = array();
         foreach ($nodeArr as $node) {
@@ -160,7 +169,7 @@ final class Buffered extends AbstractStore implements IDataStore
         if (count($keys) !== $this->getDepth($cacheKey)) {
             throw new DataCookerException("invalid depth");
         }
-        self::$phpData->update($cacheKey, $keys, $object, $this->hasAutoIncrement($cacheKey));
+        self::$bufferedData->update($cacheKey, $keys, $object, $this->hasAutoIncrement($cacheKey));
     }
 
     /**
@@ -177,7 +186,7 @@ final class Buffered extends AbstractStore implements IDataStore
         if (count($keys) !== $this->getDepth($cacheKey)) {
             throw new DataCookerException("invalid depth");
         }
-        self::$phpData->delete($cacheKey, $keys, $this->hasAutoIncrement($cacheKey));
+        self::$bufferedData->delete($cacheKey, $keys, $this->hasAutoIncrement($cacheKey));
     }
 
     /**
@@ -190,15 +199,26 @@ final class Buffered extends AbstractStore implements IDataStore
             throw new DataCookerException("BufferedDataStore can't commit to data");
         }
 
-        $trees = self::$phpData->getTrees();
+        $trees = self::$bufferedData->getTrees();
         if ($this->store !== null) {
             $this->store->commit($trees);
         }
+
+        $this->initialize();
     }
 
     public function convert()
     {
-        parent::initialize();
-        self::$phpData = new PhpMemory();
+        foreach(self::$addedObjectGroup as $addedObject) {
+            $this->store->remove($addedObject);
+        }
+
+        $this->initialize();
+    }
+
+    private function initialize() {
+
+        self::$addedObjectGroup = array();
+        self::$bufferedData = new PhpMemory();
     }
 }

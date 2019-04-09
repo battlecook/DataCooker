@@ -232,7 +232,7 @@ trait MetaTrait
         return self::$cachedMetaMap[$dataName];
     }
 
-    protected static function initialize()
+    public static function initializeCachedMeta()
     {
         self::$cachedMetaMap = array();
     }
