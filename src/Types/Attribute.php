@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace battlecook\DataStructure;
+namespace battlecook\Types;
 
 final class Attribute
 {

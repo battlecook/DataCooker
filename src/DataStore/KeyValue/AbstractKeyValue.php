@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace battlecook\DataStore\KeyValue;
 
-use battlecook\Data\Status;
+use battlecook\Types\Status;
 use battlecook\DataCookerException;
-use battlecook\DataStorage\LeafNode;
+use battlecook\Types\LeafNode;
 use battlecook\DataStore\AbstractStore;
 use battlecook\DataStore\IDataStore;
-use battlecook\DataStructure\Attribute;
+use battlecook\Types\Attribute;
 
 abstract class AbstractKeyValue extends AbstractStore implements IDataStore
 {

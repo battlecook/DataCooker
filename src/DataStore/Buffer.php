@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace battlecook\DataStore;
 
-use battlecook\Data\Status;
+use battlecook\Types\Status;
 use battlecook\DataCookerException;
-use battlecook\DataStorage\PhpMemory;
+use battlecook\Types\PhpMemory;
 
 final class Buffer extends AbstractStore implements IDataStore
 {

@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace test\DataStorage;
+namespace test\DataStore;
 
 use battlecook\DataStore\Buffer;
 use PHPUnit\Framework\TestCase;
-use test\Fixture\DataStorage\Item;
-use test\Fixture\DataStorage\ItemAutoIncrementAlone;
-use test\Fixture\DataStorage\ItemEmptyIdentifiers;
-use test\Fixture\DataStorage\ItemMultiAutoIncrement;
+use test\Fixture\DataStore\Item;
+use test\Fixture\DataStore\ItemAutoIncrementAlone;
+use test\Fixture\DataStore\ItemEmptyIdentifiers;
+use test\Fixture\DataStore\ItemMultiAutoIncrement;
 
 require __DIR__ . '/../../vendor/autoload.php';
 

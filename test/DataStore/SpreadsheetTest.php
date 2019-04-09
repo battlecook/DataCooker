@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace test\DataStorage;
+namespace test\DataStore;
 
 use battlecook\DataStore\Spreadsheet;
 use PHPUnit\Framework\TestCase;
 use test\Fixture\DataStore\Quest;
-use test\Fixture\DataStorage\Item;
+use test\Fixture\DataStore\Item;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
@@ -27,7 +27,7 @@ class SpreadsheetTest extends TestCase
 
         //when
         new Spreadsheet(null,
-            new \battlecook\Config\Spreadsheet(__DIR__ . "/../Fixture/DataAccessor/SampleEmptySheet.xlsx"));
+            new \battlecook\Config\Spreadsheet(__DIR__ . "/../Fixture/DataStore/SampleEmptySheet.xlsx"));
 
         //then
     }

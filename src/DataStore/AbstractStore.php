@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace battlecook\DataStore;
 
-use battlecook\DataUtility\MetaTrait;
+use battlecook\Types\MetaTrait;
 
 abstract class AbstractStore
 {
