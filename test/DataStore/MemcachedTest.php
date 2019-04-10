@@ -26,7 +26,7 @@ class MemcachedTest extends TestCase
     public static function setUpBeforeClass(): void
     {
         self::$memcached = new \Memcached();
-        if (self::$memcached->addServer(Config::$memcachedIP, 11211) === false) {
+        if (self::$memcached->addServer(Option::$memcachedIP, 11211) === false) {
             die('memcached addServer failed');
         }
     }
