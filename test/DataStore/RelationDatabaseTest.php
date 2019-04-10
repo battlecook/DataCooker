@@ -7,6 +7,7 @@ use battlecook\DataStore\RelationDatabase;
 use PHPUnit\Framework\TestCase;
 use test\Fixture\DataStore\Item;
 use test\Helper\Config;
+use test\Helper\Option;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
@@ -37,12 +38,21 @@ class RelationDatabaseTest extends TestCase
     }
 
     /**
+     * @return RelationDatabase
+     * @throws \battlecook\DataCookerException
+     */
+    private function createStore()
+    {
+        return new RelationDatabase(Option::getDatabaseOption());
+    }
+
+    /**
      * @throws \battlecook\DataCookerException
      */
     public function testAddWithAutoIncrement()
     {
         //given
-        $store = new RelationDatabase(null, Config::getDatabaseConfig());
+        $store = $this->createStore();
 
         $object = new Item();
         $object->id1 = 1;
@@ -66,7 +76,7 @@ class RelationDatabaseTest extends TestCase
     public function testAddDuplicated()
     {
         //given
-        $store = new RelationDatabase(null, Config::getDatabaseConfig());
+        $store = $this->createStore();
 
         $object = new Item();
         $object->id1 = 1;
@@ -89,7 +99,7 @@ class RelationDatabaseTest extends TestCase
     public function testAddWithoutAutoIncrement()
     {
         //given
-        $store = new RelationDatabase(null, Config::getDatabaseConfig());
+        $store = $this->createStore();
 
         $object = new Item();
         $object->id2 = 1;
@@ -119,7 +129,7 @@ class RelationDatabaseTest extends TestCase
     public function testSearchEmptyData()
     {
         //given
-        $store = new RelationDatabase(null, Config::getDatabaseConfig());
+        $store = $this->createStore();
 
         $object = new Item();
 
@@ -136,7 +146,7 @@ class RelationDatabaseTest extends TestCase
     public function testSet()
     {
         //given
-        $store = new RelationDatabase(null, Config::getDatabaseConfig());
+        $store = $this->createStore();
 
         $object = new Item();
         $object->id1 = 1;
@@ -168,7 +178,7 @@ class RelationDatabaseTest extends TestCase
     public function testRemove()
     {
         //given
-        $store = new RelationDatabase(null, Config::getDatabaseConfig());
+        $store = $this->createStore();
 
         $object1 = new Item();
         $object1->id1 = 1;

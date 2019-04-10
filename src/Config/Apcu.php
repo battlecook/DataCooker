@@ -5,20 +5,13 @@ namespace battlecook\Config;
 
 use battlecook\DataStore\IDataStore;
 
-final class Spreadsheet
+final class Apcu
 {
     private $store;
-    private $path;
 
-    public function __construct(?IDataStore $store = null, string $path = "")
+    public function __construct(?IDataStore $store = null)
     {
         $this->store = $store;
-        $this->path = $path;
-    }
-
-    public function getPath(): string
-    {
-        return $this->path;
     }
 
     public function getStore(): ?IDataStore

@@ -11,6 +11,7 @@ use test\Fixture\DataStore\Item;
 use test\Fixture\DataStore\Quest;
 use test\Helper\Config;
 use test\Helper\MockStore;
+use test\Helper\Option;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
@@ -51,7 +52,7 @@ class RedisTest extends TestCase
 
     private function createStore()
     {
-        return new Redis(null, Config::getRedisConfig());
+        return new Redis(Option::getRedisConfig());
     }
 
     public function testCommit()

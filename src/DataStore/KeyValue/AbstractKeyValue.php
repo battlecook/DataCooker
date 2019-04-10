@@ -12,6 +12,8 @@ use battlecook\Types\Attribute;
 
 abstract class AbstractKeyValue extends AbstractStore implements IDataStore
 {
+    const DEFAULT_EXPIRE_TIME = 60 * 60 * 7;
+
     /**
      * @param $tree
      * @return int

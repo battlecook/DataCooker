@@ -13,15 +13,23 @@ final class Apcu extends AbstractKeyValue
 
     /**
      * Apcu constructor.
-     * @param IDataStore|null $store
+     * @param array $option
      * @throws DataCookerException
      */
-    public function __construct(?IDataStore $store)
+    public function __construct(array $option = array())
     {
-        if($store instanceof Buffered) {
-            throw new DataCookerException("BufferedDataStore can't be exist for other DataStore.");
+        if(empty($option) === false) {
+            if(isset($option['store']) === true) {
+                if(($option['store'] instanceof IDataStore) === false) {
+                    throw new DataCookerException("store option have to be IDataStore instance.");
+                }
+
+                if($option['store'] instanceof Buffered) {
+                    throw new DataCookerException("BufferedDataStore can't be exist for other DataStore.");
+                }
+                $this->store = $option['store'];
+            }
         }
-        $this->store = $store;
     }
 
     private function isEmpty($tree): bool

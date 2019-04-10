@@ -3,19 +3,35 @@ declare(strict_types=1);
 
 namespace battlecook\Config;
 
+use battlecook\Config\Server\Server;
+use battlecook\DataStore\IDataStore;
+
 final class Redis
 {
-    public $ip;
-    public $port;
-    public $useAuth;
-    public $password;
+    const DEFAULT_EXPIRE_TIME = 60 * 60 * 7;
 
-    public function __construct(string $ip = "localhost", int $port = 6379, bool $useAuth = false, string $password = "")
+    private $store;
+    private $ip;
+    private $port;
+    private $server;
+    private $useAuth;
+    private $password;
+
+    public function __construct(IDataStore $store = null, \battlecook\Config\Server\Redis $server = null, $expireTime = self::DEFAULT_EXPIRE_TIME)
     {
-        $this->ip = $ip;
-        $this->port = $port;
-        $this->useAuth = $useAuth;
-        $this->password = $password;
+        $this->store = $store;
+        if ($server === null) {
+            $this->server = new \battlecook\Config\Server\Redis('localhost', 6379, "");
+        } else {
+            $this->server = $server;
+        }
+        $this->expireTime = $expireTime;
+
+        $this->ip = $server->getIP();
+        $this->port = $server->getPort();
+        if ($server->getPassword() !== "") {
+            $this->password = $server->getPassword();
+        }
     }
 
     public function getIp(): string
@@ -36,5 +52,10 @@ final class Redis
     public function getPassword(): string
     {
         return $this->password;
+    }
+
+    public function getStore(): ?IDataStore
+    {
+        return $this->store;
     }
 }

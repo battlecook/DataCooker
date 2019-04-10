@@ -8,6 +8,7 @@ use battlecook\DataStore\RelationDatabase;
 use PHPUnit\Framework\TestCase;
 use test\Fixture\DataStore\Item;
 use test\Helper\Config;
+use test\Helper\Option;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
@@ -42,7 +43,7 @@ class ComplexTest extends TestCase
     public function testBufferRelationDatabase()
     {
         //given
-        $store = new Buffered(new RelationDatabase(null, Config::getDatabaseConfig()));
+        $store = new Buffered(['store' => new RelationDatabase(Option::getDatabaseOption())]);
 
         $object = new Item();
         $object->id1 = 1;
@@ -66,7 +67,7 @@ class ComplexTest extends TestCase
     public function testAddDuplicated()
     {
         //given
-        $storage = new Buffered(new RelationDatabase(null, Config::getDatabaseConfig()));
+        $store = new Buffered(['store' => new RelationDatabase(Option::getDatabaseOption())]);
 
         $object = new Item();
         $object->id1 = 1;
@@ -77,8 +78,8 @@ class ComplexTest extends TestCase
         $object->attr3 = 1;
 
         //when
-        $storage->add($object);
-        $storage->add($object);
+        $store->add($object);
+        $store->add($object);
 
         //then
     }
@@ -92,7 +93,7 @@ class ComplexTest extends TestCase
         $buffered = new Buffered();
         $buffered->convert();
 
-        $store = new Buffered(new RelationDatabase(null, Config::getDatabaseConfig()));
+        $store = new Buffered(['store' => new RelationDatabase(Option::getDatabaseOption())]);
 
         $object = new Item();
         //$object->id1 = 1;
@@ -118,7 +119,7 @@ class ComplexTest extends TestCase
         //then
         $this->assertEquals(array(), $store->search(new Item()));
 
-        $rdbStore = new RelationDatabase(null, Config::getDatabaseConfig());
+        $rdbStore = new RelationDatabase(Option::getDatabaseOption());
         $ret = $rdbStore->search(new Item());
         $this->assertEquals($object2, $ret[0]);
     }

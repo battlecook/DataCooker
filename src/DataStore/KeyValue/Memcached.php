@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace battlecook\DataStore\KeyValue;
 
-use battlecook\Config\Memcache;
 use battlecook\DataCookerException;
 use battlecook\DataStore\Buffered;
 use battlecook\DataStore\IDataStore;
@@ -12,32 +11,40 @@ final class Memcached extends AbstractKeyValue
 {
     private $store;
     private $memcached;
-
-    const DEFAULT_EXPIRE_TIME = 60 * 60 * 7;
-
-    //todo expire time must be in the option.
-    // have expire time option with each object
     private $timeExpired;
 
     /**
      * Memcached constructor.
-     * @param IDataStore|null $store
-     * @param Memcache[] $configArr
+     * @param array $option
      * @throws DataCookerException
      */
-    public function __construct(?IDataStore $store, array $configArr)
+    public function __construct(array $option = array())
     {
-        if($store instanceof Buffered) {
-            throw new DataCookerException("BufferedDataStore can't be exist for other DataStore.");
-        }
-        $this->store = $store;
-
+        $hosts = array(array('ip' => 'localhost', 'port' => 11211));
         $this->timeExpired = self::DEFAULT_EXPIRE_TIME;
+        if(empty($option) === false) {
+            if(isset($option['store']) === true) {
+                if(($option['store'] instanceof IDataStore) === false) {
+                    throw new DataCookerException("store option have to be IDataStore instance.");
+                }
+
+                if($option['store'] instanceof Buffered) {
+                    throw new DataCookerException("BufferedDataStore can't be exist for other DataStore.");
+                }
+                $this->store = $option['store'];
+            }
+
+            if(isset($option['hosts']) === true) {
+                $hosts = $option['hosts'];
+            }
+
+            $this->store = $option['store'];
+        }
 
         $this->memcached = new \Memcached();
-        foreach ($configArr as $config) {
-            if ($this->memcached->addServer($config->getIp(), $config->getPort()) === false) {
-                throw new DataCookerException("connection error");
+        foreach ($hosts as $host) {
+            if ($this->memcached->addServer($host['ip'], $host['port']) === false) {
+                throw new DataCookerException("memcached addServer error");
             }
         }
     }

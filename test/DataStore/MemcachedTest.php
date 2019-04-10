@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace test\DataStore;
 
 use battlecook\DataStore\KeyValue\Memcached;
+use battlecook\DataStore\RelationDatabase;
 use battlecook\Types\LeafNode;
 use battlecook\Types\Attribute;
 use PHPUnit\Framework\TestCase;
@@ -11,6 +12,7 @@ use test\Fixture\DataStore\Item;
 use test\Fixture\DataStore\Quest;
 use test\Helper\Config;
 use test\Helper\MockStore;
+use test\Helper\Option;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
@@ -45,7 +47,7 @@ class MemcachedTest extends TestCase
 
     private function createStore()
     {
-        return new Memcached(null, array(Config::getMemcachedConfig()));
+        return new Memcached(Option::getMemcachedOption());
     }
 
     public function testCommit()
@@ -530,6 +532,8 @@ class MemcachedTest extends TestCase
     public function testAddAlreadyExistData()
     {
         //given
+        $store = $this->createStore();
+
         $object1 = new Item();
         $object1->id1 = 1;
         $object1->id2 = 1;
@@ -558,7 +562,7 @@ class MemcachedTest extends TestCase
                 )
         );
 
-        $store = new Memcached(null, array(Config::getMemcachedConfig()));
+
         $data = array($key1 => $value1);
 
         $store->commit($data);

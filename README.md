@@ -92,8 +92,9 @@ DataStore provides six interface (get, search, set, add, remove, commit)
 
 
 ```php
-$store = new RelationDatabase(null, new Database('localhost', 3306, 'dbName, new Auth('id', 'password')));
-       
+$store = new RelationDatabase(['store' => null,
+                               'hosts' => [['ip' => 'localhost', 'port' => 3306, 'dbname' => 'DataCooker', 'user' => 'root', 'password' => 'password']]]),
+                         
 $object = new Item();
 $object->id1 = 1;
 $object->id2 = 1;
@@ -124,13 +125,19 @@ status in database
 +-----+-----+-----+-------+-------+-------+
 
 status in memcached
+
+                        value
+                        
+            id1        id2        id3   attribute
+key => array(1 => array(1 => array(1 => array(1,1,1))))
+
 ```
 
 ##### progress #####
 ```php
-$store =  new Memcached(
-            new RelationDatabase(null, new Database('localhost', 3306, 'dbName, new Auth('id', 'password')))
-             , array(new \battlecook\Config\Memcache('localhost')))
+$store =  new Memcached(['store' => new RelationDatabase(['store' => null,
+                                                          'hosts' => [['ip' => 'localhost', 'port' => 3306, 'dbname' => 'DataCooker', 'user' => 'root', 'password' => 'password']]]),
+                         'hosts' => [['ip' => 'localhost', 'port' => 11211]]])
              
 $object = new Item();
 $object->id1 = 1;
@@ -156,6 +163,12 @@ status in database
 +-----+-----+-----+-------+-------+-------+
 
 status in memcached
+
+                        value
+                        
+            id1        id2        id3   attribute
+key => array(1 => array(1 => array(1 => array(1,1,1)
+                                   2 => array(1,1,1))))
 ```
 
 Buffered DataStore : 
@@ -176,6 +189,10 @@ The add function is performed first to get the autoIncrement value incremented.
 
 If it is not defined, it is postprocessed like any other function.
 
+When you use Buffered DataStore, you can perform like transaction with multiple data store.
+
+
+
 ##### before #####
 
 ```
@@ -189,8 +206,9 @@ before status in database
 ```
 ##### progress1 #####
 ```php
-$store =  new Buffered(new RelationDatabase(null, new Database('localhost', 3306, 'dbName, new Auth('id', 'password'))));
-             
+$store =  new Buffered(['store' => new RelationDatabase(['store' => null,
+                        'hosts' => [['ip' => 'localhost', 'port' => 3306, 'dbname' => 'DataCooker', 'user' => 'root', 'password' => 'password']]]),
+                         );       
 $object = new Item();
 $object->id1 = 1;
 $object->id2 = 1;
