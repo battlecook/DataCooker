@@ -18,7 +18,7 @@ Read this in other languages : [한국어](README.ko.md)
 ## How to install
 
 ```
-composer require battlecook/datacooker
+composer require battlecook/datacooker:dev-master
 ```
 
 ## How to use
