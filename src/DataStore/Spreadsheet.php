@@ -24,6 +24,7 @@ final class Spreadsheet extends AbstractStore implements IDataStore
      * @param \battlecook\Config\Spreadsheet $config
      * @throws DataCookerException
      */
+    /*
     public function __construct(?IDataStore $store, \battlecook\Config\Spreadsheet $config)
     {
         if($store instanceof Buffered) {
@@ -37,6 +38,71 @@ final class Spreadsheet extends AbstractStore implements IDataStore
         }
         try {
             $this->spreadsheet = IOFactory::load($config->getPath());
+        } catch (\PhpOffice\PhpSpreadsheet\Reader\Exception $e) {
+            throw new DataCookerException($e);
+        }
+
+        foreach ($this->spreadsheet->getSheetNames() as $sheetName) {
+            $sheet = $this->spreadsheet->getSheetByName($sheetName);
+
+            $columns = array();
+
+            $start = 1;
+            $count = 0;
+            while (true) {
+                $column = $sheet->getCellByColumnAndRow($start + $count, 1);
+                if ($column->getValue() === null) {
+                    break;
+                }
+                $columns[$column->getValue()] = $start + $count;
+                $count++;
+            }
+
+            if (empty($columns) === true) {
+                throw new DataCookerException("this sheet is empty");
+            }
+
+            self::$columnsMap[$sheetName] = $columns;
+        }
+    }
+    */
+
+
+    /**
+     * Spreadsheet constructor.
+     * @param array $option
+     * @throws DataCookerException
+     */
+    public function __construct(array $option)
+    {
+        if(empty($option) === false) {
+            if(isset($option['store']) === true) {
+                if(($option['store'] instanceof IDataStore) === false) {
+                    throw new DataCookerException("store option have to be IDataStore instance.");
+                }
+
+                if($option['store'] instanceof Buffered) {
+                    throw new DataCookerException("BufferedDataStore can't be exist for other DataStore.");
+                }
+                $this->store = $option['store'];
+            }
+        }
+
+        if(isset($option['path']) === false) {
+            throw new DataCookerException("Not exist path.");
+        }
+
+        if(isset($option['readonly']) === true) {
+            if($option['readonly'] === false) {
+                throw new DataCookerException("not implement write to spreadsheet.");
+            }
+        }
+
+        if (file_exists($option['path']) === false) {
+            throw new DataCookerException("this path is invalid path.");
+        }
+        try {
+            $this->spreadsheet = IOFactory::load($option['path']);
         } catch (\PhpOffice\PhpSpreadsheet\Reader\Exception $e) {
             throw new DataCookerException($e);
         }

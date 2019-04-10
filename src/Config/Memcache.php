@@ -3,24 +3,48 @@ declare(strict_types=1);
 
 namespace battlecook\Config;
 
+use battlecook\DataStore\IDataStore;
+
 final class Memcache
 {
-    public $ip;
-    public $port;
+    const DEFAULT_EXPIRE_TIME = 60 * 60 * 7;
 
-    public function __construct(string $ip = "localhost", int $port = 11211)
+    private $store;
+    private $servers;
+    private $expireTime;
+
+    /**
+     * Memcache constructor.
+     * @param IDataStore|null $store
+     * @param \battlecook\Config\Server\Memcache[] $servers
+     * @param float|int $expireTime
+     */
+    public function __construct(IDataStore $store = null, ?array $servers = null, $expireTime = self::DEFAULT_EXPIRE_TIME)
     {
-        $this->ip = $ip;
-        $this->port = $port;
+        $this->store = $store;
+        if($servers === null) {
+            $this->servers[] = new \battlecook\Config\Server\Memcache();
+        } else {
+            $this->servers = $servers;
+        }
+        $this->expireTime = $expireTime;
     }
 
-    public function getIp(): string
+    public function getStore(): ?IDataStore
     {
-        return $this->ip;
+        return $this->store;
     }
 
-    public function getPort(): int
+    /**
+     * @return \battlecook\Config\Server\Memcache[]
+     */
+    public function getServers(): array
     {
-        return $this->port;
+        return $this->servers;
+    }
+
+    public function getExpireTime()
+    {
+        return $this->expireTime;
     }
 }

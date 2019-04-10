@@ -3,24 +3,35 @@ declare(strict_types=1);
 
 namespace battlecook\Config;
 
+use battlecook\DataStore\IDataStore;
+
 final class Database
 {
+    private $store;
     private $ip;
     private $port;
     private $dbName;
     private $user;
     private $password;
 
-    //todo consider transaction option
-    public function __construct(string $ip = "localhost", int $port = 3306, string $dbName = "", ?Auth $auth = null)
+    public function __construct(IDataStore $store = null, \battlecook\Config\Server\Database $server = null)
     {
-        $this->ip = $ip;
-        $this->port = $port;
-        $this->dbName = $dbName;
-        if ($auth !== null) {
-            $this->user = $auth->getUser();
-            $this->password = $auth->getPassword();
+        $this->store = $store;
+
+        if($server === null) {
+            $server = new \battlecook\Config\Server\Database();
         }
+
+        $this->ip = $server->getIP();
+        $this->port = $server->getPort();
+        $this->dbName = $server->getDbName();
+        $this->user = $server->getAuth()->getUser();
+        $this->password = $server->getAuth()->getPassword();
+    }
+
+    public function getStore(): ?IDataStore
+    {
+        return $this->store;
     }
 
     public function getIp(): string

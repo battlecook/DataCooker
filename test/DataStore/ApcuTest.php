@@ -40,9 +40,16 @@ class ApcuTest extends TestCase
         apcu_clear_cache();
     }
 
+    private function createStore()
+    {
+        return new Apcu();
+    }
+
     public function testCommit()
     {
         //given
+        $store = $this->createStore();
+
         $object1 = new Item();
         $object1->id1 = 1;
         $object1->id2 = 1;
@@ -99,7 +106,6 @@ class ApcuTest extends TestCase
                 )
         );
 
-        $store = new Apcu(null);
         $data = array($key1 => $value1, $key2 => $value2);
 
         //when
@@ -135,7 +141,7 @@ class ApcuTest extends TestCase
     public function testSearchRoot()
     {
         //given
-        $store = new Apcu(null);
+        $store = $this->createStore();
 
         $object1 = new Item();
         $object1->id1 = 1;
@@ -228,7 +234,7 @@ class ApcuTest extends TestCase
     public function testSearchInternal()
     {
         //given
-        $store = new Apcu(null);
+        $store = $this->createStore();
 
         $object1 = new Item();
         $object1->id1 = 1;
@@ -325,7 +331,7 @@ class ApcuTest extends TestCase
     public function testSearchLeaf()
     {
         //given
-        $store = new Apcu(null);
+        $store = $this->createStore();
 
         $object1 = new Item();
         $object1->id1 = 1;
@@ -422,7 +428,7 @@ class ApcuTest extends TestCase
     public function testGet()
     {
         //given
-        $store = new Apcu(null);
+        $store = $this->createStore();
 
         $object1 = new Item();
         $object1->id1 = 1;
@@ -522,6 +528,8 @@ class ApcuTest extends TestCase
     public function testAddAlreadyExistData()
     {
         //given
+        $store = $this->createStore();
+
         $object1 = new Item();
         $object1->id1 = 1;
         $object1->id2 = 1;
@@ -550,7 +558,6 @@ class ApcuTest extends TestCase
                 )
         );
 
-        $store = new Apcu(null);
         $data = array($key1 => $value1);
 
         $store->commit($data);
@@ -572,7 +579,7 @@ class ApcuTest extends TestCase
     public function testAddEmptyData()
     {
         //given
-        $store = new Apcu(null);
+        $store = $this->createStore();
 
         $object = new Item();
         $object->id1 = 1;
@@ -595,12 +602,13 @@ class ApcuTest extends TestCase
         $expected = $store->search($object);
 
         $this->assertEquals($expected[0], $ret);
-
     }
 
     public function testAdd()
     {
         //given
+        $store = $this->createStore();
+
         $object2 = new Item();
         $object2->id1 = 1;
         $object2->id2 = 1;
@@ -648,7 +656,6 @@ class ApcuTest extends TestCase
                 )
         );
 
-        $store = new Apcu(null);
         $data = array($key1 => $value1, $key2 => $value2);
 
         $store->commit($data);
@@ -679,7 +686,7 @@ class ApcuTest extends TestCase
     public function testSet()
     {
         //given
-        $store = new Apcu(null);
+        $store = $this->createStore();
 
         $object = new Item();
         $object->id1 = 1;
@@ -712,7 +719,7 @@ class ApcuTest extends TestCase
     public function testRemoveLeaf()
     {
         //given
-        $store = new Apcu(null);
+        $store = $this->createStore();
 
         $object1 = new Item();
         $object1->id1 = 1;
@@ -750,7 +757,7 @@ class ApcuTest extends TestCase
     public function testRemoveInternal()
     {
         //given
-        $store = new Apcu(null);
+        $store = $this->createStore();
 
         $object1 = new Item();
         $object1->id1 = 1;
@@ -823,7 +830,7 @@ class ApcuTest extends TestCase
     public function testRemoveAll()
     {
         //given
-        $store = new Apcu(null);
+        $store = $this->createStore();
 
         $object1 = new Item();
         $object1->id1 = 1;

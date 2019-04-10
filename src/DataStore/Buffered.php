@@ -18,13 +18,52 @@ final class Buffered extends AbstractStore implements IDataStore
 
     private $store;
 
-    public function __construct(IDataStore $store = null)
+    /**
+     * Buffered constructor.
+     * @param array $option
+     * @throws DataCookerException
+     */
+    public function __construct(array $option = array())
     {
-        $this->store = $store;
+        if(empty($option) === false) {
+            if(isset($option['store']) === true) {
+                if(($option['store'] instanceof IDataStore) === false) {
+                    throw new DataCookerException("store option have to be IDataStore instance.");
+                }
+
+                if($option['store'] instanceof Buffered) {
+                    throw new DataCookerException("BufferedDataStore can't be exist for other DataStore.");
+                }
+                $this->store = $option['store'];
+            }
+        }
+
         if (empty(self::$bufferedData) === true) {
             self::initialize();
         }
     }
+
+    /**
+     * Buffered constructor.
+     * @param array $option
+     * @throws DataCookerException
+     */
+    /*
+    public function __construct(array $option)
+    {
+        if(isset($option['store']) === true && $option['store'] instanceof IDataStore) {
+            $this->store = $option['store'];
+
+            if($this->store instanceof Buffered) {
+                throw new DataCookerException("BufferedDataStore can't be exist for other DataStore.");
+            }
+        }
+
+        if (empty(self::$bufferedData) === true) {
+            self::initialize();
+        }
+    }
+    */
 
     /**
      * @param $cacheKey

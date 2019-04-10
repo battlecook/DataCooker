@@ -11,33 +11,70 @@ final class Redis extends AbstractKeyValue
 {
     private $store;
     private $redis;
+    private $timeExpired;
 
     /**
      * Redis constructor.
-     * @param IDataStore|null $store
-     * @param \battlecook\Config\Redis $config
+     * @param array $option
      * @throws DataCookerException
      */
-    public function __construct(?IDataStore $store, \battlecook\Config\Redis $config)
+    public function __construct(array $option = array())
     {
-        if($store instanceof Buffered) {
-            throw new DataCookerException("BufferedDataStore can't be exist for other DataStore.");
-        }
-        $this->store = $store;
+        $hosts = array(array('ip' => 'localhost', 'port' => 6379, 'password' => ''));
+        $this->timeExpired = self::DEFAULT_EXPIRE_TIME;
+        if(empty($option) === false) {
+            if(isset($option['store']) === true) {
+                if(($option['store'] instanceof IDataStore) === false) {
+                    throw new DataCookerException("store option have to be IDataStore instance.");
+                }
 
-        $this->redis = new \Redis();
-        if ($this->redis->pconnect($config->getIp(), $config->getPort()) === false) {
-            throw new DataCookerException("redis connection failed");
-        }
-
-        if ($config->useAuth === true) {
-            if ($this->redis->auth($config->password) === false) {
-                throw new DataCookerException("redis auth failed");
+                if($option['store'] instanceof Buffered) {
+                    throw new DataCookerException("BufferedDataStore can't be exist for other DataStore.");
+                }
+                $this->store = $option['store'];
             }
+
+            if(isset($option['hosts']) === true) {
+                $hosts = $option['hosts'];
+                foreach($hosts as $key => $host) {
+                    if(isset($host['ip']) === false) {
+                        throw new DataCookerException("not exist IP");
+                    }
+
+                    if(isset($host['port']) === false) {
+                        $hosts[$key]['port'] = 6379;
+                    }
+
+
+                    if(isset($host['password']) === false) {
+                        $hosts[$key]['password'] = '';
+                    }
+                }
+            }
+            $this->store = $option['store'];
         }
-        $ret = $this->redis->ping();
-        if ($ret !== '+PONG') {
-            throw new DataCookerException("redis ping failed");
+
+        if(count($hosts) > 1) {
+            try {
+                $this->redis = new \RedisCluster(null, array('localhost:6379'));
+            } catch (\RedisClusterException $e) {
+                throw new DataCookerException("redis cluster exception");
+            }
+        } else {
+            $this->redis = new \Redis();
+            if ($this->redis->pconnect($hosts[0]['ip'], $hosts[0]['port']) === false) {
+                throw new DataCookerException("redis connection failed");
+            }
+
+            if ($hosts[0]['password'] !== "") {
+                if ($this->redis->auth($hosts[0]['password']) === false) {
+                    throw new DataCookerException("redis auth failed");
+                }
+            }
+            $ret = $this->redis->ping();
+            if ($ret !== '+PONG') {
+                throw new DataCookerException("redis ping failed");
+            }
         }
     }
 

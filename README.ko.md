@@ -91,8 +91,9 @@ final class Item
 DataStore 에는 6가지 인터페이스(get, search, set, add, remove, commit)를 제공합니다. 
 
 ```php
-$store = new RelationDatabase(null, new Database('localhost', 3306, 'dbName, new Auth('id', 'password')));
-       
+$store = new RelationDatabase(['store' => null,
+                               'hosts' => [['ip' => 'localhost', 'port' => 3306, 'dbname' => 'DataCooker', 'user' => 'root', 'password' => 'password']]]),
+                                  
 $object = new Item();
 $object->id1 = 1;
 $object->id2 = 1;
@@ -120,14 +121,21 @@ Memcached 와 RelationDatabase 를 같이사용 했을때의 예시
 +-----+-----+-----+-------+-------+-------+
 |  1  |  1  |  1  |   1   |   1   |   1   |
 +-----+-----+-----+-------+-------+-------+
+
+
+수행 전 멤케시 상태
+                        value
+                        
+            id1        id2        id3   attribute
+key => array(1 => array(1 => array(1 => array(1,1,1))))
 ```
 
 ##### progress #####
 
 ```php
-$store =  new Memcached(
-            new RelationDatabase(null, new Database('localhost', 3306, 'dbName, new Auth('id', 'password')))
-             , array(new \battlecook\Config\Memcache('localhost')))
+$store =  new Memcached(['store' => new RelationDatabase(['store' => null,
+                                                          'hosts' => [['ip' => 'localhost', 'port' => 3306, 'dbname' => 'DataCooker', 'user' => 'root', 'password' => 'password']]]),
+                         'hosts' => [['ip' => 'localhost', 'port' => 11211]]])
              
 $object = new Item();
 $object->id1 = 1;
@@ -151,6 +159,13 @@ $ret = $store->add($object);
 +-----+-----+-----+-------+-------+-------+
 |  1  |  1  |  2  |   1   |   1   |   1   |
 +-----+-----+-----+-------+-------+-------+
+
+수행 후 멤케시 상태
+                        value
+                        
+            id1        id2        id3   attribute
+key => array(1 => array(1 => array(1 => array(1,1,1)
+                                   2 => array(1,1,1))))
 ```
 
 버퍼 데이터 저장소 : 
@@ -171,6 +186,8 @@ $ret = $store->add($object);
 
 정의되어 있지 않다면 다른 함수들과 마찬가지로 후 처리 합니다.
 
+버퍼 데이터 저장소를 사용한다면 복합적인 데이터 저장소를 묶어서 트렌젝션과 비슷한 효과를 낼 수 있습니다. 
+
 ##### before #####
 ```
 수행 전 데이터 베이스 상태
@@ -184,7 +201,9 @@ $ret = $store->add($object);
 
 ##### progress1 #####
 ```php
-$store =  new Buffer(new RelationDatabase(null, new Database('localhost', 3306, 'dbName, new Auth('id', 'password'))));
+$store =  new Buffered(['store' => new RelationDatabase(['store' => null,
+                        'hosts' => [['ip' => 'localhost', 'port' => 3306, 'dbname' => 'DataCooker', 'user' => 'root', 'password' => 'password']]]),
+                         );
              
 $object = new Item();
 $object->id1 = 1;

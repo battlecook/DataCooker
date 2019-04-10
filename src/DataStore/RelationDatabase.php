@@ -16,30 +16,69 @@ final class RelationDatabase extends AbstractStore implements IDataStore
 
     /**
      * RelationDatabase constructor.
-     * @param IDataStore|null $store
-     * @param Database $config
+     * @param array $option
      * @throws DataCookerException
      */
-    public function __construct(?IDataStore $store, Database $config)
+    public function __construct(array $option)
     {
-        if($store instanceof Buffered) {
-            throw new DataCookerException("BufferedDataStore can't be exist for other DataStore.");
-        }
-        $this->store = $store;
+        if (empty($option) === false) {
+            if (isset($option['store']) === true) {
+                if (($option['store'] instanceof IDataStore) === false) {
+                    throw new DataCookerException("store option have to be IDataStore instance.");
+                }
 
-        $dbName = $config->getDatabaseName();
-        $ip = $config->getIp();
-        $port = $config->getPort();
+                if ($option['store'] instanceof Buffered) {
+                    throw new DataCookerException("BufferedDataStore can't be exist for other DataStore.");
+                }
+                $this->store = $option['store'];
+            }
+
+            if (isset($option['hosts']) === true) {
+                $hosts = $option['hosts'];
+                foreach ($hosts as $key => $host) {
+                    if (isset($host['ip']) === false) {
+                        throw new DataCookerException("not exist IP");
+                    }
+
+                    if (isset($host['port']) === false) {
+                        $hosts[$key]['port'] = 3306;
+                    }
+
+                    if (isset($host['dbname']) === false) {
+                        $hosts[$key]['dbname'] = '';
+                    }
+
+                    if (isset($host['user']) === false) {
+                        $hosts[$key]['user'] = '';
+                    }
+
+                    if (isset($host['password']) === false) {
+                        $hosts[$key]['password'] = '';
+                    }
+                }
+            } else {
+                throw new DataCookerException("Not Exist Host Information");
+            }
+            $this->store = $option['store'];
+        } else {
+            throw new DataCookerException("Not Exist Option Information");
+        }
+
+        $dbName = $hosts[0]['dbname'];
+        $ip = $hosts[0]['ip'];
+        $port = $hosts[0]['port'];
+        $user = $hosts[0]['user'];
+        $password = $hosts[0]['password'];
 
         $dsn = "mysql:host={$ip};port={$port};dbname={$dbName}";
         try {
-            $this->pdo = new \PDO($dsn, $config->getUser(), $config->getPassword(), array());
+            $this->pdo = new \PDO($dsn, $user, $password, array());
+            $this->pdo->setAttribute(\PDO::MYSQL_ATTR_INIT_COMMAND, "SET NAMES utf8mb4");
+            $this->pdo->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
+            $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         } catch (\PDOException $e) {
             throw new DataCookerException();
         }
-        $this->pdo->setAttribute(\PDO::MYSQL_ATTR_INIT_COMMAND, "SET NAMES utf8mb4");
-        $this->pdo->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
-        $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
     }
 
     private function getTableName($className)
@@ -363,7 +402,7 @@ final class RelationDatabase extends AbstractStore implements IDataStore
 
             //todo this function would be tuning. ( multi insert, multi update and so on )
             foreach ($commitObjectMap as $status => $commitObjectGroup) {
-                foreach($commitObjectGroup as $object) {
+                foreach ($commitObjectGroup as $object) {
                     if ($status === Status::DELETED) {
                         $this->remove($object);
                     } elseif ($status === Status::UPDATED) {

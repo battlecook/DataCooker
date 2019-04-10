@@ -26,8 +26,7 @@ class SpreadsheetTest extends TestCase
         //given
 
         //when
-        new Spreadsheet(null,
-            new \battlecook\Config\Spreadsheet(__DIR__ . "/../Fixture/DataStore/SampleEmptySheet.xlsx"));
+        new Spreadsheet(['path' => __DIR__ . "/../Fixture/DataStore/SampleEmptySheet.xlsx"]);
 
         //then
     }
@@ -41,7 +40,7 @@ class SpreadsheetTest extends TestCase
         //given
 
         //when
-        new Spreadsheet(null, new \battlecook\Config\Spreadsheet(__DIR__ . "/../Fixture/DataStore/Sample"));
+        new Spreadsheet(['path' => __DIR__ . "/../Fixture/DataStore/Sample"]);
 
         //then
     }
@@ -53,8 +52,7 @@ class SpreadsheetTest extends TestCase
     public function testNotExistSheet()
     {
         //given
-        $store = new Spreadsheet(null,
-            new \battlecook\Config\Spreadsheet(__DIR__ . "/../Fixture/DataStore/Sample.xlsx"));
+        $store = new Spreadsheet(['path' => __DIR__ . "/../Fixture/DataStore/Sample.xlsx"]);
 
         $object = new Item();
         $object->id1 = 1;
@@ -77,8 +75,7 @@ class SpreadsheetTest extends TestCase
     public function testDifferenceFieldsAndColumns()
     {
         //given
-        $store = new Spreadsheet(null,
-            new \battlecook\Config\Spreadsheet(__DIR__ . "/../Fixture/DataStore/Sample.xlsx"));
+        $store = new Spreadsheet(['path' => __DIR__ . "/../Fixture/DataStore/Sample.xlsx"]);
 
         $object = new Quest();
         $object->id1 = 1;
@@ -100,8 +97,7 @@ class SpreadsheetTest extends TestCase
     public function testGet()
     {
         //given
-        $store = new Spreadsheet(null,
-            new \battlecook\Config\Spreadsheet(__DIR__ . "/../Fixture/DataStore/Sample.xlsx"));
+        $store = new Spreadsheet(['path' => __DIR__ . "/../Fixture/DataStore/Sample.xlsx"]);
 
         $object = new Quest();
         $object->id1 = 1;
@@ -124,8 +120,7 @@ class SpreadsheetTest extends TestCase
     public function testSearchAll()
     {
         //given
-        $store = new Spreadsheet(null,
-            new \battlecook\Config\Spreadsheet(__DIR__ . "/../Fixture/DataStore/Sample.xlsx"));
+        $store = new Spreadsheet(['path' => __DIR__ . "/../Fixture/DataStore/Sample.xlsx"]);
 
         $object = new Quest();
 
