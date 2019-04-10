@@ -19,7 +19,9 @@ README 지원언어 : [English](README.md)
 
 ## 설치하는 방법
 
-packagist.org 에 업로드 예정 입니다.
+```
+composer require battlecook/datacooker
+```
 
 ## 사용하는 방법
 

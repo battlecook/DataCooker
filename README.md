@@ -17,7 +17,9 @@ Read this in other languages : [한국어](README.ko.md)
 
 ## How to install
 
-this project is being prepared to upload at packagist.org
+```
+composer require battlecook/datacooker
+```
 
 ## How to use
 
