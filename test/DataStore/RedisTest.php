@@ -26,7 +26,7 @@ class RedisTest extends TestCase
     {
         self::$redis = new \Redis();
 
-        if (self::$redis->pconnect(Config::$redisIP, 6379) === false) {
+        if (self::$redis->pconnect(Option::$redisIP, 6379) === false) {
             throw new DataCookerException("redis connection failed");
         }
 

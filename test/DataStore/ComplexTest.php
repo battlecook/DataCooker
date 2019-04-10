@@ -7,16 +7,28 @@ use battlecook\DataStore\Buffered;
 use battlecook\DataStore\RelationDatabase;
 use PHPUnit\Framework\TestCase;
 use test\Fixture\DataStore\Item;
-use test\Helper\Config;
 use test\Helper\Option;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
 class ComplexTest extends TestCase
 {
+    private function createPdo()
+    {
+        $ip = Option::$dbIP;
+        $port = Option::$dbPort;
+        $dbName = Option::$dbName;
+        $user = Option::$user;
+        $password = Option::$password;
+
+        $dsn = "mysql:host={$ip};port={$port};dbname={$dbName}";
+
+        return new \PDO($dsn, $user, $password, array());
+    }
+
     public function setUp()
     {
-        $pdo = Config::getPdo();
+        $pdo = $this->createPdo();
         $dropSql = "drop table Item;";
         $st = $pdo->prepare($dropSql);
         $st->execute();
