@@ -4,7 +4,7 @@
   "prefer-stable": true,
   "description": "It's project for different kinds of data store. \n\nIt provides an interface by abstracting individual libraries (\\ pdo, \\ Redis, \\ Memcached, etc.) that access data stores.\n",
   "require": {
-    "php": "^7.2.0",
+    "php": "^7.1.0",
     "phpoffice/phpspreadsheet": "dev-master",
     "ext-pdo": "*",
     "ext-memcached": "*",

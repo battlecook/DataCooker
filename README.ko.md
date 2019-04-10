@@ -20,7 +20,7 @@ README 지원언어 : [English](README.md)
 ## 설치하는 방법
 
 ```
-composer require battlecook/datacooker
+composer require battlecook/datacooker:dev-master
 ```
 
 ## 사용하는 방법
