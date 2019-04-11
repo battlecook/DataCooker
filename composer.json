@@ -5,7 +5,7 @@
   "description": "It's project for different kinds of data store. \n\nIt provides an interface by abstracting individual libraries (\\ pdo, \\ Redis, \\ Memcached, etc.) that access data stores.\n",
   "require": {
     "php": "^7.1.0",
-    "phpoffice/phpspreadsheet": "dev-master",
+    "phpoffice/phpspreadsheet": "1.6.0",
     "ext-pdo": "*",
     "ext-memcached": "*",
     "ext-redis": "*",
