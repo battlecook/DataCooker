@@ -129,7 +129,8 @@ class ComplexTest extends TestCase
         $store->commit();
 
         //then
-        $this->assertEquals(array(), $store->search(new Item()));
+        $ret = $store->search(new Item());
+        $this->assertEquals($object2, $ret[0]);
 
         $rdbStore = new RelationDatabase(Option::getDatabaseOption());
         $ret = $rdbStore->search(new Item());

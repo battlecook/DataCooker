@@ -243,6 +243,7 @@ final class Buffered extends AbstractStore implements IDataStore
             $this->store->commit($trees);
         }
 
+        parent::initializeCachedMeta();
         $this->initialize();
     }
 
