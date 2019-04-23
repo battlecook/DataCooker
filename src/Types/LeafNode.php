@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace battlecook\Types;
 
-use battlecook\Types\Status;
-
 final class LeafNode extends Node
 {
     private $originalData;

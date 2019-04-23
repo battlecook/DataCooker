@@ -37,7 +37,7 @@ final class PhpMemory
     /**
      * @param string $dataName
      * @param array $keys
-     * @param array $data
+     * @param $data
      * @param $changedStatus
      */
     public function insert(string $dataName, array $keys, $data, int $changedStatus)
@@ -172,7 +172,7 @@ final class PhpMemory
     /**
      * @param string $dataName
      * @param array $keys
-     * @param array $data
+     * @param $data
      * @param bool $hasAutoIncrement
      * @throws DataCookerException
      */

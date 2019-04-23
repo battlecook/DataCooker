@@ -37,23 +37,32 @@ class PhpMemoryTest extends TestCase
     {
         //given
         $dataName = get_class(new Item());
-        $identifiers = array('id1', 'id2', 'id3');
-        $attributes = array("attr1", "attr2", "attr3");
 
-        $storage = new PhpMemory();
-        //$storage->addMetaData(new Meta(new Field($identifiers, "", $attributes), $dataName));
+        $store = new PhpMemory();
 
         $keys = array(1, 1, 1);
-        $data1 = array(1, 1, 1);
-        $storage->insert($dataName, $keys, $data1);
+        $data1 = new Item();
+        $data1->id1 = 1;
+        $data1->id2 = 1;
+        $data1->id3 = 1;
+        $data1->attr1 = 1;
+        $data1->attr2 = 1;
+        $data1->attr3 = 1;
+        $store->insert($dataName, $keys, $data1, Status::INSERTED);
 
         $keys = array(1, 1, 2);
-        $data2 = array(1, 1, 1);
-        $storage->insert($dataName, $keys, $data2);
+        $data2 = new Item();
+        $data2->id1 = 1;
+        $data2->id2 = 1;
+        $data2->id3 = 1;
+        $data2->attr1 = 1;
+        $data2->attr2 = 1;
+        $data2->attr3 = 1;
+        $store->insert($dataName, $keys, $data2, Status::INSERTED);
 
         //when
         $keys = array(1, 1);
-        $ret = $storage->search($dataName, $keys);
+        $ret = $store->search($dataName, $keys);
 
         //then
         $this->assertEquals(2, count($ret));
@@ -65,19 +74,23 @@ class PhpMemoryTest extends TestCase
     {
         //given
         $dataName = get_class(new Item());
-        $identifiers = array('id1', 'id2', 'id3');
-        $attributes = array("attr1", "attr2", "attr3");
 
-        $storage = new PhpMemory();
-        $storage->addMetaData(new Meta(new Field($identifiers, "", $attributes), $dataName));
+        $store = new PhpMemory();
 
         //when
         $keys = array(1, '2', 3);
-        $data = array('1', '2', 3);
-        $storage->insert($dataName, $keys, $data);
+
+        $data = new Item();
+        $data->id1 = 1;
+        $data->id2 = '2';
+        $data->id3 = 3;
+        $data->attr1 = '1';
+        $data->attr2 = '2';
+        $data->attr3 = 3;
+        $store->insert($dataName, $keys, $data, Status::INSERTED);
 
         //then
-        $ret = $storage->search($dataName, $keys);
+        $ret = $store->search($dataName, $keys);
         $this->assertEquals($data, $ret[0]->getData());
     }
 
@@ -85,26 +98,34 @@ class PhpMemoryTest extends TestCase
     {
         //given
         $dataName = get_class(new Item());
-        $identifiers = array('id1', 'id2', 'id3');
-        $attributes = array("attr1", "attr2", "attr3");
 
-        $storage = new PhpMemory();
-        $storage->addMetaData(new Meta(new Field($identifiers, "", $attributes), $dataName));
+        $store = new PhpMemory();
 
         $keys = array(1, 2, 3);
-        $data = array(1, 2, 3);
-        $storage->insert($dataName, $keys, $data);
 
-        $data = array(1, 2, 4);
-        $storage->update($dataName, $keys, $data);
+        $data = new Item();
+        $data->id1 = 1;
+        $data->id2 = 2;
+        $data->id3 = 3;
+        $data->attr1 = 1;
+        $data->attr2 = 2;
+        $data->attr3 = 3;
+        $store->insert($dataName, $keys, $data, Status::INSERTED);
+
+        $data->attr1 = 1;
+        $data->attr2 = 2;
+        $data->attr3 = 4;
+        $store->update($dataName, $keys, $data, true);
 
         //when
         $keys = array(1, 2, 3);
-        $data = array(1, 2, 3);
-        $storage->insert($dataName, $keys, $data);
+        $data->attr1 = 1;
+        $data->attr2 = 2;
+        $data->attr3 = 3;
+        $store->insert($dataName, $keys, $data, Status::UPDATED);
 
         //then
-        $ret = $storage->search($dataName, $keys);
+        $ret = $store->search($dataName, $keys);
         $this->assertEquals($data, $ret[0]->getData());
     }
 
@@ -116,14 +137,19 @@ class PhpMemoryTest extends TestCase
     {
         //given
         $dataName = get_class(new Item());
-        $identifiers = array('id1', 'id2', 'id3');
-        $attributes = array("attr1", "attr2", "attr3");
 
-        $storage = new PhpMemory();
-        $storage->addMetaData(new Meta(new Field($identifiers, "", $attributes), $dataName));
+        $store = new PhpMemory();
+
+        $data = new Item();
+        $data->id1 = 1;
+        $data->id2 = '2';
+        $data->id3 = 3;
+        $data->attr1 = '1';
+        $data->attr2 = '2';
+        $data->attr3 = '3';
 
         //when
-        $storage->update($dataName, array(1, '2', 3), array('1', '2', '3'));
+        $store->update($dataName, array(1, '2', 3), $data, true);
 
         //then
     }
@@ -132,21 +158,34 @@ class PhpMemoryTest extends TestCase
     {
         //given
         $dataName = get_class(new Item());
-        $identifiers = array('id1', 'id2', 'id3');
-        $attributes = array("attr1", "attr2", "attr3");
 
-        $storage = new PhpMemory();
-        $storage->addMetaData(new Meta(new Field($identifiers, "", $attributes), $dataName));
+        $store = new PhpMemory();
 
         $keys = array(1, '2', 3);
-        $data = array(1, 2, 3);
-        $storage->insert($dataName, $keys, $data);
+
+        $data = new Item();
+        $data->id1 = 1;
+        $data->id2 = '2';
+        $data->id3 = 3;
+        $data->attr1 = 1;
+        $data->attr2 = 2;
+        $data->attr3 = 3;
+
+        $store->insert($dataName, $keys, $data, Status::INSERTED);
+
+        $data = new Item();
+        $data->id1 = 1;
+        $data->id2 = '2';
+        $data->id3 = 3;
+        $data->attr1 = '1';
+        $data->attr2 = '2';
+        $data->attr3 = '3';
 
         //when
-        $storage->update($dataName, array(1, '2', 3), array('1', '2', '3'));
+        $store->update($dataName, array(1, '2', 3), $data, true);
 
         //then
-        $ret = $storage->search($dataName, $keys);
+        $ret = $store->search($dataName, $keys);
         $this->assertEquals($data, $ret[0]->getData());
     }
 
@@ -154,21 +193,26 @@ class PhpMemoryTest extends TestCase
     {
         //given
         $dataName = get_class(new Item());
-        $identifiers = array('id1', 'id2', 'id3');
-        $attributes = array("attr1", "attr2", "attr3");
 
-        $storage = new PhpMemory();
-        $storage->addMetaData(new Meta(new Field($identifiers, "", $attributes), $dataName));
+        $store = new PhpMemory();
 
         $keys = array(1, '2', 3);
-        $data = array(1, 2, 3);
-        $storage->insert($dataName, $keys, $data);
+
+        $data = new Item();
+        $data->id1 = 1;
+        $data->id2 = '2';
+        $data->id3 = 3;
+        $data->attr1 = 1;
+        $data->attr2 = 2;
+        $data->attr3 = 3;
+
+        $store->insert($dataName, $keys, $data, Status::INSERTED);
 
         //when
-        $storage->delete($dataName, array(1, '2', 3));
+        $store->delete($dataName, array(1, '2', 3), false);
 
         //then
-        $ret = $storage->search($dataName, $keys);
+        $ret = $store->search($dataName, $keys);
         $this->assertEquals(array(), $ret);
     }
 
@@ -176,22 +220,26 @@ class PhpMemoryTest extends TestCase
     {
         //given
         $dataName = get_class(new Item());
-        $identifiers = array('id1', 'id2', 'id3');
-        $autoIncrement = 'id1';
-        $attributes = array("attr1", "attr2", "attr3");
 
-        $storage = new PhpMemory();
-        $storage->addMetaData(new Meta(new Field($identifiers, $autoIncrement, $attributes), $dataName));
+        $store = new PhpMemory();
 
         $keys = array(1, '2', 3);
-        $data = array(1, 2, 3);
-        $storage->insert($dataName, $keys, $data);
+
+        $data = new Item();
+        $data->id1 = 1;
+        $data->id2 = '2';
+        $data->id3 = 3;
+        $data->attr1 = 1;
+        $data->attr2 = 2;
+        $data->attr3 = 3;
+
+        $store->insert($dataName, $keys, $data, Status::INSERTED);
 
         //when
-        $storage->delete($dataName, array(1, '2', 3));
+        $store->delete($dataName, array(1, '2', 3), true);
 
         //then
-        $ret = $storage->search($dataName, $keys);
+        $ret = $store->search($dataName, $keys);
         $this->assertEquals(Status::DELETED, $ret[0]->getStatus());
     }
 
@@ -199,22 +247,38 @@ class PhpMemoryTest extends TestCase
     {
         //given
         $dataName = get_class(new Item());
-        $identifiers = array('id1', 'id2', 'id3');
-        $attributes = array("attr1", "attr2", "attr3");
 
         $storage = new PhpMemory();
-        $storage->addMetaData(new Meta(new Field($identifiers, "", $attributes), $dataName));
 
         $keys1 = array(1, 1, 1);
         $data = array(1, 2, 3);
-        $storage->insert($dataName, $keys1, $data);
+
+        $data = new Item();
+        $data->id1 = 1;
+        $data->id2 = 1;
+        $data->id3 = 1;
+        $data->attr1 = 1;
+        $data->attr2 = 2;
+        $data->attr3 = 3;
+
+        $storage->insert($dataName, $keys1, $data, Status::INSERTED);
 
         $keys2 = array(1, 1, 2);
         $data = array(1, 2, 3);
-        $storage->insert($dataName, $keys2, $data);
+
+
+        $data = new Item();
+        $data->id1 = 1;
+        $data->id2 = 1;
+        $data->id3 = 2;
+        $data->attr1 = 1;
+        $data->attr2 = 2;
+        $data->attr3 = 3;
+
+        $storage->insert($dataName, $keys2, $data, Status::INSERTED);
 
         //when
-        $storage->delete($dataName, $keys1);
+        $storage->delete($dataName, $keys1, false);
 
         //then
         $ret = $storage->search($dataName, $keys1);
@@ -227,54 +291,74 @@ class PhpMemoryTest extends TestCase
     public function testGetData()
     {
         //given
-        $storage = new PhpMemory();
+        $store = new PhpMemory();
 
         $dataName1 = get_class(new Item());
-        $identifiers = array('id1', 'id2', 'id3');
-        $attributes = array("attr1", "attr2", "attr3");
-
-        $storage->addMetaData(new Meta(new Field($identifiers, "", $attributes), $dataName1));
 
         $keys1 = array(1, 1, 1);
-        $data = array(1, 2, 3);
-        $storage->insert($dataName1, $keys1, $data);
+
+        $data1 = new Item();
+        $data1->id1 = 1;
+        $data1->id2 = 1;
+        $data1->id3 = 1;
+        $data1->attr1 = 1;
+        $data1->attr2 = 2;
+        $data1->attr3 = 3;
+        $store->insert($dataName1, $keys1, $data1, Status::INSERTED);
 
         $keys2 = array(1, 1, 2);
-        $data = array(1, 2, 3);
-        $storage->insert($dataName1, $keys2, $data);
+
+        $data2 = new Item();
+        $data2->id1 = 1;
+        $data2->id2 = 1;
+        $data2->id3 = 2;
+        $data2->attr1 = 1;
+        $data2->attr2 = 2;
+        $data2->attr3 = 3;
+        $store->insert($dataName1, $keys2, $data2, Status::INSERTED);
 
         $dataName2 = get_class(new Quest());
-        $identifiers = array('id1', 'id2', 'id3');
-        $attributes = array("attr1", "attr2", "attr3");
-
-        $storage->addMetaData(new Meta(new Field($identifiers, "", $attributes), $dataName2));
 
         $keys1 = array(1, 1, 1);
-        $data = array(1, 2, 3);
-        $storage->insert($dataName2, $keys1, $data);
+
+        $data3 = new Item();
+        $data3->id1 = 1;
+        $data3->id2 = 1;
+        $data3->id3 = 1;
+        $data3->attr1 = 1;
+        $data3->attr2 = 2;
+        $data3->attr3 = 3;
+        $store->insert($dataName2, $keys1, $data3, Status::INSERTED);
 
         $keys2 = array(1, 1, 2);
-        $data = array(1, 2, 3);
-        $storage->insert($dataName2, $keys2, $data);
+
+        $data4 = new Item();
+        $data4->id1 = 1;
+        $data4->id2 = 1;
+        $data4->id3 = 2;
+        $data4->attr1 = 1;
+        $data4->attr2 = 2;
+        $data4->attr3 = 3;
+        $store->insert($dataName2, $keys2, $data4, Status::INSERTED);
 
         //when
-        $ret = $storage->getTrees();
+        $ret = $store->getTrees();
 
         //then
         $expected = array(
             $dataName1 => array(
                 1 => array(
                     1 => array(
-                        1 => new LeafNode($keys1, $data),
-                        2 => new LeafNode($keys2, $data),
+                        1 => new LeafNode($keys1, $data1),
+                        2 => new LeafNode($keys2, $data2),
                     )
                 )
             ),
             $dataName2 => array(
                 1 => array(
                     1 => array(
-                        1 => new LeafNode($keys1, $data),
-                        2 => new LeafNode($keys2, $data),
+                        1 => new LeafNode($keys1, $data3),
+                        2 => new LeafNode($keys2, $data4),
                     )
                 )
             ),
