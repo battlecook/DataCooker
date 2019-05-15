@@ -237,7 +237,7 @@ final class Redis extends AbstractKeyValue
      * @param null $data
      * @throws DataCookerException
      */
-    public function commit($data = null)
+    public function commitAll($data = null)
     {
         if ($data !== null) {
             $items = array();

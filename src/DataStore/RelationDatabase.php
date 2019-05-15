@@ -374,7 +374,7 @@ final class RelationDatabase extends AbstractStore implements IDataStore
      * @param null $data
      * @throws DataCookerException
      */
-    public function commit($data = null)
+    public function commitAll($data = null)
     {
         if ($data !== null) {
 

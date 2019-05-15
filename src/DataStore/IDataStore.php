@@ -15,5 +15,5 @@ interface IDataStore
 
     public function remove($object);
 
-    public function commit($data = null);
+    public function commitAll($data = null);
 }

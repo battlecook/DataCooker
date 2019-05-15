@@ -113,7 +113,7 @@ class MemcachedTest extends TestCase
         $data = array($key1 => $value1, $key2 => $value2);
 
         //when
-        $store->commit($data);
+        $store->commitAll($data);
 
         //then
         $expect1 = array(
@@ -223,7 +223,7 @@ class MemcachedTest extends TestCase
                 )
         );
 
-        $store->commit($data);
+        $store->commitAll($data);
 
         $object = new Item();
         $object->id1 = 1;
@@ -317,7 +317,7 @@ class MemcachedTest extends TestCase
                 )
         );
 
-        $store->commit($data);
+        $store->commitAll($data);
 
         $object = new Item();
         $object->id1 = 2;
@@ -414,7 +414,7 @@ class MemcachedTest extends TestCase
                 )
         );
 
-        $store->commit($data);
+        $store->commitAll($data);
 
         $object = new Item();
         $object->id1 = 1;
@@ -511,7 +511,7 @@ class MemcachedTest extends TestCase
                 )
         );
 
-        $store->commit($data);
+        $store->commitAll($data);
 
         $object = new Item();
         $object->id1 = 1;
@@ -565,7 +565,7 @@ class MemcachedTest extends TestCase
 
         $data = array($key1 => $value1);
 
-        $store->commit($data);
+        $store->commitAll($data);
 
         $object = new Item();
         $object->id1 = 1;
@@ -663,7 +663,7 @@ class MemcachedTest extends TestCase
         $store = $this->createStore();
         $data = array($key1 => $value1, $key2 => $value2);
 
-        $store->commit($data);
+        $store->commitAll($data);
 
         $object = new Item();
         $object->id1 = 1;
@@ -816,7 +816,7 @@ class MemcachedTest extends TestCase
                 )
         );
 
-        $store->commit($data);
+        $store->commitAll($data);
 
         //when
         $object = new Item();
@@ -889,7 +889,7 @@ class MemcachedTest extends TestCase
                 )
         );
 
-        $store->commit($data);
+        $store->commitAll($data);
 
         //when
         $object = new Item();

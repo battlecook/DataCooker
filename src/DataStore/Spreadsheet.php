@@ -288,7 +288,7 @@ final class Spreadsheet extends AbstractStore implements IDataStore
         self::$columnsMap = array();
     }
 
-    public function commit($data = null)
+    public function commitAll($data = null)
     {
 
     }
