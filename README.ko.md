@@ -231,7 +231,7 @@ $ret = $store->set($object);
 
 ##### progress2 #####
 ```php
-$store->commit();
+$store->commitAll();
 ```
 ##### after2 #####
 ```

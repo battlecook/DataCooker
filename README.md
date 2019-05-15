@@ -234,7 +234,7 @@ after status in database
 
 ##### progress2 #####
 ```php
-$store->commit();
+$store->commitAll();
 ```
 ##### after2 #####
 ```
