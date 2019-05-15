@@ -103,7 +103,7 @@ class ComplexTest extends TestCase
     {
         //given
         $buffered = new Buffered();
-        $buffered->convert();
+        $buffered->convertAll();
 
         $store = new Buffered(['store' => new RelationDatabase(Option::getDatabaseOption())]);
 
@@ -126,7 +126,7 @@ class ComplexTest extends TestCase
         $object2->attr3 = 2;
         $store->set($object2);
 
-        $store->commit();
+        $store->commitAll();
 
         //then
         $ret = $store->search(new Item());

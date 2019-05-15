@@ -44,7 +44,7 @@ final class MockStore extends AbstractStore implements IDataStore
         // TODO: Implement remove() method.
     }
 
-    public function commit($data = null)
+    public function commitAll($data = null)
     {
         // TODO: Implement commit() method.
     }

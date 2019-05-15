@@ -25,13 +25,13 @@ final class Buffered extends AbstractStore implements IDataStore
      */
     public function __construct(array $option = array())
     {
-        if(empty($option) === false) {
-            if(isset($option['store']) === true) {
-                if(($option['store'] instanceof IDataStore) === false) {
+        if (empty($option) === false) {
+            if (isset($option['store']) === true) {
+                if (($option['store'] instanceof IDataStore) === false) {
                     throw new DataCookerException("store option have to be IDataStore instance.");
                 }
 
-                if($option['store'] instanceof Buffered) {
+                if ($option['store'] instanceof Buffered) {
                     throw new DataCookerException("BufferedDataStore can't be exist for other DataStore.");
                 }
                 $this->store = $option['store'];
@@ -42,28 +42,6 @@ final class Buffered extends AbstractStore implements IDataStore
             self::initialize();
         }
     }
-
-    /**
-     * Buffered constructor.
-     * @param array $option
-     * @throws DataCookerException
-     */
-    /*
-    public function __construct(array $option)
-    {
-        if(isset($option['store']) === true && $option['store'] instanceof IDataStore) {
-            $this->store = $option['store'];
-
-            if($this->store instanceof Buffered) {
-                throw new DataCookerException("BufferedDataStore can't be exist for other DataStore.");
-            }
-        }
-
-        if (empty(self::$bufferedData) === true) {
-            self::initialize();
-        }
-    }
-    */
 
     /**
      * @param $cacheKey
@@ -232,7 +210,7 @@ final class Buffered extends AbstractStore implements IDataStore
      * @param null $data
      * @throws DataCookerException
      */
-    public function commit($data = null)
+    public function commitAll($data = null)
     {
         if ($data !== null) {
             throw new DataCookerException("BufferedDataStore can't commit to data");
@@ -247,17 +225,26 @@ final class Buffered extends AbstractStore implements IDataStore
         $this->initialize();
     }
 
-    public function convert()
+    public function convertAll()
     {
-        foreach(self::$addedObjectGroup as $addedObject) {
+        foreach (self::$addedObjectGroup as $addedObject) {
             $this->store->remove($addedObject);
         }
 
         $this->initialize();
     }
 
-    private function initialize() {
+    public function commit($object)
+    {
+    }
 
+    public function convert($object)
+    {
+
+    }
+
+    private function initialize()
+    {
         self::$addedObjectGroup = array();
         self::$bufferedData = new PhpMemory();
     }

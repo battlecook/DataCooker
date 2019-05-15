@@ -20,7 +20,7 @@ class BufferedTest extends TestCase
         AbstractStore::initializeCachedMeta();
 
         $buffered = new Buffered();
-        $buffered->convert();
+        $buffered->convertAll();
     }
 
     /**
