@@ -94,8 +94,18 @@ DataStore provides six interface (get, search, set, add, remove, commit)
 
 
 ```php
-$store = new RelationDatabase(['store' => null,
-                               'hosts' => [['ip' => 'localhost', 'port' => 3306, 'dbname' => 'DataCooker', 'user' => 'root', 'password' => 'password']]]);
+$store = new RelationDatabase([
+            'store' => null,
+            'hosts' => [
+                [
+                    'ip' => 'localhost',
+                    'port' => 3306,
+                    'dbname' => 'DataCooker',
+                    'user' => 'root',
+                    'password' => 'password'
+                ]
+            ]
+        ]);
                          
 $object = new Item();
 $object->id1 = 1;
