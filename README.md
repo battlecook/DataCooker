@@ -13,7 +13,7 @@ Relation Database : Pdo-managed database
 
 KeyValue Store : memcached, redis, apcu
 
-Read this in other languages : [한국어](README.ko.md)
+Read this in other languages : [korean](README.ko.md)
 
 ## How to install
 
